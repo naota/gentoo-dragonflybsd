@@ -1,0 +1,20 @@
+# Default configuration for non-set values
+#
+# As stated in sandbox.conf, any value in here do not get used if the variable
+# is already present in the environment.  All rules of the ACCESS Section
+# applies here.
+#
+# Also note that SANDBOX_WORKDIR is a special variable that is just set if
+# sandbox is run interactive (ie, no commandline options), and points to the
+# current directory.
+
+# Normally the whole filesystem should be readable
+SANDBOX_READ="/"
+
+# Finally add current directory if interactive
+SANDBOX_WRITE="${SANDBOX_WORKDIR}"
+# Needed for configure tests
+SANDBOX_WRITE="/usr/tmp/conftest:/usr/lib/conftest:/usr/lib32/conftest:/usr/lib64/conftest:/usr/tmp/cf:/usr/lib/cf:/usr/lib32/cf:/usr/lib64/cf"
+
+# Usually writes in /home should not cause violations
+SANDBOX_PREDICT="${HOME}"

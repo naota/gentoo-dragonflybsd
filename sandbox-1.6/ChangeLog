@@ -1,0 +1,4988 @@
+commit a16aafdc36375779454e5efbc0f2d3c2fe6880f0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 07:25:40 2009 -0400
+
+    sandbox: dont put duplicate sandbox.so into LD_PRELOAD
+    
+    If launching another sandbox instance, don't blindly append LD_PRELOAD
+    with the sandbox lib.
+    
+    URL: http://bugs.gentoo.org/216942
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Brian Harring <ferringb@gmail.com>
+
+commit e47edf067cbd939ac8285f87f6fab06baaccbbfb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 06:47:45 2009 -0400
+
+    libsandbox: unify getcwd wrapper with common wrappers
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 950960a7be813854495c5e7420ff5ef9d674c662
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 02:57:49 2009 -0400
+
+    libsandbox: add debug output for all wrapper early-checks
+    
+    If a wrapped function bails early due to some local logic, make sure we
+    log this at the debug level.  Having them silently return on us makes
+    tracking down problems harder than it needs to be.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 55ab6bd7a8056fc1c4c4a2ab3f76c2664b44ed1d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 02:57:07 2009 -0400
+
+    tests: make sure non-root mkdir works with funky perms
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit cfbf35136d5ebce4e0db6032f3c0b1ad423871d6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 06:27:44 2009 -0400
+
+    sandbox: pass shell exit status up
+    
+    If the command sandbox was instructed to execute failed, make sure we pass
+    that exact exit status back up instead of normalizing everything to 0/1.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 03fd3b504458cee4da623c5ec56b73e7385514dc
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 08:46:04 2009 -0400
+
+    tests: filter SANDBOX_PREDICT
+    
+    Portage sometimes sets up a predict for / when running tests.  Filter that
+    out since we don't need that kind of helping hand, and we want to test the
+    exact behavior of sandbox.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2ed9392befadf6e31ef85d9d35f8136d58d8b10f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 02:34:08 2009 -0400
+
+    libsandbox: handle unreadable dirs better as non-root
+    
+    If attempts to access the specified path fails, this is most likely due to
+    funky perms being setup.  Since this is really only an issue for non-root
+    users when testing stuff (like the coreutils tests), we can let the real
+    func do it's work when running as non-root.  If the path contains links to
+    some place we would normally deny, then attempt to dereference what little
+    we can.  If all else fails, the standard unix permissions will prevent
+    damage from being done even if we are unable to log it.
+    
+    URL: http://bugs.gentoo.org/259876
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit 6379fe3837553bba9e16fbb94cbce31bcb3c79e4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 02:11:06 2009 -0400
+
+    libsandbox: handle long paths with *at funcs
+    
+    If a path is too long, then attempting to read the fd link in /proc/*/fd/#
+    will fail with ENAMETOOLONG.  In that case, we should restore errno and
+    let the normal function do its business.  Chances are we wouldn't have
+    gotten this far in the first place if there was an actual deny in place.
+    This fixes some of the testcases in coreutils that create really long
+    paths and then test things.
+    
+    URL: http://bugs.gentoo.org/259876
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit f0d5c16506df22e31460994dba79a244b42b5198
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 12 01:59:08 2009 -0400
+
+    tests: unify some m4 logic into common code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 38e0893522c1cafcc680785986df522224c468c9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 12:42:54 2009 -0400
+
+    bump to sandbox-1.6
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bfc40d010a7e8029e706c9f7b3d5fab3be010acd
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 12:14:39 2009 -0400
+
+    tests: do not run shell script tests for non-native ABI
+    
+    Since the shell scripts rely on /bin/sh, we can only test libsandbox.so
+    that matches the ABI of the shell interpreter.
+    
+    URL: http://bugs.gentoo.org/259244
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Joshua Doll <joshua.doll@gmail.com>
+
+commit 2c1aff83232f621b73b4fb093d6a296851500b36
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 11:42:26 2009 -0400
+
+    libsandbox: improve debugging support
+    
+    Dump symbols before we abort and if SANDBOX_GDB is enabled in the env,
+    automatically launch & attach gdb to the crashing setup.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f97f3d9a39e86b6de3fda3dc0f8470907bbb0ce8
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 11:40:54 2009 -0400
+
+    libsandbox: do not restore errno in resolve_path() error path
+    
+    If resolve_path() was unable to resolve things, then do not restore the
+    errno value as we use this to signal higher layers.  This should make the
+    getcwd tests behave better.
+    
+    URL: http://bugs.gentoo.org/261936
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit 5071f86083ca028e86500ec2459894e57245ad05
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 10:35:38 2009 -0400
+
+    libsandbox: add more exec wrappers
+    
+    While the execvp() is a common entry point, the other ones are often used
+    as well.  While they don't take environ pointers directly, the env could
+    have been modified before calling the exec function, which means we need
+    to restore our LD_PRELOAD setting.
+    
+    So now we support execv/execve/fexecve/popen/system.  Missing from this
+    list are the execl* funcs, but that's because they aren't exactly easy to
+    interpose with the structure of their variable arguments.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 99e318c1a2640091204f970a2e9ff4bdc238980d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 11 07:28:09 2009 -0400
+
+    libsandbox: dump exec QA static notice to /dev/tty
+    
+    Rather than dump the QA static notice to stderr when trying to execute a
+    static binary, write directly to /dev/tty.  This prevents breaking things
+    like testsuites that validate the exact stderr output.
+    
+    URL: http://bugs.gentoo.org/261957
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Kent Fredric <kentfredric@gmail.com>
+
+commit 351ad06156e3bc3368ba94ff1c0ba3eda5237403
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Mar 10 03:42:20 2009 -0400
+
+    improve configure argument recording
+    
+    Use ac_configure_args as autoconf sets that up for us rather than trying
+    to record "$@" ourselves.  The latter may be corrupted by config.site
+    scripts.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7a9e77597977a44acf91c024410a30c31612c85f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Mar 9 05:57:12 2009 -0400
+
+    tests: convert `touch` to `open-0`
+    
+    Convert the `touch` test to use our `open-0` util so we get fine grained
+    control over the test and so we don't have to worry about localization
+    issues or about system-specific messages.
+    
+    This also extends the test framework to start parsing symbolic open()
+    flags as well as errno values (and add support for checking them).
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7fa9c03083e90cdb8476ff3dc8154572d71aa852
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Mar 9 05:53:40 2009 -0400
+
+    bump common macros up to localdecls.h so tests can use them
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 80bcecc4ddeefa5c76c64a70c98e60dd4cfc1948
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Mar 9 04:38:57 2009 -0400
+
+    tests: do not sscanf("%i", mode_t)
+    
+    Since not all systems have sizeof(int) == sizeof(mode_t), we do not want
+    to use scanf("%i") to parse a mode_t size.  Otherwise we might corrupt the
+    stack.  This happens on FreeBSD for example.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f23accf481631692b85e503949c4e73f13b86b9e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Mar 9 04:38:42 2009 -0400
+
+    tests: avoid warnings when cleaning
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b011b2f8ed359960f6d1dabe374b0dc266752e19
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Mar 8 21:32:00 2009 -0400
+
+    libsandbox: improve static ELF notice
+    
+    Rather than just dumping the name of the static ELF, include the arguments
+    to the program as well.  For common programs (that are known to be safe),
+    don't bother whining (like using the static ldso to verify binaries).
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d845565cbb879a297dfba2fe7ec069ea8995afb7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Mar 8 08:56:46 2009 -0400
+
+    bump to sandbox-1.5
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7926384647f176889ec2e64e2351758b3d9bd099
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Mar 8 08:21:22 2009 -0400
+
+    sandbox: delete the testing var after install
+    
+    We don't want people to bypass normal mechanisms with the testing var, so
+    zero out the name when installing the sandbox binary.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d4dee0ebe39627e9d3b90c312f770d7ba73a46f5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Mar 8 07:35:32 2009 -0400
+
+    tests: add symlink tests and unify code
+    
+    Add test cases for symlink behavior and unify some of the test code to
+    make adding more test cases even easier.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7b0b914b4ea0e594867bad91fe1aaffa0c21d87b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Mar 8 07:14:17 2009 -0400
+
+    libsandbox: handle symlinks properly
+    
+    Make sure we handle edge cases that involve symlinks and functions that
+    operate on symlinks.  This includes newer style *at functions that can go
+    between operating on symlinks and operating on the linked files, and on
+    symlinks to files that live in explicitly denied paths.
+    
+    URL: http://bugs.gentoo.org/254914
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Mike Auty <ikelos@gentoo.org>
+
+commit 31e552065c41abbba77cf92717533c5d8f2a98e0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Mar 7 01:44:45 2009 -0500
+
+    libsandbox: push errno save/restore down in openat()
+    
+    Minor optimization to not bother saving/restoring the errno if we don't
+    actually call another C library function.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c88c17569e39170feb5f0b2a87cd66d3203c6acb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Mar 5 00:25:40 2009 -0500
+
+    add a test case for previous commit
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 681af0011c665c0cb6f4048c91257553a9b4405a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 4 23:52:15 2009 -0500
+
+    bump to sandbox-1.4
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit aad0a25b8708a06171a4703a2f28d7da68be78c7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Mar 4 23:43:28 2009 -0500
+
+    libsandbox: save/restore errno for hardened
+    
+    Since hardened systems may return -1 in the case of an error, but this
+    isn't a "real" error, we need to save/restore errno.  Otherwise we corrupt
+    the errno value of the caller.  This is a regression on hardened systems
+    due to the recent commit bab59e2c which optimized symbol loading a bit.
+    
+    URL: http://bugs.gentoo.org/260765
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Magnus Granberg <zorry@ume.nu>
+
+commit 3f36f0ce46a85a7f60afb33e251782af99eec015
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 02:31:19 2009 -0500
+
+    libsandbox: unify openat and __wrapper_simple
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ff0dd36d8f038d29d72f0d5d7c43edaa4c2385bc
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 02:30:03 2009 -0500
+
+    libsandbox: unify creat/creat64 wrappers
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 40ac0686125f8a272346a546deb67a2c6f8ba843
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 02:29:51 2009 -0500
+
+    libsandbox: use sb_unwrapped_open() in creat wrapper
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4efa009dff3dca0d9ca31e71524491e150c53666
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 02:07:06 2009 -0500
+
+    handling NEWS is a pain, so stub it
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a9c1684b89ae38fed99f1622a72406f9a00097f9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 01:56:02 2009 -0500
+
+    bump to sandbox-1.3.9
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 15c12529fc53816d514d56a34e810ee010130c0b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 01:47:23 2009 -0500
+
+    libsandbox: add wrappers for _FORTIFY_SOURCE funcs
+    
+    When glibc is compiled with optimization and higher _FORTIFY_SOURCE
+    levels, the headers redirect dynamic calls to the open*() functions to the
+    __open*_2() functions.  The latter provides runtime checking.  But this
+    means we also need to wrap the latter forms in order to get sandbox
+    checking on the open() functions.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d11b0104fd8f8c60430e377f62964e05482292f3
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 20 01:26:41 2009 -0500
+
+    scripts: disable wrappers for weak __XXX symbols
+    
+    Since there doesn't seem to be a use for wrapping the __XXX weak symbols,
+    and things aren't using these in normal glibc/uClibc code, stop attempting
+    to handle them.  This should work around the FreeBSD infinite recursion
+    issue as well (their getcwd() calls __getcwd(), both of which are public
+    symbols).
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9e67456ccba9bf8e5c5d37e91c5822f1b63e2f8c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 17:41:40 2009 -0500
+
+    do not fail autogen step if autoconf-archive is not installed
+    
+    Rework the shell code slightly so a missed grep does not trigger the -e.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3fe37bef53db60e21a4f9caea14da05a21273499
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 16:13:16 2009 -0500
+
+    tests: use $AWK rather than awk
+    
+    The configure scripts will try hard to set up AWK as GNU awk which is what
+    we want/need in the sb_printf test.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit eda3df296ed9ec5b885172d53b02fde5cef2a2a1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 15:49:47 2009 -0500
+
+    add configure checks for the 64bit lfs funcs as well
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7b0076ad9a24f29da59146c345801b142cfe1368
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 15:34:28 2009 -0500
+
+    add checks for signal() return types
+    
+    Some systems use sighandler_t while others use sig_t.  Add a configure
+    check so that we can assume sighandler_t is always available.
+    
+    URL: http://bugs.gentoo.org/259507
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Javier Villavicencio <the_paya@gentoo.org>
+
+commit 35aad022be07f5c8cca4de9a9c71480157275800
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 15:17:36 2009 -0500
+
+    include the m4 files from the autoconf-archive package
+    
+    Not everyone has the autoconf-archive package installed, so have the
+    autogen.sh script automatically update the local copies and include them
+    in the tree.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4ff12b76f2ebf13ac079e733635fcea832631966
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 02:05:08 2009 -0500
+
+    libsandbox: lock main syscall code with a mutex
+    
+    Since the main sandbox code maintains state with global variables (like
+    sbcontext), make sure we use a pthread mutex to prevent multiple threads
+    from corrupting each other.  In the non-threaded case this shouldn't be
+    a problem as the C library provides redirection stubs in its own code.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9483901c8f7dff552dc26c0b3532f8e5065a5f61
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 02:02:10 2009 -0500
+
+    libsandbox: shuffle/unify local prototypes
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 111add353415f7ec08207ef1654327c19887e189
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 01:53:16 2009 -0500
+
+    libsandbox: avoid recursion by using sb_unwrapped_access()
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4141146ff8cf41a6a3ccd7a4580d0814698429e9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 01:52:09 2009 -0500
+
+    libsandbox: convert internal open func to sb_unwrapped_foo style
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 22e29a3ae6cc4cee0b8a96113be2cd147f277e6e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 01:50:04 2009 -0500
+
+    libsandbox: convert internal getcwd func to sb_unwrapped_foo style
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 72c4aa8d9f0f96c3c58c5d3d1f50066b386f0924
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 01:44:51 2009 -0500
+
+    libsandbox: create hidden targets for most functions
+    
+    In case we want to access a standard function unwrapped, create hidden
+    functions that do just that.  This creates a standard for most functions
+    of the form sb_unwrapped_foo().
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 140a83e17f20e5a6fecc1a73a629aed52e16036a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 00:45:50 2009 -0500
+
+    libsandbox: simplify WRAPPER_PRE_CHECKS() a bit
+    
+    Remove some of the ugly indirection in the WRAPPER_PRE_CHECKS() defines so
+    it operates like a normal C function -- much easier to work with those.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 90df3741ced48554bcd113dc40599b8ea2972e1a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 00:43:14 2009 -0500
+
+    libsandbox: tweak errno handling in fopen() wrapper
+    
+    No point in saving/restoring the errno value if we don't make any C lib
+    function calls.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bab59e2ccd4c4c6d05854f5c2459439bb85be336
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 18 00:37:57 2009 -0500
+
+    libsandbox: do save/restore errno in sym lookup
+    
+    If the symbol lookup function failed, then we abort.  If the lookup
+    worked, then errno is not touched.  In either case, there is no need to
+    save/restore the errno value.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e764d4fcb66a0b3483d48d046d84b660837ae09b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Feb 17 22:16:08 2009 -0500
+
+    drop unused local GLIBC_MINOR define
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 22057035f812a717be2a90e9b63ae7df2952089d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Feb 17 21:21:51 2009 -0500
+
+    fix environ check
+    
+    AC_CHECK_DECL will always create the relevant define and only differ in
+    the actual value (0 or 1).
+    
+    URL: http://bugs.gentoo.org/258365
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Javier Villavicencio <the_paya@gentoo.org>
+
+commit be2ba9ef57cdca2a6b0c18f42e7b5b7da17b9599
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 15 02:09:39 2009 -0500
+
+    libsandbox: update ENAMETOOLONG comments to match egetcwd() changes
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1d27d86ddfeefd6b6efe38e45740a6835527e7cb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 15 01:46:25 2009 -0500
+
+    libsandbox: convert more code to stdbool to simplify things
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c2eee93088aad4876c2f25fcb78d67ad18ffa425
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 15 01:08:00 2009 -0500
+
+    libsandbox: calculate longest symbol name dynamically
+    
+    The longest wrapped symbol name has hit the hard limit of 10 chars, so
+    rather than manually bump it up, calculate it on the fly with the awk
+    scripts.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 41621f114dcf879c45ae982c8c9796c4b050d4db
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 15 00:28:09 2009 -0500
+
+    libsandbox: make sure all mknod symbols are wrapped
+    
+    The mknodat() symbol on glibc is rewritten to __xmknodat(), so we need to
+    wrap that and check for all of them in the check_access() code.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 743b7fb6e4057edba5cffac6357a6e45f0577117
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 14 22:43:54 2009 -0500
+
+    libsandbox: simplify clean_env_entries a bit
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7fb487afc465b1c98f73717a16601029877ee561
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 14 22:35:01 2009 -0500
+
+    libsandbox: fixup egetcwd() a bit
+    
+    If lstat() worked, it won't clear errno for us, so we have to do it.  Also
+    unify the error code paths.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ec848fdee7c16ff19c3ed87b2de49c6f9ebfcda6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 14 22:26:42 2009 -0500
+
+    libsandbox: move cached_env_vars into .bss
+    
+    No point to allocating cached_env_vars dynamically since we allocate it
+    once during init and it's only 4 pointers.  Stick it into the bss instead.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7b75eafeb73f70f56de1b90eb7a874fd21fd852f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 14 03:30:16 2009 -0500
+
+    libsandbox: handle ENAMETOOLONG properly with getcwd()
+    
+    The core libsandbox code was checking for ENAMETOOLONG when working with
+    getcwd() and doing the right thing, but it never passed this error back up
+    to the caller.  This would make some tests (like the getcwd tests in many
+    gnulib/autotool based packages like coreutils) to keep on trying since it
+    did not detect the expected failure conditions.  So now when we hit the
+    ENAMETOOLONG error, we pass this specific error back up to the caller.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5839c817cc69d8e49e603502edbcd14b64f7523a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 14 02:53:29 2009 -0500
+
+    bump to sandbox-1.3.8
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 541bbacc5a7b5f2f98ce9b64d05b8e3bb94ca211
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Feb 13 02:34:53 2009 -0500
+
+    libsandbox: do not call x*() memory funcs in memory replacement code
+    
+    As Maximilian points out, the internal memory funcs in libsandbox are
+    already called by the x*() type funcs which means error checking occurs at
+    the higher level.  So we don't want to do it at the inner level either as
+    that will lose the real file/location where the memory allocation occured.
+    
+    URL: http://bugs.gentoo.org/257179
+    Signed-off-by: Maximilian Grothusmann <maxi-gentoo@own-hero.de>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a022869c9ba2782efa3693e3559a416e010c2a26
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 12 18:49:56 2009 -0500
+
+    tests: simplify script-2.sh a bit
+    
+    Since the autotest framework automatically creates private dirs for each
+    test, we don't need to do it ourself.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 515cb60c9aecff2d10c691f7fc5779f53fa97541
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 12 18:41:41 2009 -0500
+
+    sandbox: do not dist sandbox.sh and clean up error messages
+    
+    The sandbox.sh file is generated now, so do not mark it as a dist target.
+    To make this kind of error easier to figure out in the future, have all
+    sandbox errors related to files include the full filename that is causing
+    an error.
+    
+    URL: http://bugs.gentoo.org/258690
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Alexis Ballier <aballier@gentoo.org>
+
+commit 0c93216363511f5d24bba0ece697b32d59bd78fa
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 12 18:34:06 2009 -0500
+
+    disable tests for unavailable funcs
+    
+    Not all systems implement the full range of functions we wrap, so we
+    shouldn't require them in the test suite either.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4df4394aaae2b718b347c4d0b1804e1d294e5f56
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 12 02:42:25 2009 -0500
+
+    sandbox: check signal returns and allow SIGHUP to be ignored
+    
+    If the SIGHUP signal is already set to SIG_IGN, then do not replace it
+    with our own handler as most likely this means the user is using `nohup`.
+    As for the other signals, check the return value and warn if something
+    weird happens (like they aren't all set to SIG_DFL).
+    
+    URL: http://bugs.gentoo.org/217898
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ken Bloom <kbloom@gmail.com>
+
+commit 23eb90e6b96fc9a448dd9fba7640733fa578ce47
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 12 02:22:58 2009 -0500
+
+    add testcase for old PATH bug
+    
+    Also fix common script execution code to remove debug "moo" string and
+    disable pointless sleep code in sandbox.
+    
+    URL: http://bugs.gentoo.org/139591
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ciaran McCreesh <ciaran.mccreesh@googlemail.com>
+
+commit 90815cf76eb715a21af1bf7c4c55bd8239329807
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Feb 10 19:40:37 2009 -0500
+
+    bump to sandbox-1.3.7
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 86b8059f3484b9a67a5e5ae1a46fc5b1b3c0efae
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 9 19:23:24 2009 -0500
+
+    provide environ decl if system sucks and doesn't do it for us
+    
+    URL: http://bugs.gentoo.org/258365
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Dan Coats <admin@easyshellz.com>
+
+commit 3aadb01e8252557563baaa469cb986fa7ccf11c6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 8 00:48:36 2009 -0500
+
+    tests: get scripts working in sandbox.sh
+    
+    Make sure we source the local sandbox.{bashrc,conf} and we always make the
+    helper functions available when testing even if we aren't interactive.  Now
+    we can run `make check` and test the local version of sandbox even when we
+    are running under another sandbox env.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a16fad96ea5de993cca61753198db43789156c7e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 8 00:47:05 2009 -0500
+
+    sb_printf: get z modifier working and fixup tests
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0f7ed37fdc1d7c98328536db372ec6b7a49c0d5e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 22:39:22 2009 -0500
+
+    libsandbox: let real funcs handle non-existent paths (part 2)
+    
+    Let real funcs do their magic even before predicted paths.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3b6b39b9a7f44af3669ef6618e940851a3b983bf
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 21:56:06 2009 -0500
+
+    bump to sandbox-1.3.6
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 00dc6a461d15aeb6dfad4ca7e61b38f9375bc203
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 21:49:11 2009 -0500
+
+    libsandbox: fix sandbox /proc/self/fd regression
+    
+    The optimize changes added after 1.3.2 were not entirely correct.  The
+    sandbox /proc/self/fd check was changed to check for the dir itself rather
+    than allowing all paths that started with the dir.  So let's comment more
+    about what's going on and fix it up.
+    
+    URL: http://bugs.gentoo.org/257418
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit f808b78fa2bfe7e9893c3a79f87bca8a3a6455bb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 21:45:13 2009 -0500
+
+    libsandbox: fix sandbox log dir regression
+    
+    The optimize changes added after 1.3.2 were not entirely correct.  The
+    sandbox log dir check was changed to check for the dir itself rather than
+    blacklisting all paths that started with the dir.  So let's comment more
+    about what's going on and fix it up.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4f4ac7dae9efdca7db226c8c56a240eff5d5db9f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 19:34:50 2009 -0500
+
+    tests: add some more test scripts
+    
+    Some helper scripts for automating git bisection, and add a test case for
+    /dev/fd/ regression.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1f835b90585676e3f87608e94a6500b8732b4b45
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 16:43:43 2009 -0500
+
+    sandbox: fix typo in struct sandbox_info_t decl
+    
+    A "typedef" was missing when declaring the sandbox_info_t struct resulting
+    in a large unused "sandbox_info_t" object showing up everywhere.  Normally
+    this isn't a problem (other than resource waste), but some systems don't
+    like multiply defined objects even if they're in the .bss section.
+    
+    URL: http://bugs.gentoo.org/258031
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Timo Kamph <timo@kamph.org>
+
+commit 5b39935d5dbaff7c93844fb0bbb048ab25dd8563
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 07:11:21 2009 -0500
+
+    bump to sandbox-1.3.5
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit dbf1c6bd951a2d30a78a4cdf183e2361a0b52400
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 07:05:59 2009 -0500
+
+    libsandbox: ignore *.py[co] files for now
+    
+    A very common bug (apparently) is for .py[co] files to fall out of sync
+    with their .py source files.  Rather than trigger a hard failure, let's
+    just whine about it.  Once python itself gets sorted out, we can drop
+    this.
+    
+    URL: http://bugs.gentoo.org/256953
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 28d7ee79e8a6bb8823eaf7b725eeaeb1bd94d8eb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 06:48:10 2009 -0500
+
+    libsandbox: fix call to backtrace()
+    
+    The size argument to backtrace() is the number of elements, not the number
+    of bytes.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 969d7480ea15d36c5fdd10827b30d22c81bd2eb5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Feb 7 06:38:46 2009 -0500
+
+    libsandbox: fix minor memleak from cmdline simplification
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c68e1f174ef60d3d75b14a7780368598f6cbdaf9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 5 01:53:36 2009 -0500
+
+    gen_symbol_version_map.awk: filter out more symbols
+    
+    Ignore symbols that are not functions, or do not have the proper binding
+    and/or visibility for us to override.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0a6857ff4b2adbb3f27eccf724cfdc934ab918ea
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 5 01:52:40 2009 -0500
+
+    pull in siginfo.h when available
+    
+    Some systems define psignal() in siginfo.h, so use it when available.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5f0d95f6bee4d81655603fc83b29c80918459a0b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Feb 5 01:31:07 2009 -0500
+
+    libsandbox: detect linker flag for version scripts
+    
+    Support --version-script and -M flags for passing version scripts.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 30255588cd23d0be9dda3d5f385ea27c8f9d67f1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 4 22:55:51 2009 -0500
+
+    libsandbox: use xxx_t types with __xmknod
+    
+    Use the public xxx_t types rather than the internal __xxx_t.  The former
+    are more portable.  With glibc systems, these are the same anyways.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7238cb1a6077705cfb585ddedbdabf5ebf38201e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 4 22:55:44 2009 -0500
+
+    libsandbox: add _xmknod wrapper point for __xmknod
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e170e9771355e80fdab6547fd54a33e7a9bf8a0c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Feb 4 20:13:04 2009 -0500
+
+    support the OpenSolaris toolchain
+    
+    If the linker doesn't support -Wl,--verbose (such as the linker in
+    OpenSolaris), then try using -Wl,-M and parse the linker map for libc.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 60dd15b1cd4beb1472d559550782d767b78604c1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 2 02:12:28 2009 -0500
+
+    sandbox: new sb_{p,}err() helper functions
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ff1976a7b23b583ec9e9b17a6b2953b1258f78c5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 2 02:05:24 2009 -0500
+
+    sandbox: fixup a few more NULL memory checks
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1001c5ed6854cad1bf52b8b59e3a1a084600b8c6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 2 01:54:25 2009 -0500
+
+    libsandbox: let real funcs handle non-existent paths
+    
+    If no explicit deny exists on a path, and some leading components of the
+    path do not actually exist, pass the path on to the actual function when
+    we know said functions will fail.  For example, many tests operate on some
+    kind of path where the leading components do not exist.  Such as the m4
+    test that tries to do fopen("/none/such", "w") and the /none/ dir does not
+    actually exist.  Since we know /none/ does not exist, let through funcs
+    that will fail in this case.
+    
+    URL: http://bugs.gentoo.org/244396
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit 12117c5a9410793d21ae4aa37e9133c0ab1e6c7e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 2 00:35:02 2009 -0500
+
+    build with --as-needed by default
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 920b65fa516e0430258d2b9d7c64f6a82efbe655
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 15:34:40 2009 -0500
+
+    sandbox/libsbutil: remove more useless error checks and var inits
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a82b13d844b3362021b90df86c10be6dda72f185
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 14:55:36 2009 -0500
+
+    sandbox: convert remaining perror to sb_pwarn
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit cc079307a39019c59b4b114e0133c267198e35de
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 13:55:56 2009 -0500
+
+    build with --gc-sections by default
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a3877e55eb25e1206d780869a5425f3adb3ceace
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 13:55:36 2009 -0500
+
+    AUTHORS: fix Geert and Brads e-mail address and sort it
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9fe6d7b99e77c259a53820885e9e2423585c402f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 03:14:31 2009 -0500
+
+    sandbox: unify/standardize message output functions
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 14167287a8afc9ba66ec51f5a47b0c331c95e09d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:57:56 2009 -0500
+
+    sandbox: remove unused /var/tmp dir handling
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e9eb2df4855a8e9a5e96d15850b6bc2bb0da1e17
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:44:47 2009 -0500
+
+    libsandbox: drop unused rc_log_domain
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 220cf5fed1d0e3f3818e68735af0e7d26e1dd346
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:39:55 2009 -0500
+
+    libsandbox: use -avoid-version
+    
+    Since we don't care about library versioning (as we always just preload
+    the libsandbox.so file), don't bother including it in the SONAME.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 97323794fa9faf5d8d939024cf7a90fa8fc80ad9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:37:14 2009 -0500
+
+    libsandbox: combine consecutive write statements
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c172de371192102aeeac0b1e51ef9a8cb3c231a6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:29:04 2009 -0500
+
+    libsbutil: cull more unused debug/string code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 8cb975fd5dcd9d22c986bee924b7d713b797db60
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:28:48 2009 -0500
+
+    sandbox: declare all local funcs static
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b010b6f06fb73850edfa54107b4ce1f4ef59cb1b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:27:30 2009 -0500
+
+    sandbox: simplify print_sandbox_log() function
+    
+    Avoid memory management issues and read/write the log file directly to
+    stderr.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 6b0d80b98ba7da7facd9b4be901905fe25516d11
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Feb 1 02:24:04 2009 -0500
+
+    libsandbox: simplify cmdline reading to avoid strndup
+    
+    Rather than dynamically allocating memory via dynbuf and reading the
+    cmdline into that (and thus calling strndup), just read/write the cmdline
+    straight into the log file.
+    
+    URL: http://bugs.gentoo.org/257179
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Maximilian Grothusmann <maxi-gentoo@own-hero.de>
+
+commit c688d9325b44f2593a425236da5f5dc1fea09c24
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Jan 29 23:10:09 2009 -0500
+
+    libsandbox: test for mknod separately from xmknod
+    
+    When optimizing the string calls, mknod was commented out due to it not
+    being available by default on Linux, but that's not really correct.  Now
+    that things are all available, make sure we check it.
+    
+    URL: http://bugs.gentoo.org/256825
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Tested-by: Javier Villavicencio <the_paya@gentoo.org>
+
+commit eae354957cf66484f85e1e63d594ab4c372a60bd
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Jan 29 11:21:48 2009 -0500
+
+    use AX_CFLAGS_WARN_ALL from autoconf-archive
+    
+    Rather than doing our own toolchain detection for warning flags, just use
+    the AX_CFLAGS_WARN_ALL macro from the autoconf-archive package.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit dddd2da9feeeba54b3b75d345f2f38ba20e7d47a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Jan 29 11:13:12 2009 -0500
+
+    libsbutil: setup {offsetof,MIN,MAX} helper macros if they dont exist
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit cc2d53c4c09e0ddb1b6de3243bf4eebe3b79c58f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Jan 29 03:01:20 2009 -0500
+
+    configure: dont bother building libctest with -Wall
+    
+    We don't actually care about the code, so don't bother using -Wall.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a16c2b178f6cd5591fd11f8497d2e570d81e9b06
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Jan 29 02:20:22 2009 -0500
+
+    libsbutil: add fallback strndup() implementation
+    
+    Not all systems provide strndup() in their C library, and getting rid of
+    the last consumer is a bit painful atm, so just provide a simple
+    replacement.
+    
+    URL: http://bugs.gentoo.org/256741
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Javier Villavicencio <the_paya@gentoo.org>
+
+commit 25ec463eb4ba49c2c82ad0e7e82ed48799be4f4d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Jan 28 22:34:05 2009 -0500
+
+    sandbox: use $(LIBDL) rather than -ldl
+    
+    URL: http://bugs.gentoo.org/256741
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Javier Villavicencio <the_paya@gentoo.org>
+
+commit dd6cb02ea383046a054e6b50d893da2056eab3d9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Jan 27 20:18:52 2009 -0500
+
+    bump to sandbox-1.3.4
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a0d188683e1dd95a53856b418fa5a6aa24bf3cd7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Jan 26 00:53:26 2009 -0500
+
+    sandbox.d: drop settings that packages should be handling
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ec3bfe9a8c11f9dec94871feb11c492a443469d2
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Jan 26 00:53:04 2009 -0500
+
+    libsandbox: include errno value in internal error messages
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1d8dac7eee63b01e70239872e297d60994f08865
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Jan 26 00:50:16 2009 -0500
+
+    libsbutil: find libsandbox.so in non-standard paths
+    
+    If installing sandbox into a non-standard location (and the library ends up
+    in a non-standard path where the ELF loader does not search), then set the
+    LD_PRELOAD variable to the full path.
+    
+    URL: http://bugs.gentoo.org/254358
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Jeremy Olexa <darkside@gentoo.org>
+
+commit 900b62ee39e93b58c87e0bad6430458b5ab5e440
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Jan 9 18:33:46 2009 -0500
+
+    sandbox.bashrc: provide simple fallback e* msg funcs
+    
+    If testing on a non-Gentoo system (no functions.sh), then provide simple
+    e* msg functions so we still get usable output.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 498b431f68db3b8d53f8c08d17857c860487bfda
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 09:37:42 2008 -0500
+
+    libsandbox: optimize!
+    
+    Kill off string operations where unnecessary, and convert the sets of
+    prefixes to arrays that we can iterate over.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c9f9ef7dc32c851b44f51b67912cf2d9a48b108f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 07:13:17 2008 -0500
+
+    libsbutil: cleanup x* memory functions
+    
+    Pull the x* memory functions out of rcscripts and into libsbutil and change
+    their style to match the rest of sbutil.  Also add xzalloc() and xstrdup(),
+    and convert pointless strndup() usage to strdup().
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4f2ab93644139991f3b8f34feff14e61fe5fbc90
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 07:11:37 2008 -0500
+
+    libsandbox/libsbutil: link with -no-undefined
+    
+    Since all symbols should be satisfied, link these libraries with the
+    libtool flag -no-undefined.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 90e9c762d9b5dbeb8432f4992b6ba570baa732ca
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 07:08:47 2008 -0500
+
+    libsbutil: delete more unused code imported from rcscripts
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d9247b61293d4290333bb9377a4844507b81feeb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 06:48:26 2008 -0500
+
+    libsbutil: drop remove() replacement
+    
+    The remove() function is in POSIX, so drop our copy of it.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e44be81ea43780f5925b71401bd219dfb5ef2d1c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 06:43:06 2008 -0500
+
+    libsbutil: sb_close(): only reset errno when close() worked
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 62f0e1c5e257ce187db37c15672b9a6145ad226b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 06:42:30 2008 -0500
+
+    libsbutil: simplify get_tmp_dir code a little
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 8669764872f1ff838eead846403f4154a7b25068
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Wed Dec 31 06:14:00 2008 -0500
+
+    libsandbox: unify wrapper funcs
+    
+    Unify a lot of duplicated code in the wrapper-funcs handling.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9aaa71aa4196395a638015363f9dd465d2dbd086
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Dec 29 15:56:11 2008 -0500
+
+    configure: improve -static detection
+    
+    Some build flags contain "-static" in the middle of it, so make sure our
+    -static detection code only finds words named -static rather than partial
+    strings.
+    
+    URL: http://bugs.gentoo.org/253021
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Gordon Schumacher <gordon@rebit.com>
+
+commit 9f1de9b6afdbb83ff75fad66204fd95a83975eab
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Dec 26 23:37:18 2008 -0500
+
+    libsandbox: run awk scripts in C locale
+    
+    To avoid random locale issues, run the awk scripts in the C locale.  Some
+    locales (like turkish ones) do not map lower<->upper like the C locale.
+    
+    URL: http://bugs.gentoo.org/252629
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Gürkan Gür <seqizz@gmail.com>
+    Reported-by: Harald van Dijk <truedfx@gentoo.org>
+
+commit 0271b7f0befd33f5302b3564b84af3c52d08045a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Dec 23 08:15:17 2008 -0500
+
+    bump to sandbox-1.3.3
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 91381072e456175eca6da9b72b361cabd3c9f34a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Dec 23 08:11:04 2008 -0500
+
+    libsandbox: handle unlinkat() like unlink() for symlinks
+    
+    URL: http://bugs.gentoo.org/248254
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 56a3e5cd27f2a7b19a0b9855577ae6f6015027aa
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Dec 23 10:06:48 2008 -0200
+
+    libsandbox: make sure SB_NR_* is always defined
+    
+    If the host libc does not support a wrapped function, then setup a bogus
+    SB_NR_* define for it still.  This way we don't need to fill up the source
+    with ugly #ifdef's.  The resulting overhead at runtime should be
+    negligible anyways as it's simply one additional integer compare.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 406edf1ed12fe843a2c4c028b1bb2d9db405db60
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Dec 23 10:05:36 2008 -0200
+
+    define AT_FDCWD for older systems
+    
+    If the system is not up-to-date with latest POSIX, then setup AT_FDCWD
+    ourself so that things build.  Considering how we actually use the value,
+    this shouldn't cause any problems ...
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bec9a4a36ba5b3569b74ef4fbdc322613d3df519
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Dec 23 10:03:18 2008 -0200
+
+    handle MAP_ANON on *BSD systems
+    
+    Some systems (like the BSDs) do not define MAP_ANONYMOUS but rather just
+    MAP_ANON.  So handle it.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2fe10002a1a2df0aef56147e2024bc5f70863c1b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:51:11 2008 -0500
+
+    libsbutil: scrub more unused rcscripts code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ad906c8d8511e86f0034294ef4630a46338f37d4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:44:19 2008 -0500
+
+    sandbox: include full libc path in version output
+    
+    Include the full libc path (LIBC_PATH) in the sandbox --version output as
+    this is very useful debug information.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 06b3c2877175baa4f0c9689f585e17b25a6c8106
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:36:33 2008 -0500
+
+    use AC_USE_SYSTEM_EXTENSIONS
+    
+    Rather than hardcode _GNU_SOURCE and such, just use the autoconf macro.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4d4224e633a88b0703ecd886d75b5d7688b2b02d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:35:52 2008 -0500
+
+    move -fexceptions into a configure test
+    
+    To better support non-GNU compilers out there, move -fexceptions into a
+    configure test.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 52e42743bfa7f107d47798c5e1282f2690701775
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:23:27 2008 -0500
+
+    libsbutil: drop bogus inline usage
+    
+    Remove inline markings from functions whose bodies are never available at
+    the point of inline calculation (i.e. they're always external functions).
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ce962a81797d455e4160f379c53d3432bbec36d4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 04:06:05 2008 -0500
+
+    libsandbox: use integers rather than strings for functions
+    
+    Rather than doing a buttload of strcmp's on function names, use integers.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 63e2691d7d5c068ebd01f7576c4ae5a7df17a6d8
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 03:39:06 2008 -0500
+
+    libsandbox: push STRING_NAME into libsandbox.h
+    
+    Since all FUNCTION_SANDBOX_SAFE() need to pass up the func name, push the
+    usage into the macro itself rather than every wrapper file.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7619984ebeeb1eb152c823c4c48ed91190380fc7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 03:29:16 2008 -0500
+
+    libsandbox.map: beautify output
+    
+    Make the output of gen_symbol_version_map.awk a bit more readable.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit dc9432c7a5ed8a098a9724c0b7f83ea1f8fc7b31
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Nov 29 03:27:55 2008 -0500
+
+    simplify awk scripts
+    
+    Simplify the generation of libsandbox.map and symbols.h and the associated
+    awk scripts.  Now we don't have to rely on arbitrary whitespace in the
+    symbols.h.in file.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0c556cb2100b4e88edb7193476a4aeb2609ca662
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 21:53:13 2008 -0500
+
+    bump to sandbox-1.3.2
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f7485cd5b9e2d6faf5278550e7ce7eb4757beb0b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 21:42:23 2008 -0500
+
+    libsandbox: pass __xmknod through the wrap stage
+    
+    Handle __xmknod properly in check_access().
+    
+    URL: http://bugs.gentoo.org/248254
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit 3387af6b2afa9a7dde9cc685cd40d10741cc4a3a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 21:39:21 2008 -0500
+
+    sandbox.bashrc: fix ccache default for non-root
+    
+    Don't set the CCACHE_DIR to /root/.ccache if it isn't actually writable
+    (i.e. running as non-root).
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c0c8553c4ce239da62e44e4807303d5d171866f4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 21:17:54 2008 -0500
+
+    src/sandbox.sh: produce it from configure
+    
+    Rather than mucking with paths dynamically, just get the absolute top
+    builddir from configure.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit eda1e106efba88ee1f8704e48df1476bdc6bc3b3
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 20:22:50 2008 -0500
+
+    libsandbox: tweak style a bit -- no functional changes
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f6c8d0f1c3c1a44d0d723a25193b1fa2e62c1688
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 20:20:05 2008 -0500
+
+    libsandbox: pass lutimes/utimensat through the wrap stage
+    
+    Handle lutimes/utimensat properly in check_access().
+    
+    URL: http://bugs.gentoo.org/248263
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Ryan Hill <dirtyepic@gentoo.org>
+
+commit 0419849fb1219dda53d27e935f6a50ab92aae55f
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 20:18:16 2008 -0500
+
+    ChangeLog: use git to generate
+    
+    Now that we're using git rather than svn, update the ChangeLog generation
+    method accordingly.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b4cf252f139ac09ee20bbd43fec1dad8d6a1fd75
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 19:38:00 2008 -0500
+
+    sp_printf: make sure all output goes to stderr
+    
+    All output (even "normal" messages) have to go to stderr so we don't
+    inadvertently break shell scripts that are being passed via stdout.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 04b874014374585ad32434ba897f81661a226e64
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 18:59:11 2008 -0500
+
+    INSTALL: update to automake-1.10.2 version
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit abada735d9461fab73f57c7857f4a37f5012bc07
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Nov 28 18:52:17 2008 -0500
+
+    .gitignore: ignore tests/atlocal
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bcdb7fda7600c2b748a37ceece7611c5d66c5913
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 17 12:15:30 2008 +0000
+
+    TODO: add more todo
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0ad69f6ee4cdef15673b4ecb16f28c862404c2f5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 17 12:15:24 2008 +0000
+
+    tests/sb_printf: include line number in test
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2f978b474b66172b5b07bca89d9e7890c24cbea2
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 21:26:27 2008 +0000
+
+    tests: fixup running test out of src tree
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f6513976e16ede361e2a53766673d73a51c046f8
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 21:14:00 2008 +0000
+
+    tests: move libsigsegv disable to configure.ac
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 50161cc0aec0c69f937103bb43f8fe5cbf88dc03
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 16:55:11 2008 +0000
+
+    tests: ignore libsigsegv test for now
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 743ea3da313d82b7fe40d7ea340c137a63aa2689
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 16:50:05 2008 +0000
+
+    libsandbox: resolve_path(): save/restore errno in all cases and dont leak memory
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a9f8a5a1dfb2f87c6d1c4fbce874baf790d1dd97
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 16:13:34 2008 +0000
+
+    .gitignore: ignore .gdb_history files
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 31599d72d7bdb0cccef5d446d3761759bd06f6bb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 16:13:01 2008 +0000
+
+    tests: add test case for libsigsegv
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 96e7b32aa9037b3e0a91301dc9fb7d6f4c45e8c4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 15:57:56 2008 +0000
+
+    tests: execute sb_printf
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3ad0c9cb7ae914f3d05f27636148fc7075095999
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 14:39:45 2008 +0000
+
+    sandbox: make -h/--help/-V/--version print out something useful
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e481ddb59e814a0331ff5043ce32e921a961075a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 14:15:38 2008 +0000
+
+    configure.ac: bump ver to 1.3.1
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 155c7417c426a7c18b4d82e2d80796c08e3cdcaa
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 13:17:13 2008 +0000
+
+    .gitignore: new file
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 075744a86f2c305f14b37a0495491ef7d1c4bf2d
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 13:02:46 2008 +0000
+
+    tests: add an include to top srcdir
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 98e3336d09b6fe33d6a0396d8152058263e3c5f4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:59:25 2008 +0000
+
+    tests: add tests.h to EXTRA_DIST
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 6e440008590acda29c91f70e4a1c81397ef8498c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:58:09 2008 +0000
+
+    tests: add test-skel-0.c to EXTRA_DIST
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9d5b7fc7d1c689624fbd8be8998ebc12f3d87412
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:54:19 2008 +0000
+
+    NEWS: note major stuff for sandbox-1.3.0
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4b1695da5045021b800c36f60b66a7e19f957b08
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:54:10 2008 +0000
+
+    TODO: add more items
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c6b1d05c2143d878402ca48cbf0dbbae64d09c8a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:47:43 2008 +0000
+
+    sandbox: add a script to quickly test locally built libsandbox
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b1af67322b6012190968363a8e5f7a1f8d0305e1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 12:47:24 2008 +0000
+
+    TODO: start a TODO
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b2435fd4fdee8473602affe6cfa720f8231d3188
+Author: Ed Catmur <ed@catmur.co.uk>
+Date:   Sun Nov 16 12:30:38 2008 +0000
+
+    sandbox: display when a process exits due to a signal
+    
+    URL: http://bugs.gentoo.org/194943
+    Signed-off-by: Ed Catmur <ed@catmur.co.uk>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 25e02f73215681b3f0c2f23b70786ef8f93d46e0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 07:43:25 2008 +0000
+
+    libsandbox: implement initial dirfd parsing for *at functions
+    
+    Some programs like `chmod -R` actually use the *at functions as designed, so
+    we have to handle things
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit fe6802f063cd147711bb63f8705b710a744ce8c6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 07:15:48 2008 +0000
+
+    sb_printf: handle NULL pointers for %s
+    
+    if told to printf(%s) a NULL pointer, output "(null)" rather than crash
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 73a1f1f082f6f896a362f8176f43ce45691ba091
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 06:58:28 2008 +0000
+
+    tests: add errp()
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 56c7f4b93489dcea347538be54d85276ecc8acfd
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 06:26:09 2008 +0000
+
+    libsandbox: use SB_EERROR() rather than DBG_MSG()
+    
+    when things crash, DBG_MSG() tends to not actually output the message, so
+    use the internal SB_ERROR() instead
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 054cd0bf015381548247950bfd7e48cf5b68c053
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 06:19:28 2008 +0000
+
+    libsandbox/execve: fix crash with small files
+    
+    make sure the file being executed is big enough for the static elf check
+    so we don't segfault by walking beyond the file map
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 96a5fad2341df12d4569d357acc6156719a4a101
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 05:32:35 2008 +0000
+
+    add tests for sb_printf()
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c2fb309e472014783f268fa6d74ea64a718dbc3b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 05:31:35 2008 +0000
+
+    sb_printf: implement %*s support
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f25d8135bdb77a3fbbcce2d6820011e09316046e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 04:12:34 2008 +0000
+
+    fix up one more old style SB_EERROR
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a7afc3f309c901c544c1be8ff72d61d2f45137f8
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 04:11:23 2008 +0000
+
+    unify SB_E{INFO,WARN,ERROR} functions and have them call the internal sb_printf function
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7f6145b395121cccf90dd44604177e1ab900c6d0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 03:56:35 2008 +0000
+
+    libsbutil: simple custom printf() replacement
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bd391f56049dbb8d9564793acd462f0f1fac69c3
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 02:28:16 2008 +0000
+
+    libsbutil: drop some unused code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 373b9bcf101988405419ac4032818b3531f75934
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 16 01:40:28 2008 +0000
+
+    libsbutil: unify duplicate log debug functions
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d3953761f66476d7a0e6a38ede57661b4d190589
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Nov 11 08:23:51 2008 +0000
+
+    tests: initial test framework
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e76e62fd39c4ea793a16b3c9fdf5af88b64bec12
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Nov 11 06:23:02 2008 +0000
+
+    move build flags to configure rather than Makefile
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7dd90e17678fecf015d88d9f0e9db0e729e5a458
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Nov 11 05:42:04 2008 +0000
+
+    libsandbox: catch fchownat and fchmodat
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit b77e39be895e5fdec22489c377a4c870ae542074
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 22:42:25 2008 +0000
+
+    get the ChangeLog hook working with distcheck
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 62d9fe7aa9dae724d224bc0c2c10b601873f3e0e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 22:17:21 2008 +0000
+
+    sandbox: convert to stdbool
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4d0d89215fa446bf00061043ac2542c511d22462
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 22:12:20 2008 +0000
+
+    libsandbox: do a little memory memory checking on free() to make sure the pointer didnt get corrupt
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 53f3ceca6eabcf671dc049e6e352373a374190ab
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 22:11:40 2008 +0000
+
+    libsandbox: zero out cached_env_vars
+    
+    make sure we zero out cached_env_vars when we free it so we don't hit a
+    double-free on exit
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 30fe03ce830a59bdc84c67405806ad7b63d02d53
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 22:10:58 2008 +0000
+
+    libsandbox: make sure we use local strdup rather than system libc
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e04e46ef28233efd013b3226eec88ca9742df8b2
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 21:43:08 2008 +0000
+
+    libsbutil: convert to stdbool.h
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2f65b0e4a6fa228869f0ca5b77cc840f9b3280ae
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 21:42:57 2008 +0000
+
+    check for backtrace and stdbool.h/elf.h/execinfo.h
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f1f979ce56ec02a8e76e017c88b6a105bc185925
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 21:04:32 2008 +0000
+
+    libsandbox: detect static ELFs and warn when we try to execute them
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1789ad209be18f72d2e42cf69ab10fcbdff17c3b
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 19:55:50 2008 +0000
+
+    libsandbox: initial support for wrapping *at functions #174233
+    
+    URL: http://bugs.gentoo.org/174233
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Zhixu Liu <zhixu.liu@gmail.com>
+
+commit 17207a5ff5029ca680515b0e572582dedffb0b69
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 17:20:34 2008 +0000
+
+    sandbox.bashrc: use proper escape chars in PS1 so bash knows about them
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 57526ca2ab225d95285b933788f6e03da24787ec
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 16:38:52 2008 +0000
+
+    libsandbox: pull in headers for dist
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 6caba96424ba0defe3e56da1c63168b2a557682a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 16:37:53 2008 +0000
+
+    svn2cl: make sure we find/use the local xsl
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f27622d796b1ee07a604b0fdb3a2c15c9e0c3343
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 15:48:58 2008 +0000
+
+    libsandbox: unify 64bit versions with the non-64bit versions
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5dea7ed777362d7eff2e23925ba13e7d669d74a2
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 07:23:39 2008 +0000
+
+    libsandbox: break function args out into WRAPPER_ARGS and func name into STRING_NAME
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 189734b5b1fffa6495ef0062b8fdfdccb7f3f5eb
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 06:52:29 2008 +0000
+
+    scripts: strip whitespace
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 02eb8b554ca364090389edc8c78e2353a9252e4e
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 06:47:19 2008 +0000
+
+    svn2cl: also update xsl to 0.9
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3a22120c45757f4e034f1c1afb90c5fc406fe111
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Nov 10 06:21:46 2008 +0000
+
+    fix grammar: do not exist -> does not exist
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 31332c02594dd34055cb99028814af5c043fb890
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 14:39:00 2008 +0000
+
+    libsandbox: also handle lutimes()
+    
+    URL: http://bugs.gentoo.org/163770
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Harald van Dijk <truedfx@gentoo.org>
+
+commit ccdeab0d67d1d95247ef1013af0fe164def1c3b3
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 14:34:12 2008 +0000
+
+    libsandbox: catch utime/utimes #163770
+    
+    URL: http://bugs.gentoo.org/163770
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Harald van Dijk <truedfx@gentoo.org>
+
+commit 0ee8c98153b0a0a5e5ffdbe30f679db3d67bb2cf
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 13:20:55 2008 +0000
+
+    sandbox: remove remaining multilib code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 04f2f48f8b4fd7d1765ad8b071b3242f09f28567
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 13:20:38 2008 +0000
+
+    libsbutil: make sure we always let the ldso do the libsandbox search
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2605fe464acaa4b4a8972e40be85242ee2ae7392
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 12:49:18 2008 +0000
+
+    sandbox: unify banner message and drop "linux" from it
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2f528569a05dea5b66eb5ea4bd92efd0a36c2a03
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 12:26:15 2008 +0000
+
+    libsandbox: create local memory functions
+    
+    Some packages create their own set of memory functions and if libsandbox
+    tries to use those, we tend to crash.  So have all libsandbox code use its
+    internal memory functions based on mmap().
+    
+    URL: http://bugs.gentoo.org/164656
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Signed-off-by: Ed Catmur <ed@catmur.co.uk>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 268c72beb3e1bfcfe79de1158a9c23b67822a7e6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 11:33:40 2008 +0000
+
+    Makefile.am: add headers.h to EXTRA_DIST
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c38daf1f9867b92a2e6f5a853752536dc3b6ae11
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 11:33:32 2008 +0000
+
+    sandbox.bashrc: use /etc/init.d/functions.sh rather than /sbin/functions.sh
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 8c5c2289a9b7bc246eb3351724d3c08dbfc7d4db
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 11:08:25 2008 +0000
+
+    bump ver to 1.3.x and build lzma tarballs
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 23598dc0ee3e695dd10b526e7495ab0b44b73bb0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 11:07:10 2008 +0000
+
+    NEWS: for now, read the changelog for news
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 4b87a6ba2eec557698efbe9eeff88c08d87e50da
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 11:00:39 2008 +0000
+
+    libsandbox: use internal memory funcs
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0dfd082cabff2f6ecf5398313bd12aadaf6b1695
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 10:46:45 2008 +0000
+
+    svn2cl: update to 0.9
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1ee6d8ed5a3cbac3764032bb7ac095cf0f664e50
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 10:44:39 2008 +0000
+
+    libsandbox: make code path in is_sandbox_on() a bit simpler
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 933bf3ec3c8ebf6935058ad85ec820931429a3a9
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 10:44:02 2008 +0000
+
+    libsandbox: fixup style/warnings in previous commit
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 0a539b142f24a902c91f6f383211f9ece6e5a610
+Author: Robin Johnson <robbat2@gentoo.org>
+Date:   Sun Nov 9 10:35:50 2008 +0000
+
+    libsandbox: fix symbol loading on hardened systems
+    
+    It seems that on hardened systems, USE_RTLD_NEXT is not always usable, and
+    this trips up sandbox.
+    
+    URL: http://bugs.gentoo.org/206678
+    Signed-off-by: Robin H. Johnson <robbat2@gentoo.org>
+    Signed-off-by: Ned Lud <solar@gentoo.org>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 090b53c17d70324947a49e8f5feb9cdc577cc989
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 10:29:58 2008 +0000
+
+    headers.h: consolidate all random system includes into one file
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3ab4fb266af960b0ff91cdb0b4128b4a38c42d34
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 09:48:28 2008 +0000
+
+    cleanup whitespace and comments -- no functional changes
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 30f83070c7c5455032218f285b52e1906b3fa351
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 09:33:17 2008 +0000
+
+    sandbox: drop pointless cast
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a861e9dfcf066af9d64a16e125466f7546df0851
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:54:50 2008 +0000
+
+    libsbutil: drop log_domain volatile markings
+    
+    There is no need to mark log_domain volatile as there is no long running
+    function where we have to worry about reloading of the storage.
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e5cecce3a871436f71a28a524bbc49e87df3c5cd
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:34:18 2008 +0000
+
+    libsbutil: use __func__ rather than __FUNCTION__
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 7bde33e3e53504158e7ec20811e9b6ea4f9de547
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:30:33 2008 +0000
+
+    libsandbox: fix typo: wrappers.c, not wrapper.c
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 8f3e94bae3f8273192b08acb8735f76755291c75
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:30:19 2008 +0000
+
+    INSTALL: update to latest autotool version
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a49468c3b47392acea04b3b4ec50d977b6cd20ff
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:20:21 2008 +0000
+
+    update COPYING license to latest GPL-2
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 3292d9ad9795c8778400936179e8e2452d73f398
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:19:31 2008 +0000
+
+    README: also note InstallWatch as a related project
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f0c675fa9d6bdda038aad7ece86a4e068f083622
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:18:38 2008 +0000
+
+    AUTHORS: sort list and add myself
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d6af50c784a8629166d6b0da4038d714983768d0
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Nov 9 08:16:55 2008 +0000
+
+    README: add some info on this project
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a4e5d51062392f89e206deb819eee1f06589241a
+Author: Jose Luis <Rivero>
+Date:   Sun Nov 9 07:38:53 2008 +0000
+
+    libsandbox: make sure wrapper.c depends on symbols.h
+    
+    URL: http://bugs.gentoo.org/190051
+    Signed-off-by: Jose Luis Rivero <yoswink@gentoo.org>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: David Pyke <gentoo-bugs@loftwyr.ca>
+
+commit 893ab3b806e34b5dc4bdb21507be13cd51ebeec8
+Author: David Leverton <levertond@googlemail.com>
+Date:   Sat Nov 8 14:43:40 2008 +0000
+
+    sandbox: properly use the return value of xrealloc
+    
+    URL: http://bugs.gentoo.org/238231
+    Signed-off-by: David Leverton <levertond@googlemail.com>
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 43b8eed3580370537592c2144ffc3178ea0e19ce
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Tue Oct 23 23:49:35 2007 +0000
+
+    libsandbox: mark the new "e" fopen() flag as safe
+    
+    URL: http://bugs.gentoo.org/196720
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 80ef90247f3eb4c8e6c98dddaa5fd9b5c610ceb7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 19 01:27:04 2007 +0000
+
+    cleanup style a bit and drop multilib code
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5f059dc5e5da401d5d2b3b5578844c2d145a9fb6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 19 01:09:22 2007 +0000
+
+    use `make dist` to generate tarballs
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit a71ecdff555f477135798a8f49c35de172fdc7c2
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 19 01:07:41 2007 +0000
+
+    libsbutil: drop the svn external links
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1eae83f13a13f6207edc180efc49ba06df02f1dc
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 19 01:04:50 2007 +0000
+
+    INSTALL: update to current autoconf
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f7ffcb59df65215209175e0645354f1161e2f3ee
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 19 01:03:28 2007 +0000
+
+    svn2cl: run during `make dist` rather than `./autogen.sh`
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5ea332e6dd9b6fd7d29408a57f536cec2da145bc
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Sep 3 07:56:36 2006 +0000
+
+    src/sandbox.h: add missing header
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 303c512d6dcea07d1a4d937ec8589ce4292c3abc
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Aug 20 12:04:04 2006 +0000
+
+    insert/delete whitespace
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 86ea37f7857d026dd7c2c0aafe8a32c975fe3a2d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 16:18:29 2006 +0000
+
+    Punt vim indentation line.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 45b21e3fb6af2af88ccc59147b4b1dea50501684
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 16:17:56 2006 +0000
+
+    Punt vim indentation line.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a4335f8ad6f714c31fd25139b5d8986119672fc9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 16:16:30 2006 +0000
+
+    Punt old copyright stuff, as nearly everything was rewrited.  If something is was not and is pointed out, I will rectify it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cbd73cdcd5aa478624c5ea48222f2e95656e57ef
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 16:12:29 2006 +0000
+
+    Split out environment related functions, and make their naming a bit more sane.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c221795fea5519bcbab33836da0e0bd099850e9f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 15:41:48 2006 +0000
+
+    Split out util functions.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ffb86caa786ce1ae5b07f5ab192981400b0483a6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 15:25:38 2006 +0000
+
+    Add back using libsbutil.a, else libsandbox.so increase currently with at least 3kb.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 45feb8a12677397348efa8617493aed197e15447
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 13:39:31 2006 +0000
+
+    Fix wrappers not being included in distribution.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b249d32f73aa0e30cbfc58e783aa02acd1092172
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 12:30:08 2006 +0000
+
+    Add awol commit for renaming of wrapper-funcs commit.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 22f89a2b008f956b656f33d64d43dc12019ea00f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 12:27:16 2006 +0000
+
+    Most other code use old_errno, so make it the same here.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 783f38f28e4ccc08caff3b54df3f4e1ac791ce1b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 12:26:42 2006 +0000
+
+    Make sure the unlink() wrapper do not touch errno.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 824e9979aaace0af1df5801ac34e05f69d420f17
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 12:22:29 2006 +0000
+
+    Cleanup execve() wrapper.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 786ea857091badb62641eb5a6ac9230d13ec8c92
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 10:26:50 2006 +0000
+
+    Rename wrapper-decls to wrapper-funcs.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2c5ef21f288deba39f2fa86ba52d732439fc93ee
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 13 10:23:48 2006 +0000
+
+    Split wrappers out to make modifying easier.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7813904efcb06a48358f73dce1ce8fe731870781
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 12 16:53:51 2006 +0000
+
+    Make sure we do not segfault with invalid mode passed to fopen() and co.  Add note about allowing different errno to be returned.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f67ce371c0d974d184ac7cb1bf91c9445d590844
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 12 16:45:21 2006 +0000
+
+    Add patch for using open() to test if the file exists, bug #135745.
+    
+    URL: http://bugs.gentoo.org/135745
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Torbjörn Svensson <azoff@se.linux.org>
+
+commit cb62e9671867e6b8e2fd30eade3b47b81d1ae2ed
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 12 15:49:47 2006 +0000
+
+    Update for librcutil dynbuf function name changes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7c0efcef8d4edc479cee9b27d5b654c096ebb54a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 18:49:26 2006 +0000
+
+    Release sandbox-1.2.20alpha2.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2ec299b14dbfd003e48a20194bf8badb4c0083de
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 16:40:23 2006 +0000
+
+    Fix breakage of last commit.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5d972ef3abebc8f28ec5402622303b5d59928e32
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 16:36:19 2006 +0000
+
+    Add EINTR check back to sb_open(), as FreeBSD for one seem to be able to fail with errno set to it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0153e86d64e463b9b85c33cf1256717529fb5f6f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 16:27:38 2006 +0000
+
+    Check log size before we open it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 74e6afef79fee112262a1cbe4b3980da73ee801b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 16:22:46 2006 +0000
+
+    Use IO related sb_*() functions, and improve error checking.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 16e2d4d6dcc88e945ee2ede290842f7098f43ed5
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 16:00:08 2006 +0000
+
+    Convert getcmdline() to use dynbuf functions cleaning up nicely.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 963b22b30df2b785ad0e4f6754076b58dea28512
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 11 09:36:56 2006 +0000
+
+    Do not source /etc/profile even in interactive mode.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6f405d7f46acda9c1bd46beb66a5f55cc0537026
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Jul 10 17:18:38 2006 +0000
+
+    Move the FUNCTION_SANDBOX_SAFE* macro's to libsandbox.h where they are more appropriate.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d6c9c53c3c9684969314210031ac292d12fdc23b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Jul 10 17:16:34 2006 +0000
+
+    Update copyright in case something from InstallWatch are still in here.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b72765ede1779f9e8c0ddee6158c23a9d69cf30d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Jul 10 07:21:53 2006 +0000
+
+    Add wrapper for internal use of getcwd().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f4dec3394bce65a32a5c26987950d63849d6f3a6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Jul 10 07:16:56 2006 +0000
+
+    Move wrappers out of libsandbox.c.  Move IO functions to
+    libsbutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 439fb325a1a4b65ab7ef9021b902679791c55c80
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 20:46:01 2006 +0000
+
+    Add forgotten libsandbox.h.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4dbcb7b0361808a84c31fdee11a1d1779581a89f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 20:38:41 2006 +0000
+
+    Start moving libsandbox only related stuff out of libsbutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b2cff294de799314eec0b6d4ad15d5f7468c52a9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 20:33:52 2006 +0000
+
+    Remove file_length(), and rather use rc_get_size().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3e73051416e153f506dd75b25027e24da96449d2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 20:28:18 2006 +0000
+
+    Make sure the first realpath() in get_tmp_dir() failing do
+    not set errno and thus trigger DBG_MSG().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit bebce61f50531c2cb24b62b398d9c302136dc80e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 20:09:20 2006 +0000
+
+    Use defines for proc directories/files.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0013a4d60b9b22cdd7b728b88f71dc815c175791
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 19:59:15 2006 +0000
+
+    Use PAGE_SIZE to read proc files.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7d6d1398ea837188607c4d7b615f9e7fbcf4d6d8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 19:21:33 2006 +0000
+
+    Move libsandbox to its own directory.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit af23d1cbc9351808befde8e61da51ce202eaaa64
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 19:13:57 2006 +0000
+
+    As we are using a symbol map for libsandbox, its no longer needed
+    to have all the internal functions static, and thus we can break
+    things out a bit and make the source layout more sane.  Start by
+    moving librcutil to libsbutil, and adding all the defines and
+    helper functions needed by both libsandbox and sandbox.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit da09e24428514a0e28d85aedbce618187450192a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 17:52:07 2006 +0000
+
+    Reformat previous added code a bit, and add debug messages
+    and even more error checking.  Abort on some more unrecoverable
+    errors.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9dd5c99b76d55c0d0aa95b2bac6065003eb1f92f
+Author: Alex Unleashed <unledev@gmail.com>
+Date:   Sun Jul 9 17:48:43 2006 +0000
+
+    Apply patch to make reading and writing more reliable
+    
+    Signed-off-by: Alex Unleashed <unledev@gmail.com>
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5effd5369d52d7a6be3d150aa82a467a5736414c
+Author: Alex Unleashed <unledev@gmail.com>
+Date:   Sun Jul 9 16:30:14 2006 +0000
+
+    Fix access call strncmp's
+    
+    Signed-off-by: Alex Unleashed <unledev@gmail.com>
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5a4a8ed1eabf678341b00c021a257f0c7535941e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 9 00:26:56 2006 +0000
+
+    Update comment.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 678a48f8c6210f0cda2bcefbd62e8114fcdec791
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 23:24:31 2006 +0000
+
+    Free child argv we allocated earlier, as at execve() duplicates
+    this, so no need to keep it around and waiste more memory.  Make
+    sure we will not in future free them twice.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 471dd994a807cd783aa80403358231a7f94ce1b2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 23:18:59 2006 +0000
+
+    Free child environ we allocated earlier, as at execve() duplicates
+    this, so no need to keep it around and waiste more memory.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0257f6dbabea5bea12befc2688292c04d076b684
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 23:13:12 2006 +0000
+
+    Rather link libsandbox against librcutil's libtool objects (.lo),
+    as it should be more portable, but do add the extra fat.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c446796d93b4ffce025433bf27471beefef7b5a7
+Author: Alex Unleashed <unledev@gmail.com>
+Date:   Sat Jul 8 21:39:28 2006 +0000
+
+    Add needed changes to get a working sandbox on FreeBSD
+    
+    Signed-off-by: Alex Unleashed <unledev@gmail.com>
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c5cb25236a3f49a1f51601149124f74de177528d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 21:12:12 2006 +0000
+
+    Remove debug printf() that I missed to remove.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 02e5e596dbfad96bd0b685d08b8006d63b8d201c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 21:01:51 2006 +0000
+
+    Convert all string list operations to use the str_list_*() macro's.
+    This allow a nice cleanup of the bash argv stuff, and also actually
+    add error handling to that part of the code.  Some more cleanup of
+    the environ stuff.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9a862070ee687175912d1cc5222abfb6997917a3
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 19:53:06 2006 +0000
+
+    Set 'env_ptr = environ;' _after_ we unset and set variables, else the
+    block could have been reallocated, and leave us using the wrong pointer.
+    General cleanup of the env handling code.  Free all memory used.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f21eaa408918ff2ad93666f6b857866b2a418463
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jul 8 16:13:40 2006 +0000
+
+    Fix double free() in sandbox.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 99901c6765fb75f257d31c1c5ca17abd41a8e190
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 7 19:13:17 2006 +0000
+
+    Make sure Mike's sandboxshell mojo do not get recusively called and
+    only do the whole of it if we are not connected to a terminal.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 998bb4b219319851a67a6e53929bb7d40c3d324d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 7 14:24:07 2006 +0000
+
+    Add forgotten Makefile.am for librcutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0b8b4eb1f577bd24baa69fb626d11a80fe3ab06c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 7 14:20:49 2006 +0000
+
+    Release sandbox-1.2.20alpha1.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit fbe6f640e6f22fd4faf1a39fa672bbe36e27bda8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 19:18:09 2006 +0000
+
+    Remove uneeded test, as setenv(,,0) do not replace.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1e87abf953f06049aea016c9ef37f8ffb684487b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 17:25:46 2006 +0000
+
+    Use debug versions of malloc(), realloc() and calloc().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 062aaa51a2319b01b53dd21067a717ca48664564
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 17:19:05 2006 +0000
+
+    Add comment about SANDBOX_WORKDIR.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 85556a23b3dbcd54c59f00c0e8f1cde4a07a6119
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 17:02:08 2006 +0000
+
+    Move default SANDBOX_PREDICT value from sandbox.conf to 00default.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5c23d11155525708bc894d02e9986d5e0732030e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 16:44:48 2006 +0000
+
+    Free some of our custom environment data.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 27feeab6e5eb6e2ff389943899691b18c970b08c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 16:37:20 2006 +0000
+
+    Set default values via a config file.  Also support sandbox.d
+    config directory for package specific configuration files.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4454c36a6648ff9701aec00a73548839233c1c65
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 10:56:30 2006 +0000
+
+    Only print info if we have a controlling terminal.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 857ee9bc6b0100716986caefdc005be8d023ae76
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 09:27:39 2006 +0000
+
+    Fixup color handling.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cbe0a730c9827f03c4d815d39e4b6354ff258d0a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 08:49:13 2006 +0000
+
+    Remove last libsandbox-only functions in favour for ones provided
+    by librcutil.  Setup log_domain properly for debugging.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6da7beb4a1e29bf25e57b68527d25851e4553525
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 6 07:46:12 2006 +0000
+
+    Updates for changes to librcutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9ad2db7aecb08012339c34dbaf72991686547f58
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 17:06:40 2006 +0000
+
+    Fix build failure due to exists() still being needed for libsandbox.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 415047660cc5c63caaefa6ffd731cee0d704369e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 16:51:12 2006 +0000
+
+    Use librcutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 53867c713f0bc2a8cf3fa60fbc56a4e2c7137935
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 16:34:00 2006 +0000
+
+    Rename EINFO, etc to SB_EINFO, etc to not conflict with macros from
+    librcutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1c8c6fb0cad83cdde9ef02ca238605a09c3d8be4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 16:25:28 2006 +0000
+
+    Enable building of librcutil.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a6433b10fefd58dbd4dbc114f4bb6df8ade55222
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 15:14:07 2006 +0000
+
+    Use is_env_on(ENV_SANDBOX_ON) now that we have is_env_on().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 86629e856deeedb6aefc7e631406ce5d11655080
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 15:11:17 2006 +0000
+
+    Abort on possible security breach.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e8e2f5dae06d648d40a25e206a45583e267925bc
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 15:01:57 2006 +0000
+
+    Set NOCOLOR to 'no', else ebuild.sh do not set COLS, etc.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 937bd6c6481af3e5703cfd485ff7f41a48708648
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 13:50:48 2006 +0000
+
+    Just killing the child with SANDBOX_ABORT do not actually abort the make process
+    in many cases.  So also kill the offending child, and pray that make will also
+    abort.  This is really hackish, and we should rather kill the whole process tree,
+    but currently its too much work (considering that we are in signal context which
+    probably will make things difficult - not even talking about the bsd's ...), so it
+    will have to do.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3f9e59a52e7c472c6e3d8ffb5c52c8d9ca810e81
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 11:35:24 2006 +0000
+
+    Make stop_called volatile as its used in signal handler.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d1e429d72656cfd99913979192a971811a7f2ea0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 5 10:55:54 2006 +0000
+
+    Add /dev/full to write allowed paths, bug #137240.
+    
+    URL: http://bugs.gentoo.org/137240
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Sascha Biberhofer <karasu@inode.at>
+
+commit 20b50c7f6c567f8a44e8e8a264d00e393d9761a9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 15:32:43 2006 +0000
+
+    Add SANDBOX_INTRACTV logic, and Vapier's sandboxshell mojo.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c94004a1682455407d16e98e9a5aaf8f86a00f97
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 15:10:37 2006 +0000
+
+    Small logic simplification.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 39e1b0ddae387081758d868857f3fc36c189432e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 14:58:16 2006 +0000
+
+    Add is_env_off().  Also check for true/false. Use is_env_*.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit dab1c99e7b3f40b74a9b693f330c4c094279c396
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 14:35:18 2006 +0000
+
+    Slightly adjust log format header.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 08830eaf0cc64aa60031f5b53a9065a1b8918a79
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 14:32:38 2006 +0000
+
+    Theoretically add support to terminate immediately if we had an access violation,
+    
+    bug #138499.  Uses environment variable SANDBOX_ABORT.
+    
+    URL: http://bugs.gentoo.org/138499
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Ed Catmur <ed@catmur.co.uk>
+
+commit 8313492a957283e6348c4793ab5357bf085c8dcb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 14:22:30 2006 +0000
+
+    Add is_env_on(), and some other environ variable defines we will be using.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6e245f656a77030c5a8a97b4247e4aa77498148c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jul 4 12:44:54 2006 +0000
+
+    Change log format, and add more info, especially cmdline, bug #138501.
+    
+    URL: http://bugs.gentoo.org/138501
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Ed Catmur <ed@catmur.co.uk>
+
+commit 6427bae301489b1345abebd5a3c9dbc7fc1c02b0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jun 30 11:13:24 2006 +0000
+
+    Use EERROR for OOM message instead of EWARN.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3d70c91d3f6fce30e7430e8f00ba723e081368fd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jun 30 11:10:35 2006 +0000
+
+    Fix possible huge overflow with logging code.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 872108a8baacc8fda7688bb06353a91c3e048a34
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sat Jun 10 15:08:08 2006 +0000
+
+    Rafal Rzepecki writes:
+    sandbox's configure script first finds readelf, then ignores the path found
+    earlier when checking LIBC version. This leads (on my system) to configure
+    failing with error `configure: error: Unable to determine LIBC VERSION'.
+    http://bugs.gentoo.org/136284
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5a1d109ecedafe7ea90f70e3806bc624d518f197
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 19 12:08:51 2006 +0000
+
+    Release sandbox-1.2.18.1
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ef7af2ec4abdc570c7d441de570744dff38a1909
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 9 09:30:16 2006 +0000
+
+    Do not free buffer returned by getcwd() if it was not obtained by getcwd(),
+    
+    bug #125701, thanks Mike.
+    
+    URL: http://bugs.gentoo.org/125701
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1947b5efc14d39eab620c07ad42f7560442d349f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon May 8 14:15:00 2006 +0000
+
+    Comment egetcwd() some more, and fix a double-free.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c8c7b7fa55f696c06fa21dee59c4f2a910560382
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 3 11:21:54 2006 +0000
+
+    Release sandbox-1.2.18.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3bd8c5dd35bc0fac0ec6c86ced7cd91df3f09db0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 3 11:18:28 2006 +0000
+
+    If glibc/kernel side of getcwd() screwed up, return ENAMETOOLONG.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 754ccfc7765364373d7d9aee14f70d2fea7afab1
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Apr 25 08:27:28 2006 +0000
+
+    Fix symbol/map generation on Alpha
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Fernando J. Pereda <ferdy@gentoo.org>
+
+commit ff5c787de1936c8939efc529d8e6a0b756c03b9c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Apr 25 08:25:37 2006 +0000
+
+    Try to triple check getcwd() sanity.  Do not think it will help for
+    
+    bug #125701, but we try.
+    
+    URL: http://bugs.gentoo.org/125701
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Alexander Simonov <devil@gentoo.org.ua>
+
+commit c2b1dd1eeaeb4bd4b0aaa6e3760dd5eac9e8e2fd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Feb 6 13:49:20 2006 +0000
+
+    Update svn2cl and fix parse issue with latest libxslt-1.1.15.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 81514563c33bd6aa22a95cdf8e66caca7de87a13
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Feb 6 12:45:59 2006 +0000
+
+    Revert last change, and add comment.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1d4e4af4db18077a555492cf8b4348e115844f0a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 6 05:02:51 2006 +0000
+
+    add static/shared library checks to prevent anyone else wasting our time
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1e9292df793de334694d427c4a899b5c35310ea4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 6 04:11:37 2006 +0000
+
+    force people to use -n if they want to generate stuff
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit acb27ba3085ed6ef354885a01ce46ba263d943e1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 6 04:08:11 2006 +0000
+
+    syntax touchups
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit ed3d3c6e44c52ca458e3693b7ffc137279999e50
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon Feb 6 04:04:10 2006 +0000
+
+    log issues with LIBC PATH a little better
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 6813a945a6396e323328f238f3c935f79c8ae52d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Dec 10 12:12:27 2005 +0000
+
+    Cleanup.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 326c4bd1174aae0573408590652505b46f223e1f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Dec 10 11:51:49 2005 +0000
+
+    Add support for readelf from elfutils.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cd9b3f6e7cf1622b2f191d6c7df32fb2378387c0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 22:49:20 2005 +0000
+
+    More configure related cleanups. Define HAVE_RTLD_NEXT
+    via config.h.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 55fd7471a6b46ad3b18b1c6c956d092f6a805de3
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 17:14:24 2005 +0000
+
+    Indentation fixes and other cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit fd3a19d231952be273877275ee00cb72b40572e8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 16:55:50 2005 +0000
+
+    Small cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 63119133f2c143b9b9d7db9518aac1f14f0fd955
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 14:35:11 2005 +0000
+
+    We use memcpy() now and no longer mempcpy().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cf8e49e0a601b1d5ffd30472a92a514e0df76cb0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 14:34:25 2005 +0000
+
+    Fix weak symbols on 32bit glibc where it have a different version.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 26e15e9d0bed78b5a1cef0a4c77bf7c8c89f47bd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 14:07:48 2005 +0000
+
+    Release sandbox-1.2.17.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ddcdf39b369a3877babbe0f22dd6f5d067cd7083
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 14:06:58 2005 +0000
+
+    Small tweak.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4c4f1c8946916074c4ad9a60d8b76cc10827ffa3
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 13:55:37 2005 +0000
+
+    Fix regex for newer uclibc that also matches /lib/ld-uClibc.so.0.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 47277865c2d697186f9e1dada21e58da80b5346b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 13:54:04 2005 +0000
+
+    Cleanup RTLD defines.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 153a1eb928467815251b033f00a736f3576f0851
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 13:41:39 2005 +0000
+
+    Remove getcwd.c, as its no longer used.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b1c261bcd5ef5d1059b391f56cf3ea2ded396b75
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 13:40:36 2005 +0000
+
+    More changes to try and resolve OSes with generic getcwd() implementations.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ec1e976060209af9492bcf4301c2e0f4d0188f4c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 11:24:20 2005 +0000
+
+    FreeBSD have RTLD_NOW, but still have the getcwd() issue.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 67588f2444dc327da5289000cb9b4f321f234f84
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 11:18:39 2005 +0000
+
+    Split sandbox_on stuff out to libsandbox.h.  Only enable if we do not
+    have RTLD_NEXT.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 54a22b49cd75089716d3138ed686ff58c9e62516
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 11:08:26 2005 +0000
+
+    Add sandbox_on variable to tweak internally if sandbox is on or off.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d1f53e5790a2fc702241b8c9c2e5a2446c53a8c6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 10:10:47 2005 +0000
+
+    Rather check for RTLD_NEXT than glibc.  Some other cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 61f81f6fa71f9403e2f7784bf7a1b3924ab030a4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 09:54:40 2005 +0000
+
+    More bsd fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit eb334306e6f74d963ea0d7b18c0b33cef4210ed3
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 09:53:28 2005 +0000
+
+    Add checks for bsd that have dlopen() in libc.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 35f98d39414dc3dba63bb5bfbb92e589a3a5dde1
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 09:43:56 2005 +0000
+
+    Quoting fixes
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 78c94147bc5c6e985e69211c192b91b7ad57021c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 09:28:34 2005 +0000
+
+    Rename sandbox_futils.c to sandbox_utils.c.  Add gstrndup() and gbasename()
+    to sandbox_utils.c.  Add check for glibc, and fixup things to not need glibc
+    only extensions if not needed for versioned symbols.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e51e9cb0062f295f42335e5c75a5f8b83ca0f135
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 09:02:46 2005 +0000
+
+    Make sure the aquired libc is readable.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e4105c76a843423e4aa50a91db71d39d6881e5aa
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 08:13:19 2005 +0000
+
+    Also add weak symbols.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cf4fe536164216d02a937dd46ded3340d3264534
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Dec 5 07:17:51 2005 +0000
+
+    Stop processing when we get to the '.symtab' section.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c5a8c7b86a31ed45182d582cd4c1328cba2b3012
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Dec 4 20:33:05 2005 +0000
+
+    Do not check for compatible malloc(), as we do not care.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b3e848b3afcaa84eaaa2264d0e9a5011158feb8a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Dec 3 11:42:38 2005 +0000
+
+    Change default prefix '__' to '_DEFAULT' suffix to avoid confusion
+    some people seem to have.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d456197178cdc16785c79d03ec79a7f0e8ffe506
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 12:41:44 2005 +0000
+
+    Release sandbox-1.2.16.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit fb518539ffd4423b23b525eb598802a5b8c28436
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 12:41:18 2005 +0000
+
+    Add dist.sh to make my life easier.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit df2124fa148eaea6e27cb38e22dd665d9c21139b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 12:34:19 2005 +0000
+
+    Use mempcpy() instead of __mempcpy(), as svn uClibc hides it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 173c7b5774e9cd464f83f92e4532e31e351ccd5d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 12:32:53 2005 +0000
+
+    Do not re-set VERSIONED_LIBC if already set.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 360a48dc690b5a565716a0098752c82d6cb44b39
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 12:31:19 2005 +0000
+
+    Do not add unversioned symbols if we have a versioned libc.
+    
+    Do not add duplicates.  This is mostly due to unstripped libc .. bug #114200.
+    
+    URL: http://bugs.gentoo.org/114200
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: James <James@superbug.demon.co.uk>
+
+commit 55c1b6fa295fa34f73d22141f6289f998a3b4b94
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Dec 2 08:49:38 2005 +0000
+
+    Add /dev/shm to write path.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f0744de4c0f13dd842f324fc9e591e180bcbf1f7
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 21:56:07 2005 +0000
+
+    Move clean.sh to scripts.  Some 'make distcheck' fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5d167bc643c6fa7ed5643b7d450725b04e764936
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 18:04:53 2005 +0000
+
+    Release 1.2.15.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2326bfcb534ce6ace05a3c230f43d1aae4fc9f84
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 17:50:52 2005 +0000
+
+    Update clean.sh to do a 'make distclean'.  Add '-n' switch for
+    autogen.sh to skip generating ChangeLog.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7ff2dcf907d1d60059c048e78e832f55607bf2b6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 12:07:25 2005 +0000
+
+    Add scripts/svn2cl.*; move ChangeLog and update autogen.sh to
+    generate ChangeLog.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 30c93d50dec782b772a8453e5524007d51bef7ed
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 12:01:33 2005 +0000
+
+    Some comment touch-ups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0d919f602c51c16c720be6769daab97812ad0079
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 11:56:29 2005 +0000
+
+    Wrap mkfifo() as it seems it was missing.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d7ff04f399a9392f1fc8f065aa3cb103a03b871b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 11:33:20 2005 +0000
+
+    Wrap mknod() as well.  Misc cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0d7ab77a4a9bec0bac85e1b05e3ca8fdd0c6d20f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 11:04:31 2005 +0000
+
+    Rather use fstat() to get file size in file_length() than lseek().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 13898250949c40654ae7cfb9c83e808644502667
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 10:58:54 2005 +0000
+
+    Use egetcwd() in sandbox.c.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0f55b9e2d836fe934bddc16b15d6f59f403e1f12
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 10:54:12 2005 +0000
+
+    Fixup SANDBOX_ON handling after already running changes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 324ceef54cf4e9c8669b31c459c3e0f226f79453
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 10:45:43 2005 +0000
+
+    Rename filter_path() to resolve_path() and other renames for clarity.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 64ed77f12830369e7ad8cf3d4753985d7145a87e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 10:40:09 2005 +0000
+
+    Cleanup local defines for egetcwd() and erealpath().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 054272cc65d94fbec6e9ea24f98cf999b3ff3cd0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 09:47:42 2005 +0000
+
+    Rename src/symbols.in to src/symbols.h.in.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 58aaec27050c17f90289181151f0f67648ff8392
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 09:46:17 2005 +0000
+
+    Remove the SB_STATIC and including of getcwd.c, etc voodoo, as we new use a
+    symbol map, and all non-exported symbols are local.  Cleanup getcwd.c, as
+    the generic getcwd for older 2.4 kernels do not work properly anyhow, and
+    just makes things slower.  Some other warning fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5a912065a7be063434e3409d2d42984d02cb213d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 01:01:44 2005 +0000
+
+    Fixup comments related to strong aliases.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit dd7fcf79c15562adeb22e4b08f326d4d40970082
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Dec 1 01:00:40 2005 +0000
+
+    Fix non-versioned libc's to also prepend '__' to internal symbols by using
+    strong aliases.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2b688ccf33de909e4b6d0f0b890e750335cee568
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Nov 30 23:27:59 2005 +0000
+
+    Rename configure.in to configure.ac.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 830943e11930adfd0c983ee4170dfc6ab5120f4c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Nov 30 23:21:55 2005 +0000
+
+    Small syntax cleanup.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3d2e7de9dac39645b60917667355a2681d66f409
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Nov 30 23:11:34 2005 +0000
+
+    Only check SANDBOX_ACTIVE, and not its value.  More BASH_ENV fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit da7c507a3ea1eda35b9b0b9c765737691faa8c0b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Nov 30 22:54:36 2005 +0000
+
+    Use versioned symbols on supported libc's for functions we wrap, as well as
+    provide all versions of specific functions.  Some syntax cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 590230a9446151277bd8e6613bcc729b5570a0d6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Nov 30 08:42:30 2005 +0000
+
+    Move dlvsym define.  Add symbol_version macros.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a204c6ca18f25a4bc16bc999f0114eebafb01ffb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 11:35:30 2005 +0000
+
+    Revert 64bit arch test, as we should build the 32bit version without full
+    path checking as well, and add --enable-multilib switch to configure.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b3e3b33f04c06189ea54b7dbc81886e54e018ed2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 11:13:17 2005 +0000
+
+    Update contact email.  Fix quoting.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 75d1d28b6c72d759ec336c6cb581084124473636
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 11:04:14 2005 +0000
+
+    Detect if we on 64bit arch automatically.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7561c08cf26eb38ae23b89ed662e7f26ef4c3267
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 10:52:03 2005 +0000
+
+    Reorder source layout.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ad6ef6518cfddb5156f4c48b7c766a3755bf2322
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 10:30:39 2005 +0000
+
+    Sandbox 1.2.14 release.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit aead109c943a50115d7d016c9d5a37dc99708061
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 10:24:06 2005 +0000
+
+    Make sure we use our bashrc.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cc324b94cfc60a21e3a283c16217cd9473c9b0c4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 10:13:15 2005 +0000
+
+    Rather check SANDBOX_ACTIVE if we are already running. Set SANDBOX_ACTIVE
+    to readonly in sandbox.bashrc.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1fc67c7b61610137d0d7375b1a5d418a91c753b1
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 10:05:52 2005 +0000
+
+    Cleanup environ variables.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a5ae0ccbb4fc8f9ed892362cdd5658169d8e0df4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 09:55:54 2005 +0000
+
+    Check generic getcwd()'s return as well for validity, bug #101728.
+    
+    URL: http://bugs.gentoo.org/101728
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Michael Kiermaier <michael.kiermaier@gmx.net>
+
+commit a1d3e629628c37aa334f607433f718cbc8de0c72
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Nov 28 09:50:39 2005 +0000
+
+    Change calling order of autotools.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit dde4d15aefb7510bc311dc57f40227aeff6cbc94
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Nov 1 16:02:30 2005 +0000
+
+    Do not pass mode to true_open and true_open64 if not needed.  Should fix a
+    segfault in some cases.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b98ec626a54c16ccec9c654732250a776a0406de
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Nov 1 15:41:31 2005 +0000
+
+    Fix wrong version number.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 50a36e5aeaf5aabe5ae8ceadcdffaf949016c497
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Sep 12 07:05:41 2005 +0000
+
+    Release sandbox-1.2.13.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e91c239e8607ec2d3f2cfbb3ec3352d6d8bc9fce
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Sep 12 06:50:53 2005 +0000
+
+    Make libsb_fini() do cleanup a bit more complete just in case we get another
+    uClibc 'call preloaded library fini before that of app' issue ... probably
+    will not help much, but we try.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 88177cea0946a1702f2ad5497d0017191c0a9e4d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Sep 12 06:44:52 2005 +0000
+
+    Do not handle adding working directory to SANDBOX_WRITE, as portage does it itself.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9d42df13a3c2b67683769ff98d47491e407fae6e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Sep 4 11:17:09 2005 +0000
+
+    Also allow symlink() system call to operate on a symlink in a writable path
+    
+    that points to non-writable path, bug #104711.
+    
+    URL: http://bugs.gentoo.org/104711
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Albert Hopkins <marduk@gentoo.org>
+
+commit 4dd3883ec10ef43556946dc84ce7736e878c1394
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Aug 29 15:39:19 2005 +0000
+
+    Remove debug code I forgot to remove.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 681e26cfe3d7f288e6481c9b9f840c9b3d2fe593
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Aug 29 15:38:02 2005 +0000
+
+    Form cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1328d9fce72c92c983038b5c07bb16d7563dcf49
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Aug 5 14:49:15 2005 +0000
+
+    Release sandbox-1.2.12.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e5483a591d52756a4e3064ce7360b390200eccfb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Aug 5 14:11:55 2005 +0000
+
+    Improve error handling for get_sandbox_*_envvar() functions.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2cf9b886cd697fc6ca4aa412638f66042f127c19
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Aug 5 13:58:53 2005 +0000
+
+    Remove the tmp_dir variable - we do not need it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 893bbfc403a7fea0392f4715a267477f1732cc25
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Aug 5 13:55:08 2005 +0000
+
+    If we are called from the command line, do not care about PORTAGE_TMPDIR,
+    and make the current directory the work directory.  Also rename the variable
+    portage_tmp_dir to work_dir.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5c2869e571e7847ce346616d2cc2db4d76f96b14
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Aug 5 13:33:54 2005 +0000
+
+    Do not give an access violation if the access() system call do not have
+    
+    write/read access - it does not actually modify, so we only need to return
+    not being able to write/read.  Noted by Andres Loeh <kosmikus@gentoo.org>,
+    bug #101433.
+    
+    URL: http://bugs.gentoo.org/101433
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Andres Loeh <kosmikus@gentoo.org>
+
+commit 656dc92e3703e5c96a32de5198a4328c051c4113
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Aug 1 14:02:17 2005 +0000
+
+    Add /dev/tts to write permit, bug #42809.
+    
+    URL: http://bugs.gentoo.org/42809
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Mike Culbertson <mike@infoleak.com>
+
+commit ff605af613444de4d1930954a06f16da7c0e9581
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Aug 1 08:08:08 2005 +0000
+
+    Add support for SANDBOX_VERBOSE (enabled by default).  Adjust SANDBOX_DEBUG
+    to only enable if equal to 1 or yes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9a8fcf142a49936aa8e205fba987c3769bd18bc2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Aug 1 07:57:35 2005 +0000
+
+    Still do normal log if debugging is requested.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e25c857935dbbab65ba92b1b72b282c2ec32c034
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 27 18:04:35 2005 +0000
+
+    Do not resolve symlinks in PORTAGE_TMPDIR in sandbox .. we will handle that
+    
+    in libsandbox .. bug #100309.
+    
+    URL: http://bugs.gentoo.org/100309
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Cameron Blackwood <korgg2@darkqueen.org>
+
+commit 6a368e459c676c5f810cf4f8c8c4bc0b3a893053
+Author: Zac Medico <zmedico@gentoo.org>
+Date:   Fri Jul 22 08:13:25 2005 +0000
+
+    Print all logging to stderr, bug #90343, comment #15
+    
+    URL: http://bugs.gentoo.org/90343
+    Signed-off-by: Zac Medico <zmedico@gentoo.org>
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit de0b08f8ad2a6dfd624f35f0d649373176312b83
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 14 11:08:27 2005 +0000
+
+    Release sandbox-1.2.11.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 33e8e3839c73f12a2fdf8ec051cd3b859383b1c9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 14 11:06:38 2005 +0000
+
+    Fix getcwd, bug #98419.
+    
+    URL: http://bugs.gentoo.org/98419
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: bartron <bartron@gmx.net>
+
+commit 5ad4cab01b63e8e29556e976a4876cb4b225ea96
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 8 15:49:23 2005 +0000
+
+    Fix compile error with previous change, and return rather then exit().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5af6c81fa300b0ab4d0a8dae4ea9d7d69eeee56a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 8 15:07:50 2005 +0000
+
+    Remove old logs if present and conflicting with current.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 49ff3bddf52255af380e0fa3b340a5fa0944198c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jul 8 14:52:26 2005 +0000
+
+    Try to cleanup and make error handling/printing consistent.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f85ca7a5db97ffb36cb64991feed56a38ab0b1af
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 22:58:16 2005 +0000
+
+    Cleanup access/log printing.  Make access printing honour NOCOLOR.  Fix log
+    printing's last line not honouring NOCOLOR.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit fb2ea20e4381585151388b65c9c5373df0a40135
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 22:19:52 2005 +0000
+
+    Only declare functions in sandbox_futils.c that are used in libsandbox.c when
+    OUTSIDE_LIBSANDBOX is not defined.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a5fd252f8ef4d0d70bcf43e1a42410230200ea6d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 22:14:57 2005 +0000
+
+    Remove unused includes and variables.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 8213f9a331a9d5eb86781f05011deeab89cec7af
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 22:08:17 2005 +0000
+
+    Remove sandbox_dir and co - we are not using it anymore.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2dc3265dbf52789b7ffbc8b9e840e1ab5cff14a2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 22:01:14 2005 +0000
+
+    Redo the interface of the get_* functions so that we do not leak memory.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4e253f09266dbce08e4bca389f34e3770cce4523
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 21:42:33 2005 +0000
+
+    Major cleanup of sandbox_futils.c.  Removed most of the functions as we now
+    write to /var/log/sandbox/, so in theory do not need all that.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ca1a5799c0374408c110e8569b53613084233401
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jul 7 13:01:31 2005 +0000
+
+    Fix possible segfault in env init code.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 073d59a658f3f9085caa354a5fe170a30fd10edd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 21:33:23 2005 +0000
+
+    Cleanup init_env_entries() and check_prefixes().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d4b1f484e6544315c47a18557d809c070260f608
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 19:41:26 2005 +0000
+
+    Add check_prefixes() with major cleanup on check_access().
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4f8251346144b1a545a4d49163d224e4014d52cb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 18:40:01 2005 +0000
+
+    Clean up logging in libsandbox.c, and hopefully make it more consistant.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d75d04ccd1cb2780c1f164332deab4557e573b79
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 17:35:30 2005 +0000
+
+    Change log dir to /var/log/sandbox/.  Make sure the sandboxed process cannot write to it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f46a6c2b143f1e7f650c01622e59b6e7b2bc3a92
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 00:36:46 2005 +0000
+
+    Remove unused 'pids file' code.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 270d0a8ae97fbf2947b4d4d03c6c09dd1750d547
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jul 6 00:12:49 2005 +0000
+
+    Remove unused variables.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c0da8ccef68b6df67efe30a73c32e188ca9a6ac6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 3 19:05:34 2005 +0000
+
+    Remove trailing ':' for SANDBOX_PREDICT.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cb97b15cff011b8dacd3c0d11ab3350761786e48
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 3 18:51:27 2005 +0000
+
+    * sandbox-1.2.10, try #2.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0f4f25f27e4ebcbb940da86f2ffb37312e151314
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 3 18:48:50 2005 +0000
+
+    * sandbox-1.2.10
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c9ef15676e1d30cda764ecb08a39eb9958da0fa2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Jul 3 18:48:22 2005 +0000
+
+    Fix typo in Robin's patch.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 7f8a1a9a3fedc0a4a3c995a70c171c649f74cd0f
+Author: Robin Johnson <robbat2@gentoo.org>
+Date:   Sun Jul 3 18:46:52 2005 +0000
+
+    Add PREDICT items for nss-db, bug #92079
+    
+    URL: http://bugs.gentoo.org/92079
+    Signed-off-by: Robin Johnson <robbat2@gentoo.org>
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c277956289d56e8ed259ebe3e6f7bc825d79b8c4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jun 17 12:32:02 2005 +0000
+
+    Move get_sandbox_*_envvar() to sandbox_setup_environ(), as its more appropriate there.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 9c62d427a4f6f18ac5609d8c6421230332780de9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Jun 17 12:10:14 2005 +0000
+
+    Remove fooling around with exit codes - we error out on presence of a log anyhow.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5503d12bf16a6613b7d92e593a29e1eedc723cdb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jun 14 21:59:07 2005 +0000
+
+    Label rename for clarity.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ee6684649676dc05d25ae0493855595f991c8de8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue Jun 14 21:57:00 2005 +0000
+
+    Cleanup the fail_nametoolong stuff a bit more.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 37abdf336ea67a6681e111f09022d1d613a3641e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jun 11 10:04:07 2005 +0000
+
+    Remove hopefully the last ld.so.preload bits we do not use anymore.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 53d8035cda3915ed845cf689b017caf81c25249f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jun 11 10:01:11 2005 +0000
+
+    Remove the unneeded canonicalize() calls in the wrappers - we do it anyhow
+    in check_syscall().  Should speed things up a bit (at least for the getcwd()
+    and long path name test it goes down to under a second, and not 10+ seconds
+    like before).  Also warn if we skip checking due to the canonicalized path
+    being too long.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2278e487916bcfc16aff757b75b773bff282a2e7
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jun 11 08:54:24 2005 +0000
+
+    More comment/readability cleanups
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 75578f47bef472ad0c98aa6127f69178555fbee7
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Jun 11 07:25:36 2005 +0000
+
+    Some strncpy/strncat and other cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 07754f24336ee227551acd912841a20f98f7b3ab
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 17:20:08 2005 +0000
+
+    * sandbox-1.2.9
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6d64f33eaa042832b516a8ff8c696e5c533fa4fb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 16:53:13 2005 +0000
+
+    Move symlink hack down a bit to try and minimize on the amount of lstat()
+    calls we do.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 262949767ca40be9e92abff51e3bcdfb9cecfb63
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 16:47:21 2005 +0000
+
+    Add hack to allow writing to /proc/self/fd (or /dev/fd), bug #91516.
+    
+    URL: http://bugs.gentoo.org/91516
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Chris Slycord <slycorc@cc.wwu.edu>
+
+commit 4f0670acb8f239e056386359fc3fbdff8eee129b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 15:47:25 2005 +0000
+
+    Add wrapper for access() function, bug #85413.
+    
+    URL: http://bugs.gentoo.org/85413
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: ratmice <ratmice@yahoo.com>
+
+commit c5f7df996e9274ce355e3dcd9b5bb606b124d1a8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 15:12:20 2005 +0000
+
+    Use generic getcwd() implementation from uclibc - should be more portable
+    and looks a bit cleaner.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ac78f9e774c5ee25ae4c9a024d62356e3cf93e37
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 14:42:11 2005 +0000
+
+    Make sure our true_* pointers are initialized to NULL, and that we check for
+    all references that they are valid.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a0ab51c4e1fdd5749098ef5071446b6c8d7aece5
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Jun 9 14:32:28 2005 +0000
+
+    Be default we will fail if the path name we try to canonicalize is too long.
+    
+    This however could cause issues with some things (bug #94630 and #21766), so
+    if fail_nametoolong == 0, canonicalize() will return a null length string and
+    do not fail.
+    
+    URL: http://bugs.gentoo.org/21766
+    URL: http://bugs.gentoo.org/94630
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Spider <spider@gentoo.org>
+    Reported-by: Michael Cramer <portage@bigmichi1.dyndns.org>
+
+commit 6d7a01f861debe240b875eeffff4a42aa014804d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jun 8 13:52:33 2005 +0000
+
+    Do not abort if TMPDIR is not valid, but rather use '/tmp', bug #94360
+    
+    Also make sure we re-export the new TMPDIR environment variable.
+    
+    URL: http://bugs.gentoo.org/94360
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Krzysiek Pawlik <nelchael@gentoo.org>
+
+commit 234d2edc846197c5bc3939f8256fe58daa37b76f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jun 8 13:39:53 2005 +0000
+
+    Whitespace fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit ed8568d1ae20c40e06e031e7dc3d684be22d01c6
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jun 8 13:37:18 2005 +0000
+
+    Fix incorrect free of non-malloc'd array, bug #92313 and #94020
+    
+    URL: http://bugs.gentoo.org/92313
+    URL: http://bugs.gentoo.org/94020
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Signed-off-by: Daniel Gryniewicz <dang@gentoo.org>
+    Signed-off-by: Marcus D. Hanwell <cryos@gentoo.org>
+    Reported-by: Mike Frysinger <vapier@gentoo.org>
+    Reported-by: Corey McGuire <coreyfro@coreyfro.com>
+
+commit a1690cf70011281dfcd520658d4d309daaad18fc
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Jun 8 13:29:37 2005 +0000
+
+    Add /dev/console to write list, bug #38588.
+    
+    URL: http://bugs.gentoo.org/38588
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Sascha Silbe <sascha-gentoo-bugzilla@silbe.org>
+
+commit 7d9bda636898052fa05d92fb6e58bba66b4e433a
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Sun Jun 5 07:45:28 2005 +0000
+
+    whitespace tweaks
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit d33d0afae00b075a110de18f5fb34fb695851a0e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 15:24:31 2005 +0000
+
+    * sandbox-1.2.8
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 34f83e7308b2e917cc6d59d0f71e3d55d82c7ba3
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 15:23:28 2005 +0000
+
+    General cleanups.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4d595fbed05d5eccf51950abe575c327f8916ed5
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 14:18:05 2005 +0000
+
+    Various LD_PRELOAD cleanups.  Do not unset LD_PRELOAD for parent.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit bc08094a41dbe7bcd6ec313483404b978b83d44c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 13:30:51 2005 +0000
+
+    Modify get_sandbox_pids_file(), get_sandbox_log() and get_sandbox_debug_log()
+    to use TMPDIR if present in environment.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 3debd276c5c6d668c065b7bca6473a87cb6b0993
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 12:53:15 2005 +0000
+
+    Remove sandbox_log_file from main() as its no longer used.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b972ca0c49c8f9b6f4c31b7730a3b0ce05b09f31
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri May 13 12:52:10 2005 +0000
+
+    Add get_sandbox_debug_log(), and use it (add behaviour similar to SANDBOX_LOG
+    if already exported when sandbox started).  Fix get_sandbox_log() and new
+    get_sandbox_debug_log() to not use already exported environment variables if
+    they have '/' in them.  Use snprintf()'s instead of strncpy()'s.  More
+    SB_PATH_MAX fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6e858afbad2f0593f6f74e8bc2a93e1d287184f8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu May 12 01:08:20 2005 +0000
+
+    Add comments about memory we do not free at the moment.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit b67e8dfd758e389774763f4ec6ec89fe54c662ff
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu May 12 00:09:00 2005 +0000
+
+    * sandbox-1.2.7
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 8e2030f3e892a8a924745663cc8175a42d9009eb
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu May 12 00:07:21 2005 +0000
+
+    More path limit fixes.  Declare SB_BUF_LEN global and use it where needed.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2ba7c60aa686c1e023605e41e17fb28c6380af41
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 23:59:50 2005 +0000
+
+    Fix paths limited to 255 chars.  Fix get_sandbox_dir() returning a string
+    with '(null)' in it if we did not call sandbox with absolute path.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit e67319475ce2ef1806e248d9c0dd53e5b92c0c09
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 23:35:14 2005 +0000
+
+    Set SANDBOX_ON *before* doing the child's env stuff, else its not set
+    for the child.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit c0712b819e6b1d116618d2c14116fb263c354041
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 23:28:42 2005 +0000
+
+    Remove global preload_adaptable as it is no longer used.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0d301f399743cf9583cd864b091a356295b1667e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 23:23:07 2005 +0000
+
+    Rewrite environment stuff to only be set when execve'ing the child process
+    
+    to try and avoid issues like bug #91541 that causes sandbox to crash if
+    we set LD_PRELOAD sandbox side already.
+    
+    URL: http://bugs.gentoo.org/91541
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Lasse Bigum <zenith@zenith.dk>
+
+commit a45c0756cfb02ffabc86b4489ce9a1a1117df1b5
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:52:08 2005 +0000
+
+    Move print_sandbox_log() up to make things neater.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1568506b4d6c3196e963defa9d2ea1921936d724
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:48:18 2005 +0000
+
+    Remove load_preload_libs(), as its not used anymore.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 19baf7bce8ee3991e8eb8db65f45a16fc2a2c50e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:42:45 2005 +0000
+
+    Remove NO_FORK stuff, as its not used, and 'strace -f' works just fine.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 1403e7929c41e5a2b3cfd75493ef3b4931d9b24d
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:40:51 2005 +0000
+
+    Remove USE_SYSTEM_SHELL stuff, as it is not secure, and not in use (continued).
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f76577b8e85fc78e160a502b9bbcf3acc9afb56e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:39:13 2005 +0000
+
+    Remove USE_SYSTEM_SHELL stuff, as it is not secure, and not in use.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 81d9c4f68629221fa6c39925f15468ddd6d9eda9
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 11 15:36:36 2005 +0000
+
+    Remove ld.so.preload crap - we are not going to use it again.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f6bbf1c8872a5dc73b57c2c01431d89ac1f58adf
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 10 07:38:49 2005 +0000
+
+    Fix typo in code that checks if we got valid group information, causing a
+    
+    segmentation fault, bug #91637.
+    
+    URL: http://bugs.gentoo.org/91637
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Olivier Crete <tester@gentoo.org>
+
+commit ed4ba939f440ff848906f75c9f7ea2a58617d651
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 10 07:10:50 2005 +0000
+
+    Really remove libctest.c
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cdab007d2bf39307d1b7d5682bdd4991c953018a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 10 07:09:21 2005 +0000
+
+    * sandbox-1.2.6
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4b1f983e8deea8c0d1683ec46855a5c5dbbe994b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 10 07:08:21 2005 +0000
+
+    Do not use LD_PRELOAD if it contains libtsocks.so, as it breaks sandbox
+    
+    for some odd reason, bug #91541.
+    
+    URL: http://bugs.gentoo.org/91541
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Lasse Bigum <zenith@zenith.dk>
+
+commit b1e6a203300b94122588c92a554788570278476b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon May 9 18:00:45 2005 +0000
+
+    Fix typo (sizeof -> strlen).
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 10739188e3f87d520d90667a55316de2ca0bc976
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sun May 8 11:27:37 2005 +0000
+
+    rewrote sbcontext caching so it accounts for env changes since lib initialization.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit ed0b393782c3ca906e04fb59bb4242dc5176c569
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 4 23:35:39 2005 +0000
+
+    We create libctest.c via configure, so no need to keep it around.  Do some
+    cleanup related to libctest.c and libctest during configure.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 72148bc1d73c5a2b6ab3f7d3bc09859f45a8a329
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 4 15:33:47 2005 +0000
+
+    Add rename support of symlinks pointing to protected files/directories.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 5e11e90db093afb6c5d83a04667984757ed70e77
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 4 15:01:12 2005 +0000
+
+    * sandbox-1.2.5
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit fab138a96d080bd9946b1299873204db6b4e757f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed May 4 14:46:50 2005 +0000
+
+    Do not reset already set LD_PRELOAD when starting sandbox.  If LD_PRELOAD is
+    
+    already set, init of the env vars fails for some reason, so do this later on,
+    and do not warn (bug #91431).
+    
+    URL: http://bugs.gentoo.org/91431
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Nguyen Thai Ngoc Duy <pclouds@gentoo.org>
+
+commit 3cad2e257f07baa90b4c107f6484bf4eb8addc81
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 3 21:43:50 2005 +0000
+
+    Fixup sandbox and sandbox.bashrc to call bash with the proper .bashrc.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 83199e4da40b9ba00ed5db549f64cd78f5aba007
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 3 11:07:38 2005 +0000
+
+    * sandbox-1.2.4
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit cd4334b071566d6061b3020ee4489863309ff15f
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 3 11:06:08 2005 +0000
+
+    Add bug #91040 for previous change.
+    
+    URL: http://bugs.gentoo.org/91040
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Andrej Filipcic <andrej.filipcic@ijs.si>
+
+commit fddc5695421ed3f40b14c1d59aff684cfdcde9cd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 3 10:56:19 2005 +0000
+
+    Do not init the env entries with each call, as it creates too many calls to
+    
+    lstat, etc.  Should speedup things a bit.
+    
+    URL: http://bugs.gentoo.org/91040
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Andrej Filipcic <andrej.filipcic@ijs.si>
+
+commit 3fd16082eaaaa86ab5f91a0b55bc0a7ecf24b8f0
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Tue May 3 09:59:26 2005 +0000
+
+    Add /dev/pty to default write list.  Noticed by Morfic.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0114a5c3ab1bc32c1d0886e069cadfe786c1a18c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon May 2 23:58:47 2005 +0000
+
+    whitespace fixes
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 9e3f0cef92bc58071c0257a019831b4b681e01b5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon May 2 23:53:52 2005 +0000
+
+    dont define BROKEN_RTLD_NEXT in uClibc
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f516e65bc7634a77fcdd480023f13d87e940e3ef
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Mon May 2 23:53:39 2005 +0000
+
+    dlvsym doesnt exist in uClibc
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit f02d208cc22585354a937bcaa861f3bd58981a70
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Fri Apr 29 22:18:22 2005 +0000
+
+    use dnl for comments, not #
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 1f4e63082e4d301838cd1230fe9bbbfc582ceb18
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Apr 29 13:37:57 2005 +0000
+
+    sandbox-1.2.3
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 42390f5dd42be12b1665dd77855e37f353b8ef75
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Apr 29 00:22:48 2005 +0000
+
+    I cannot spell, shoot me.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit f7190baf7b22bcff411b709d201abdbc8106a95b
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Fri Apr 29 00:15:08 2005 +0000
+
+    Add comment for CXX/F77 puntage
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2e28b2d23e3a95f543cbbeb2ed70a11cfb890d08
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Apr 28 23:43:32 2005 +0000
+
+    Do not check for (*&#$(* CXX or F77.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2583fdcc17a5d9bfd78103541887857accb124d7
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 28 22:54:22 2005 +0000
+
+    gawk -> $AWK
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 5b96f6c577312dc0496b86e7f65c4d723cbd44c4
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Apr 28 22:41:57 2005 +0000
+
+    Do not append '/' to pathname in filter_path() if it already ends with it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit a4f0a206b2095e5186e613acf0dc5e1c441ef5c4
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 28 22:21:10 2005 +0000
+
+    fix cross-compiling and uclibc and all that jazz
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit adfe64a18ab45ae5d00be00fa29fccdc14a83fc1
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 28 22:20:37 2005 +0000
+
+    whitespace fixes and move LIBC_VERSION to config.h
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 68d89b001251b6cf341f58558eeab198b2dcc907
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 28 22:19:19 2005 +0000
+
+    use automake-1.9 (not that it really matters eh)
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit cede7741e89ebc7cc05325ffd78b878215e0182c
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Apr 28 22:18:52 2005 +0000
+
+    remove the symbols header file
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 2424516742bd511b336ac10e6847f61223d55d67
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Apr 28 16:18:36 2005 +0000
+
+    * sandbox-1.2.2
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6b9561281a276eee476765dc8f455e569d34acdd
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Thu Apr 28 15:49:30 2005 +0000
+
+    Only check for /dev/{null,zero} for unlink hack, else ricers using /dev/shm
+    
+    have issues; bug #90592.
+    
+    URL: http://bugs.gentoo.org/90592
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Robin Johnson <robbat2@gentoo.org>
+
+commit 142d77aae37d46e4bbdd1b3904435a489b1bcb9c
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Apr 23 21:03:40 2005 +0000
+
+    Add sandbox-1.2 release comment to ChangeLog
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 0072d9d3ca9255ee342500a10bfe7834e06a045a
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Apr 23 20:52:57 2005 +0000
+
+    sandbox-1.2.1
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d07476b41ebf9d62a745d51066474bbac9b2b3d2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sat Apr 23 20:44:15 2005 +0000
+
+    Make sure all functions used in libsandbox.c is declared static.  Define
+    
+    SB_STATIC in localdecls.h for this.  Include sandbox_futils.c rather than
+    linking with its object.  Hopefully this will fix bug #90153.
+    
+    URL: http://bugs.gentoo.org/90153
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Alexandre Rostovtsev <tetromino@gmail.com>
+
+commit 254d8d150f3692ac4b34e309ea4e46e9988b984f
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Apr 23 06:21:03 2005 +0000
+
+    Tagged and bagged 1.2
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 34214c6c62bafca64f50921b867e9e9883e59251
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Mar 21 23:30:13 2005 +0000
+
+    Allow lchown a symlink in write-allowed path pointing to write-denied target.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit d43c0e034f6ce9152b25868afd7fe0dcf25eb16f
+Author: Marius Mauch <genone@gentoo.org>
+Date:   Mon Mar 21 08:54:02 2005 +0000
+
+    show resolved symlinks in log
+    
+    Signed-off-by: Marius Mauch <genone@gentoo.org>
+
+commit fbb34b9081f88e24e3a8dfeb1e4077b8bbf34ec9
+Author: Marius Mauch <genone@gentoo.org>
+Date:   Mon Mar 14 16:00:45 2005 +0000
+
+    dropping duplicate symbols
+    
+    Signed-off-by: Marius Mauch <genone@gentoo.org>
+
+commit 4173f398f0f7aec50773b851164af436dae9c6b8
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Mon Mar 14 00:28:10 2005 +0000
+
+    Seems -nostdlib was the problem with the constructor/destructor - remove it
+    from Makefile.am, and change the constructor/destructor names again.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4db24ea4c0da0ec3287dfa2e4e8040c38ed6d262
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Mar 13 23:29:28 2005 +0000
+
+    Also rename the _init() and _fini() declarations.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 4c9cfe2dddba6eceb3c408dd2716f7a55c402dfe
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Sun Mar 13 23:23:00 2005 +0000
+
+    Fixup the constructor/destructor function names again (they should be _init()
+    
+    and _fini() it seems, and not being called caused sandbox_lib_path to be
+    unset, and thus breaking the execve() wrapper's LD_PRELOAD protection).
+    Add both the path in given SANDBOX_x variable, as well as its symlink
+    resolved path in init_env_entries().  Modify filter_path() to be able to
+    resolve paths without resolving symlinks, as well as to be able to resolve
+    symlinks.  Fix a possible segfault in check_access().  Add symlink resolving
+    to check_access() resolving bug #31019.  Add 'hack' for unlink, as the fix
+    for bug #31019 cause access violations if we try to remove a symlink that is
+    not in protected path, but points to a protected path.  Fix a memory leak in
+    sandbox.c (sandbox_pids_file in main()).  Fix the realpath() calls in main()
+    (sandbox.c) being unchecked.  Fix the debug logname not having the pid in it
+    (pid_string was uninitialized).  General syntax cleanups.
+    
+    URL: http://bugs.gentoo.org/31019
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: Andrea Luzzardi <scox@sig11.org>
+
+commit b5f747d6757d0b0871c41c70d46a34bb24059675
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Wed Mar 9 07:39:50 2005 +0000
+
+    happy output time.
+    missing new line.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit d332990aa00afa2490c1cb298d1c53a23614e6d3
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Wed Mar 9 07:34:30 2005 +0000
+
+    correct symbols.h building when libdir !+ "/lib"
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 2616a5a14e09454733ff6d0b8eaa6847d01aef18
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Mar 2 17:30:16 2005 +0000
+
+    Hack to make sure sandboxed process cannot remove a device node
+    
+    URL: http://bugs.gentoo.org/79836
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+    Reported-by: David Wood <jbevren@yahoo.com>
+
+commit 5ecb9985810a929cc9722bb826dc7915088f247e
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Mar 2 09:18:01 2005 +0000
+
+    Fix symbols.in not added to dist.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 6cf5c3ca64e594bf068ac11bb0c5bb35904706d7
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Mar 2 09:04:45 2005 +0000
+
+    White space fixes.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 477d4cb3b2f4d28304f0778d84aaef545bae58e2
+Author: Martin Schlemmer <azarah@gentoo.org>
+Date:   Wed Mar 2 09:01:36 2005 +0000
+
+    Fix inverse test logic in canonicalize.c, use a strncpy.  Fix gcc warning in
+    getcwd.c.  Add symbols.in and logic to Makefile.am to generate symbol versions
+    for glibc and other libc's that use this.  Update libsandbox.c to use these
+    symbol versions if available.  Fix exec wrapper to re-export LD_PRELOAD if the
+    process unset it.
+    
+    Signed-off-by: Martin Schlemmer <azarah@gentoo.org>
+
+commit 2d62019fb429798ba96cab96b3a5ad7d4db76e5f
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Wed Mar 2 05:48:12 2005 +0000
+
+    killed off _init and _fini in favor of
+    void __attribute__ ((constructor)) init_func and
+    void __attribute__ ((destructor)) closing_func.  _(init|func) were deprecated.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 9e0e7c36c0958860433ba2453c41890a461d1424
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Wed Mar 2 05:36:46 2005 +0000
+
+    work damn you.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 78bfdb4cee54fc60ec4ea3e6464dffc76813df65
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Mon Dec 6 21:42:51 2004 +0000
+
+    hopefully cvs is done being stupid.  Compilation fixes, along w/ make dist fix.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 08f4d01d67407c4c458e197c061de377a2a5ab67
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sun Dec 5 06:14:21 2004 +0000
+
+    compilation fixups.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 88064e02ca4aa710b6954d715caa78e33ebd8bac
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sun Dec 5 05:42:10 2004 +0000
+
+    should make things compile again
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit c519aea6404bd3dc7021fd7f994440e6744a2ee6
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Dec 2 05:22:49 2004 +0000
+
+    turn create-localdecls into semi-autotooled
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit 6e7527a0b5ca6b480c2b58f4e681a68cd66019df
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Dec 2 05:20:50 2004 +0000
+
+    need to include config.h
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit e5a2ddec3d454646a656571825c63fa8bddea7f5
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Dec 2 04:46:02 2004 +0000
+
+    touchups
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit bbd9f279d157cce13b7b198922678b54df54ff05
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Dec 2 02:53:00 2004 +0000
+
+    scripts to generate/clean build
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit fe061d7f38cfe70226603ddd97b3d64a8a276287
+Author: Mike Frysinger <vapier@gentoo.org>
+Date:   Thu Dec 2 02:52:46 2004 +0000
+
+    remove generated files
+    
+    Signed-off-by: Mike Frysinger <vapier@gentoo.org>
+
+commit c5d5197e0db46558eae3b287e74e5f3a1d406e17
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Thu Dec 2 02:25:36 2004 +0000
+
+    stupid libtool.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 39b92fd2fe791a8db057aad06f8469bd0d6f1c3a
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sun Nov 21 02:23:33 2004 +0000
+
+    adjustment so it stops installing a couple of extra srcs to /usr/share.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit dfb9a2160ea1eb7016362e4a6bd146445a85b270
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 13:21:37 2004 +0000
+
+    corrections to remove hardcoded paths.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit b6a187154186eda1dee8769e3e8183218c96e4e7
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 13:21:06 2004 +0000
+
+    nore should these.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 86d035969e4434bf14fd4752070fa36774e65d11
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 13:20:02 2004 +0000
+
+    this shouldn't be in cvs.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 8d79451e82e27c62c64dc660e9ebe39d0c169899
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 13:05:24 2004 +0000
+
+    removed the /usr/lib/portage/ hardcoded reference for bashrc.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit b6952e5c5c394e5f202b31044e1d15fb70e70e33
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 09:26:09 2004 +0000
+
+    nuke the creation of a gz for dist target.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 9a9a218e8779754d0344e86ce7e925ca4d4530c5
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 00:49:15 2004 +0000
+
+    final make dist tweak.  stupid bugger.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit f3c5c1860471e5bf0026247c1e31800e2b0626ec
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 00:43:01 2004 +0000
+
+    corrections for make dist, include canocicalize.c
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit ebe90135b22bfaff450c21dfa99db580a393f8ed
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 00:28:03 2004 +0000
+
+    changed the dist target to include building bz2'd tarballs.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 3af963253dff232c79a811b3da903fb2877b8fef
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 00:21:17 2004 +0000
+
+    annoying autotool files.  stuck usual copyright stuff w/ gpl v2 notice in COPYING.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 2fa024d17e53dca4649d00eb330e7de25f281844
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Sat Nov 20 00:17:06 2004 +0000
+
+    a quicky attempt at making authors actually useful.  Fairly complete from what I can see.  Basically walked the
+    changelogs, cvs logs, etc.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit b82860b7e655382e0ef7d9f3b052b702333bae29
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Fri Nov 19 22:11:38 2004 +0000
+
+    entry regarding cvs shift, and the beast being autotooled.
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>
+
+commit 79cb18ddd2ab2ea4ee108f21dd80a29548faefba
+Author: Brian Harring <ferringb@gentoo.org>
+Date:   Fri Nov 19 22:03:42 2004 +0000
+
+    Initial revision
+    
+    Signed-off-by: Brian Harring <ferringb@gentoo.org>

@@ -1,0 +1,712 @@
+# ChangeLog for Path Sandbox
+# Copyright 1999-2005 Gentoo Foundation; Distributed under the GPL v2
+
+  01 Dec 2005; Martin Schlemmer <azarah@gentoo.org> configure.in, Makefile.am,
+  localdecls.h, scripts/Makefile.am, scripts/gen_symbol_version_map.awk,
+  scripts/gen_symbol_header.awk, src/Makefile.am, src/symbols.in,
+  src/libsandbox.c, src/getcwd.c, src/sandbox.c, data/sandbox.bashrc:
+
+  Use versioned symbols on supported libc's for functions we wrap, as well as
+  provide all versions of specific functions.  Some syntax cleanups.
+
+  Only check SANDBOX_ACTIVE, and not its value.  More BASH_ENV fixes.
+
+  Rename configure.in to configure.ac.
+
+  Fix non-versioned libc's to also prepend '__' to internal symbols by using
+  strong aliases.
+
+  Remove the SB_STATIC and including of getcwd.c, etc voodoo, as we new use a
+  symbol map, and all non-exported symbols are local.  Cleanup getcwd.c, as
+  the generic getcwd for older 2.4 kernels do not work properly anyhow, and
+  just makes things slower.  Some other warning fixes.
+
+  Rename src/symbols.in to src/symbols.h.in.
+
+  Cleanup local defines for egetcwd() and erealpath().
+
+  Rename filter_path() to resolve_path() and other renames for clarity.
+
+  Fixup SANDBOX_ON handling after already running changes.
+
+  Use egetcwd() in sandbox.c.
+
+  Rather use fstat() to get file size in file_length() than lseek().
+
+  Wrap mknod() as well.  Misc cleanups.
+
+  Wrap mkfifo() as it seems it was missing.
+
+  28 Nov 2005; Martin Schlemmer <azarah@gentoo.org> configure.in, sandbox.c,
+  sandbox_fdutils.c:
+
+  Detect if we on 64bit arch automatically.
+
+  Update contact email.  Fix quoting.
+
+  Revert 64bit arch test, as we should build the 32bit version without full
+  path checking as well, and add --enable-multilib switch to configure.
+
+* sandbox-1.2.14 (2005/11/28)
+
+  28 Nov 2005; Martin Schlemmer <azarah@gentoo.org> getcwd.c, libsandbox.c,
+  sandbox.c, sandbox.h, sandbox.bashrc:
+
+  Check generic getcwd()'s return as well for validity, bug #101728.
+
+  Cleanup environ variables.
+
+  Rather check SANDBOX_ACTIVE if we are already running. Set SANDBOX_ACTIVE
+  to readonly in sandbox.bashrc.
+
+  Make sure we use our bashrc.
+
+  01 Nov 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+
+  Do not pass mode to true_open and true_open64 if not needed.  Should fix a
+  segfault in some cases.
+
+* sandbox-1.2.13 (2005/09/12)
+
+  12 Sep 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, libsandbox.c:
+
+  Do not handle adding working directory to SANDBOX_WRITE, as portage does it
+  itself.
+
+  Make libsb_fini() do cleanup a bit more complete just in case we get another
+  uClibc 'call preloaded library fini before that of app' issue ... probably
+  will not help much, but we try.
+
+  04 Sep 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+
+  Also allow symlink() system call to operate on a symlink in a writable path
+  that points to non-writable path, bug #104711.
+
+* sandbox-1.2.12 (2005/08/05)
+
+  05 Aug 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h:
+
+  Do not give an access violation if the access() system call do not have
+  write/read access - it does not actually modify, so we only need to return
+  not being able to write/read.  Noted by Andres Loeh <kosmikus@gentoo.org>,
+  bug #101433.
+
+  If we are called from the command line, do not care about PORTAGE_TMPDIR,
+  and make the current directory the work directory.  Also rename the variable
+  portage_tmp_dir to work_dir.
+
+  Remove the tmp_dir variable - we do not need it.
+
+  Improve error handling for get_sandbox_*_envvar() functions.
+
+  01 Aug 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+
+  Still do normal log if debugging is requested.
+
+  Add support for SANDBOX_VERBOSE (enabled by default).  Adjust SANDBOX_DEBUG
+  to only enable if equal to "1" or "yes".
+
+  Add /dev/tts to write permit, bug #42809.
+
+  27 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h,
+  sandbox_futils.c:
+
+  Do not resolve symlinks in PORTAGE_TMPDIR in sandbox .. we will handle that
+  in libsandbox .. bug #100309.
+
+  22 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.h:
+
+  Print all logging to stderr, bug #90343, comment #15, by Zac Medico.
+
+* sandbox-1.2.11 (2005/07/14)
+
+  14 July 2005; Martin Schlemmer <azarah@gentoo.org> getcwd.c:
+  Fix getcwd, bug #98419.
+
+  08 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox_futils.c,
+  libsandbox.c:
+  - Try to cleanup and make error handling/printing consistent.
+  - Remove old logs if present and conflicting with current.
+  - Fix compile error with previous change, and return rather then exit().
+
+  07 July 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h, sandbox_futils.c:
+  - Fix possible segfault in env init code.
+  - Major cleanup of sandbox_futils.c.  Removed most of the functions as we now
+    write to /var/log/sandbox/, so in theory do not need all that.
+  - Redo the interface of the get_* functions so that we do not leak memory.
+  - Remove sandbox_dir and co - we are not using it anymore.
+  - Remove unused includes and variables.
+  - Only declare functions in sandbox_futils.c that are used in libsandbox.c when
+    OUTSIDE_LIBSANDBOX is not defined.
+  - Cleanup access/log printing.  Make access printing honour NOCOLOR.  Fix log
+    printing's last line not honouring NOCOLOR.
+
+  06 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.h, sandbox_futils.c,
+  libsandbox.c:
+  - Change log dir to /var/log/sandbox/.  Make sure the sandboxed process cannot
+    write to it.
+  - Clean up logging in libsandbox.c, and hopefully make it more consistant.
+  - Add check_prefixes() with major cleanup on check_access().
+  - Cleanup init_env_entries() and check_prefixes().
+
+  05 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h,
+  sandbox_futils.c, libsandbox.c:
+  Remove unused 'pids file' code.
+
+* sandbox-1.2.10 (2005/07/03)
+
+  03 July 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Add PREDICT items for nss-db, bug #92079.  Patch from Robin Johnson.
+
+  17 June 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  General cleanups:
+  - Remove fooling around with exit codes - we error out on presence of a log
+    anyhow.
+  - Move get_sandbox_*_envvar() to sandbox_setup_environ(), as its more
+    appropriate there.
+
+  12 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Cleanup the fail_nametoolong stuff a bit more.
+
+  11 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Remove hopefully the last ld.so.preload bits we do not use anymore.
+
+  11 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Remove the unneeded canonicalize() calls in the wrappers - we do it anyhow
+  in check_syscall().  Should speed things up a bit (at least for the getcwd()
+  and long path name test it goes down to under a second, and not 10+ seconds
+  like before).  Also warn if we skip checking due to the canonicalized path
+  being too long.
+
+  11 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  More comment/readability cleanups.
+
+  10 June 2005; Martin Schlemmer <azarah@gentoo.org> canonicalize.c, getcwd.c,
+  sandbox_futils.c, libsandbox.c:
+  Some strncpy/strncat and other cleanups.
+
+* sandbox-1.2.9 (2005/06/09)
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Move symlink hack down a bit to try and minimize on the amount of lstat()
+  calls we do.
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c:
+  Add hack to allow writing to /proc/self/fd (or /dev/fd), bug #91516.
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> symbols.in, libsandbox.c:
+  Add wrapper for access() function, bug #85413.
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> getcwd.c:
+  Use generic getcwd() implementation from uclibc - should be more portable
+  and looks a bit cleaner.
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> getcwd.c, libsandbox.c:
+  Make sure our true_* pointers are initialized to NULL, and that we check for
+  all references that they are valid.
+
+  09 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Be default we will fail if the path name we try to canonicalize is too long.
+  This however could cause issues with some things (bug #94630 and #21766), so
+  if fail_nametoolong == 0, canonicalize() will return a null length string and
+  do not fail.
+
+  08 June 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox_futils.c:
+  Do not abort if TMPDIR is not valid, but rather use '/tmp', bug #94360.  Also
+  make sure we re-export the new TMPDIR environment variable.
+
+  08 June 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Fix incorrect free of non-malloc'd array, bug #92313 and #94020.  Fix noted
+  by Marcus D. Hanwell <cryos@gentoo.org>.
+
+  08 June 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Add /dev/console to write list, bug #38588.
+
+* sandbox-1.2.8 (2005/05/13)
+
+  13 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h, sandbox_futils.c:
+  General cleanups.
+
+  13 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h:
+  Various LD_PRELOAD cleanups.  Do not unset LD_PRELOAD for parent.
+
+  13 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h, sandbox_futils.c:
+  Modify get_sandbox_pids_file(), get_sandbox_log() and get_sandbox_debug_log()
+  to use TMPDIR if present in environment.
+
+  13 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Remove sandbox_log_file from main() as its no longer used.
+
+  13 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h,
+  sandbox_futils.c:
+  Add get_sandbox_debug_log(), and use it (add behaviour similar to SANDBOX_LOG
+  if already exported when sandbox started).  Fix get_sandbox_log() and new
+  get_sandbox_debug_log() to not use already exported environment variables if
+  they have '/' in them.  Use snprintf()'s instead of strncpy()'s.  More
+  SB_PATH_MAX fixes.
+
+* sandbox-1.2.7 (2005/05/12)
+
+  12 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h,
+  sandbox_futils.c:
+  More path limit fixes.  Declare SB_BUF_LEN global and use it where needed.
+
+  12 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox_futils.c:
+  Fix paths limited to 255 chars.  Fix get_sandbox_dir() returning a string
+  with '(null)' in it if we did not call sandbox with absolute path.
+
+  12 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Set SANDBOX_ON *before* doing the child's env stuff, else its not set
+  for the child.
+
+  12 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Remove global preload_adaptable as it is no longer used.
+
+  12 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Rewrite environment stuff to only be set when execve'ing the child process
+  to try and avoid issues like bug #91541 that causes sandbox to crash if
+  we set LD_PRELOAD sandbox side already.
+
+  11 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Move print_sandbox_log() up to make things neater.
+
+  11 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Remove load_preload_libs(), as its not used anymore.
+
+  11 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h:
+  Remove NO_FORK stuff, as its not used, and 'strace -f' works just fine.
+
+  11 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h:
+  Remove USE_SYSTEM_SHELL stuff, as it is not secure, and not in use.
+
+  11 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h:
+  Remove ld.so.preload crap - we are not going to use it again.
+
+  10 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox_futils.c:
+  Fix typo in code that checks if we got valid group information, causing a
+  segmentation fault, bug #91637.
+
+* sandbox-1.2.6 (2005/05/10)
+
+  10 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Do not use LD_PRELOAD if it contains libtsocks.so, as it breaks sandbox
+  for some odd reason, bug #91541.
+
+  09 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Fix typo (sizeof -> strlen).
+
+  08 May 2005; Brian Harring <ferringb@gentoo.org> libsandbox.c:
+  rewrote the sbcontext caching code so it accounts for env changes since lib
+  initialization.
+
+  05 May 2005; Martin Schlemmer <azarah@gentoo.org> configure.in, libctest.c:
+  We create libctest.c via configure, so no need to keep it around.  Do some
+  cleanup related to libctest.c and libctest during configure.
+
+  04 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Add rename support of symlinks pointing to protected files/directories.
+
+* sandbox-1.2.5 (2005/05/04)
+
+  04 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.bashrc:
+  Do not reset already set LD_PRELOAD when starting sandbox.  If LD_PRELOAD is
+  already set, init of the env vars fails for some reason, so do this later on,
+  and do not warn (bug #91431).
+
+  03 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox.h,
+  sandbox.bashrc:
+  Fixup sandbox and sandbox.bashrc to call bash with the proper .bashrc.
+
+* sandbox-1.2.4 (2005/05/03)
+
+  03 May 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Do not init the env entries with each call, as it creates too many calls to
+  lstat, etc.  Should speedup things a bit, bug #91040.
+
+  03 May 2005; Martin Schlemmer <azarah@gentoo.org> sandbox.c:
+  Add /dev/pty to default write list.  Noticed by Morfic.
+
+  02 May 2005; Mike Frysinger <vapier@gentoo.org> configure.in, localdecls.h, 
+  sandbox.h:
+  uClibc doesn't support dlvsym() so add a configure check to make sure it doesn't 
+  exist.  Also update localdecls.h so BROKEN_RTLD_NEXT isn't defined in uClibc.
+
+* sandbox-1.2.3 (2005/04/29)
+
+  29 Apr 2005; Martin Schlemmer <azarah@gentoo.org> configure.in:
+  Do not check for (*&#$(* CXX or F77.
+
+  29 Apr 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Do not append '/' to pathname in filter_path() if it already ends with it.
+
+  28 Apr 2005; Mike Frysinger <vapier@gentoo.org> Makefile.am, configure.in:
+  With az's help, clean up autotools to work with cross-compiling.
+
+* sandbox-1.2.2 (2005/04/28)
+
+  28 Apr 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Only check for /dev/{null,zero} for unlink hack, else ricers using /dev/shm
+  have issues; bug #90592.
+
+* sandbox-1.2.1 (2005/04/23)
+
+  23 Apr 2005; Martin Schlemmer <azarah@gentoo.org> Makefile.am, canonicalize.c,
+  getcwd.c, libsandbox.c, localdecls.h, sandbox.h, sandbox_futils.c:
+  Make sure all functions used in libsandbox.c is declared static.  Define
+  SB_STATIC in localdecls.h for this.  Include sandbox_futils.c rather than
+  linking with its object.  Hopefully this will fix bug #90153.
+
+* sandbox-1.2 (2005/04/23)
+
+  22 Mar 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Allow lchown a symlink in write-allowed path pointing to write-denied
+  target.
+
+  21 Mar 2005; Marius Mauch <genone@gentoo.org> libsandbox.c:
+  Also show resolved symlink names in the log.
+
+  14 Mar 2005; Martin Schlemmer <azarah@gentoo.org> Makefile.am, libsandbox.c:
+  Seems -nostdlib was the problem with the constructor/destructor - remove it
+  from Makefile.am, and change the constructor/destructor names again.
+
+  14 Mar 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Also rename the _init() and _fini() declarations.
+
+  14 Mar 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c:
+  Fixup the constructor/destructor function names again (they should be _init()
+  and _fini() it seems, and not being called caused sandbox_lib_path to be
+  unset, and thus breaking the execve() wrapper's LD_PRELOAD protection).
+  Add both the path in given SANDBOX_x variable, as well as its symlink
+  resolved path in init_env_entries().  Modify filter_path() to be able to
+  resolve paths without resolving symlinks, as well as to be able to resolve
+  symlinks.  Fix a possible segfault in check_access().  Add symlink resolving
+  to check_access() resolving bug #31019.  Add 'hack' for unlink, as the fix
+  for bug #31019 cause access violations if we try to remove a symlink that is
+  not in protected path, but points to a protected path.  Fix a memory leak in
+  sandbox.c (sandbox_pids_file in main()).  Fix the realpath() calls in main()
+  (sandbox.c) being unchecked.  Fix the debug logname not having the pid in it
+  (pid_string was uninitialized).  General syntax cleanups.
+
+  09 Mar 2005; Brian Harring <ferringb@gentoo.org> sandbox.c: Fixed the 
+  infamous "pids file is not a regular file" w/out newline bug.
+
+  09 Mar 2005; Brian Harring <ferringb@gentoo.org> Makefile.am, configure.in:
+  Correct libc_version path detection, since it was screwing up if libdir != 
+  "/lib/".
+
+  02 Mar 2005; Martin Schlemmer <azarah@gentoo.org> libsandbox.c:
+  Hack to make sure sandboxed process cannot remove a device node, bug #79836.
+
+  02 Mar 2005; Martin Schlemmer <azarah@gentoo.org> Makefile.am:
+  Fix symbols.in not added to dist.
+
+  02 Mar 2005; Martin Schlemmer <azarah@gentoo.org> Makefile.am, canonicalize.c,
+  getcwd.c, libsandbox.c, sandbox.c, sandbox.h, sandbox_futils.c:
+  White space fixes.
+
+  02 Mar 2005; Martin Schlemmer <azarah@gentoo.org> Makefile.am, canonicalize.c,
+  configure.in, getcwd.c, libsandbox.c, symbols.in:
+  Fix inverse test logic in canonicalize.c, use a strncpy.  Fix gcc warning in
+  getcwd.c.  Add symbols.in and logic to Makefile.am to generate symbol versions
+  for glibc and other libc's that use this.  Update libsandbox.c to use these
+  symbol versions if available.  Fix exec wrapper to re-export LD_PRELOAD if the
+  process unset it.
+
+  01 Mar 2005; Brian Harring <ferringb@gentoo.org> libsandbox.c: 
+  killed off _init and _fini in favor of 
+  void __attribute__ ((constructor)) init_func and
+  void __attribute__ ((destructor)) closing_func.  _(init|func) were deprecated.
+
+  06 Dec 2004; Brian Harring <ferringb@gentoo.org> Makefile.am, libsandbox.c,
+  canonicalize.c, getcwd.c: Fixed compilation *again*.  Hopefully cvs is done
+  having the hick-ups.
+
+  04 Dec 2004; Brian Harring <ferringb@gentoo.org> libsandbox.c, getcwd.c,
+  Makefile.am:  Fixed compilation.
+
+  01 Dec 2004; Brian Harring <ferringb@gentoo.org> aclocal.m4:
+  Gutted the bugger so it stops checking for a c++ and fortran compiler.
+  Do *not* regenerate aclocal.m4 for making a release until a better 
+  solution is created.
+
+  20 Nov 2004; Brian Harring <ferringb@gentoo.org> Makefile.am, sandbox_futils.c:
+  Removal of more hardcoded paths.
+
+  20 Nov 2004; Brian Harring <ferringb@gentoo.org> Makefile.am, configure.in,
+  sandbox_futils.c: tweaks to install sandbox.bashrc, and use it.
+
+  19 Nov 2004; Brian Harring <ferringb@gentoo.org>:
+  Sandbox is now autotooled, create-localdecls needs to be killed and the code
+  shifted into configure.in.  Currently builds *one* libsandbox.so- if multiple
+  are desired (-m64 and -m32 for amd64), the ebuild should do it (imo).
+  To get to a point of testing, automake && autoconf; created requisite files w/
+  a(utomake|clocal)-1.8, and autoconf 2.59.  Installs to /usr/, instead of 
+  /lib and /usr/lib/portage/bin.
+
+  14 Nov 2004; Brian Harring <ferringb@gentoo.org> libsandbox.c, sandbox.c:
+  closing out bug #70225, potential overflow of the sandbox_pids_file var.
+
+  07 Nov 2004; Brian Harring <ferringb@gentoo.org> libsandbox.c: c99 standard, 
+  (think it was at least) allows intermixing of code and data segments.  bug #70351
+  should be fixed by this.
+
+  03 Nov 2004; Brian Harring <ferringb@gentoo.org> libsandbox.c, sandbox_futils.c:
+  futils fix from bug #65201 via solar, and libsandbox log path checks via #69137
+
+  02 Aug 2004; Nicholas Jones <carpaski@gentoo.org> libsandbox.c: Code from
+  Seth Robertson that tracked down all adjuct flags for read operations that
+  do not invoke a write operation.
+
+  04 Apr 2004; Nicholas Jones <carpaski@gentoo.org> libsandbox.c, sandbox.c:
+  Another fix from jstubbs regarding a free() on a stack variable for the
+  environment -- tracking now prevents extraneous free()'s segfault.
+  
+  04 Apr 2004; Nicholas Jones <carpaski@gentoo.org> libsandbox.c, sandbox.c:
+  J. Stubbs tracked down a new bug where mkdir was failing to the patch on
+  the lstat in mkdir... it now only returns 0 or -1 as documented for mkdir.
+  Also remove the errno = ESUCCESS settings as documentation points out that
+  a library isn't allowed to do that.
+
+  04 Apr 2004; Nicholas Jones <carpaski@gentoo.org> libsandbox.c: Added a
+  file_security_check() function to check random potential exploits on files
+  that sandbox is to load and read -- Normally sandboxpids.tmp. This fixes
+  the 'system-crippling' exploits (bug 21923) and catches a few other
+  potential problems.
+
+  20 Mar 2004; Nicholas Jones <carpaski@gentoo.org> Makefile: Updates for
+  32/64 bit sandbox. Made CC and LD '?=' values to allow passed in CC to work.
+
+  20 Mar 2004; Nicholas Jones <carpaski@gentoo.org> libsandbox.c:
+  bug 42048 -- Fixed the lstat/errno conditions for mkdir <caleb@g.o>.
+  Added the 64/32 bit sandbox patch for AMD64 bug 32963 <brad/azarah>.
+
+  29 Feb 2004; Martin Schlemmer <azarah@gentoo.org> sandbox.c, sandbox_futils.c :
+  Fix permissions and group of pids file and logs.  Permissions should be 0664
+  and group should be 'portage'.  Bug #34260.
+
+  28 Feb 2004; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  Besides a small cleanup, redo how we replace LD_PRELOAD in the environ passed
+  to the real execve (in our execve wrapper).  Seems that on some arches (sparc
+  among others) do not allow us to tamper with the readonly copy passed to
+  execve, so pass our own copy of the environment.  Bug #42290.
+
+  11 Jan 2004; Nicholas Jones <carpaski@gentoo.org> create-decls:
+  Changed tail to head and added a notice about duration of glibc check.
+
+  21 Dec 2003; Nicholas Jones <carpaski@gentoo.org> create-decls:
+  Changed the glibc subversion check to use /usr/bin/* instead of /bin/sh
+  as there isn't a guarentee that it is dynamic.
+
+  02 Nov 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  If 'file' passed to before_syscall(const char *func, const char *file) is
+  invalid, we should set errno to ENOENT, and not EINVAL.  This should
+  close bug #32238.
+
+  14 Oct 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  Fix a bug that occurs mainly on 64bit arch, where the file passed to
+  the functions we wrap, is invalid, and then cause canonicalize to pass
+  garbage to before_syscall(), thanks to great detective work from
+  Andrea Luzzardi <al@sig11.org> (bug #29846).
+
+  13 Oct 2003; Martin Schlemmer <azarah@gentoo.org> create-localdecls :
+  Add a uClibc detection patch from Peter S. Mazinger <ps.m@gmx.net>.
+
+  13 Oct 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  Fix a bug in libsandbox.c 's checking in the rename wrapper - it basically
+  only checked the destination patch, and not the source, so we could move
+  a protected file to a unprotected directory, and then delete/modify it.
+  Thanks to Andrea Luzzardi (scox) <al@sig11.org>, bug #30992, for this fix.
+
+  12 Oct 2003; Nicholas Jones <carpaski@gentoo.org> sandbox.c :
+  Added python2.3 to the predict section/variable.
+
+  28 Sep 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, sandbox.c,
+  sandbox.h, sandbox_futils.c :
+  Add support to set the pids file via SANDBOX_PIDS_FILE at startup.  If
+  it is not set, it will revert to its old value.
+
+  27 Sep 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  Fix our mkdir wrapper to check if the dir exist, and return EEXIST if so,
+  rather than failing with a violation, bug #29748.
+
+  27 Jul 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  Fix canonicalize() to ignore calls with path = "".
+
+  27 Jul 2003; Martin Schlemmer <azarah@gentoo.org> getcwd.c, libsandbox.c,
+  sandbox_futils.c, canonicalize.c :
+  Once again coreutils fails, as my systems had 2.5 kernel, the getcwd system
+  call handled strings larger than PATH_MAX (bug #21766).  It however does not
+  work the same on 2.4 kernels.
+
+  To fix, I added the posix implementation of getcwd() (from glibc cvs) that
+  do not need the system call.  We use the default getcwd() function via a
+  wrapper (egetcwd), and then lstat the returned path.  If lstat fails, it
+  means the current directory was removed, OR that the the system call for
+  getcwd failed (curious is that it do not fail and return NULL or set
+  errno, but rather just truncate the retured directory - usually from the
+  start), and if so, we use the generic getcwd() function (__egetcwd).  Note
+  that we do not use the generic version all the time, as it calls lstat()
+  a great number of times, and performance degrade much.
+
+  29 Jun 2003; Martin Schlemmer <azarah@gentoo.org> create-localdecls,
+  libsandbox.c :
+  Make sure SB_PATH_MAX will not wrap.  Fix two possible memory leaks.
+
+  22 Jun 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c, canonicalize.c
+  create-localdecls :
+  When checking path names of files accessed, we need to canonicalize it, else
+  it may be a symlink in a 'write allowed' directory pointing to a file in a
+  directory we should not have write access to.
+
+  With something like coreutils-5.0, we have two problems:
+  1)  One of the tests checks if getcwd() can return a path longer than
+      PATH_MAX.  This test then tries to create a dir which even while
+      created local (mkdir("conftest2")), it ends up being resolved with
+      a name that is much larger than PATH_MAX.  The problem now is that
+      canonicalize() have undefined behaviour when the path was too long
+      (returned wrongly truncated paths, etc), and pass the wrong path to
+      before_syscall() (causing the bogus sandbox violations).
+  2)  The ecanonicalize() function we used, along with the canonicalize()
+      function did not support longer than PATH_MAX.  This is partly a
+      cause for 1), but the error checking (rather lack of it) of calls
+      to erealpath() in canonicalize() was the prime reason for 1).
+
+  As we do not use this canonicalized name to call the function, we resolve this
+  by fixing canonicalize() to do better error checking, and ecanonicalize() as
+  well as all functions in libsandbox.c to use a PATH_MAX of 'PATH_MAX * 2'.
+  While they will resolve paths properly now, and can check if a write/read is
+  allowed, the functions called from the sandboxed environment will still work
+  as expected.
+
+  This should resolve bug #21766.
+
+  06 Apr 2003; Martin Schlemmer <azarah@gentoo.org> libsandbox.c :
+  For some reason sandbox fails with a 'open_wr' if you run 'locale -a' under
+  it (bug #16298).
+  
+  Problem is that for some reason locale fopen's locale.alias with mode "rm".
+
+  -------------------------------------------------------
+  nosferatu root # grep fopen locale.log 
+  fopen("/usr/share/locale/locale.alias", "rm"ACCESS DENIED  open_wr:   /usr/share/locale/locale.alias
+  nosferatu root # 
+  --------------------------------------------------------
+
+  I checked the source of locale, but it have fopen with mode 'r', so
+  not sure where the "rm" mode comes from.  Anyhow, changed the check in
+  before_syscall_open_char() to also see mode "rm" as readonly.
+
+  23 Feb 2003; Martin Schlemmer <azarah@gentoo.org> create-localdecls :
+
+  Add glibc-2.3 support.
+
+  22 Feb 2003; Martin Schlemmer <azarah@gentoo.org> sandbox.c :
+
+  Some /etc/ld.so.preload fixes.  Just changed the #if defines to cover all
+  operations releated to preload, as well as only try to modify ld.so.preload
+  if we can.  Also modify to write the pid to /tmp/sandboxpids.tmp even when
+  not using ld.so.preload.  Fix to not write this instance of sandbox's pid
+  to /tmp/sandboxpids.tmp on exit if this is not the last sandbox running.
+
+  22 Feb 2003; Nicholas Jones <carpaski@gentoo.org> Makefile :
+  
+  Changed the LD to CC for hppa.
+
+  22 Feb 2003; Nicholas Jones <carpaski@gentoo.org> create-localdecls :
+  
+  Killed the previous changes I made.
+
+  17 Feb 2003; Nicholas Jones <carpaski@gentoo.org> create-localdecls :
+  
+  Added parisc to BROKEN_RTLD_ARCHLIST to see if it we can fix the relocation probs.
+
+  09 Jan 2003; J Robert Ray <jrray@gentoo.org> sandbox.c :
+  
+  Don't segfault if $HOME isn't set, set $HOME to "/" instead.  Fixes bug 10868.
+
+  16 Dec 2002; Martin Schlemmer <azarah@gentoo.org> create-localdecls :
+
+  Fix memory leak for mips, bug #12236.  Thanks to Torgeir Hansen <torgeir@trenger.ro>
+  for this fix.
+
+  4 Dec 2002; J Robert Ray <jrray@gentoo.org> sandbox.h sandbox_futils.c :
+  
+  sandbox_futils defined a dirname() function that was masking the same
+  function in glibc and was broken (e.g.: SANDBOX_DIR was being set to
+  '/usr/lib/portage/bi/').  Fixed function to return expected results and
+  renamed it to sb_dirname() to no longer mask the glibc function.  Closes bug
+  11231.
+
+  4 Dec 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Fix a segfault in libsandbox.c if canonicalize() was called with
+  first parameter = NULL.
+
+  1 Sep 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Fix my braindead 'return 1;' in a void function.  Updated sandbox.c,
+  cleanup() for this.
+
+  Change cleanup() in sandbox.c not to exit with fail status if
+  the pidsfile is missing.  We really should still display sandbox
+  violations if they occured.
+
+  31 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Update cleanup() in sandbox.c to remove the PIDSFILE if this is
+  the last sandbox running.
+
+  25 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Major cleanups to mainly libsandbox.c again.
+
+  22 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Add copyrights to sandbox.h and sandbox_futils.h.  If wrong, the
+  parties involved should please contact me so that we can fix it.
+
+  Add opendir wrapper to libsandbox.c.
+
+  21 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Do some more cleanups to ecanonicalize(), as it dropped filenames in
+  rare cases (after my symlink cleanups), and caused glibc to bork.
+  These fixes went into canonicalize.c.
+
+  20 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Fix spawn_shell() and main() in sandbox.c to properly return fail
+  status.
+
+  19 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  The new canonicalize() function in libsandbox.c also resolved symlinks,
+  which caused on cleaning sandbox errors if the symlink pointed to a
+  file in the live root.   Ripped out canonicalize() and realpath() from
+  glibc; removed the symlink stuff, and changed them to ecanonicalize()
+  and erealpath().
+
+  18 Aug 2002; Martin Schlemmer <azarah@gentoo.org> :
+
+  Ripped out all the wrappers, and implemented those of InstallWatch.
+  Losts of cleanups and bugfixes.  Implement a execve that forces
+  $LIBSANDBOX in $LD_PRELOAD.  We can now thus do away with the feared
+  /etc/ld.so.preload (*g*) ... Made the needed changes to sandbox.c,
+  sandbox.h and sandbox_futils.c.  Rewrote the Makefile for most
+  parts; it now have an install target.
+  
+  Reformat the whole thing to look somewhat like the reworked sandbox.c
+  and new sandbox.h and sandbox_futils.c from:
+  
+    Brad House <brad@mainstreetsoftworks.com>.
+
+  Additional Copyrights now due to the InstallWatch code:
+  
+    Copyright (C) 1998-9 Pancrazio `Ezio' de Mauro <p@demauro.net>
+

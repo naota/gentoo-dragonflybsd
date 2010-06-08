@@ -1,0 +1,63 @@
+# List of functions we wrap.
+#
+# Note that if the specific libc do not support some function, it
+# will not make it into symbols.h or libsandbox.map, so a non-issue.
+#
+# NB: Order is very important!  For example, 'open()' should be
+#     before 'creat()' as 'creat()' uses 'open()' ...
+
+chmod
+fchmodat
+chown
+fchownat
+open
+__open_2
+openat
+__openat_2
+creat
+fopen
+lchown
+link
+linkat
+mkdir
+mkdirat
+opendir
+mknod
+mknodat
+_xmknod
+__xmknod
+__xmknodat
+mkfifo
+mkfifoat
+access
+faccessat
+rename
+renameat
+rmdir
+symlink
+symlinkat
+truncate
+unlink
+unlinkat
+getcwd
+open64
+__open64_2
+openat64
+__openat64_2
+creat64
+fopen64
+truncate64
+#execl
+#execle
+#execlp
+execv
+execve
+execvp
+fexecve
+system
+popen
+utime
+utimes
+utimensat
+futimesat
+lutimes
