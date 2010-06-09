@@ -37,7 +37,7 @@ src_prepare() {
 src_configure() {
 	econf ${myconf} \
 		--disable-dependency-tracking \
-		--with-modules-dir=/$(get_libdir)/security/
+		--with-modules-dir=/$(get_libdir)/security
 }
 
 src_install() {
