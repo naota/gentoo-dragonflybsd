@@ -47,6 +47,9 @@ make_args() {
 	elif use kernel_FreeBSD ; then
 		MAKE_ARGS="${MAKE_ARGS} OS=FreeBSD"
 		brand="FreeBSD"
+	elif use kernel_DragonFlyBSD ; then
+		MAKE_ARGS="${MAKE_ARGS} OS=DragonFlyBSD"
+		brand="DragonFly BSD"
 	fi
 	export BRANDING="Gentoo ${brand}"
 }
@@ -70,6 +73,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/${P}-network-syntax.patch #310805
 	epatch "${FILESDIR}"/openrc-9999-msg-style.patch
 	epatch "${FILESDIR}"/openrc-9999-pause.patch
+	cp "${FILESDIR}"/os-DragonFlyBSD.mk mk
 }
 
 src_compile() {
