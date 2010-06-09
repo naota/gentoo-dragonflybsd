@@ -148,7 +148,11 @@ int canonicalize(const char *path, char *resolved_path)
 		 * an absolute path
 		 */
 
+#ifndef __linux__
+		if (ENAMETOOLONG == errno || ERANGE == errno)
+#else
 		if (ENAMETOOLONG == errno)
+#endif
 			return -1;
 
 		if (NULL == egetcwd(resolved_path, SB_PATH_MAX - 2))
@@ -157,7 +161,11 @@ int canonicalize(const char *path, char *resolved_path)
 		snprintf(resolved_path + len, SB_PATH_MAX - len, "/%s", path);
 
 		if (NULL == erealpath(resolved_path, resolved_path)) {
+#ifndef __linux__
+			if (errno == ENAMETOOLONG || errno == ERANGE) {
+#else
 			if (errno == ENAMETOOLONG) {
+#endif
 				/* The resolved path is too long for the buffer to hold */
 				return -1;
 			} else {
