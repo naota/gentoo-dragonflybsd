@@ -31,6 +31,10 @@ src_unpack() {
 	epatch "${FILESDIR}"/${PN}-0.9.8h-ldflags.patch #181438
 	epatch "${FILESDIR}"/${PN}-0.9.8m-binutils.patch #289130
 
+	if use kernel_DragonFlyBSD; then
+		epatch "${FILESDIR}"/${P}-dragonfly-libcompat.patch
+	fi
+
 	# disable fips in the build
 	# make sure the man pages are suffixed #302165
 	# don't bother building man pages if they're disabled
