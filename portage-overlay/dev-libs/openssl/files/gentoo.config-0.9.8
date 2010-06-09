@@ -23,6 +23,8 @@ if [[ $1 == "test" ]] ; then
 		"sparc64-alpha-freebsdX.Y     |BSD-sparc64" \
 		"ia64-gentoo-freebsd5.99234   |BSD-ia64" \
 		"x86_64-gentoo-freebsdX.Y     |BSD-x86_64" \
+		"whatever-gentoo-dragonflyX.Y   |BSD-generic32" \
+		"i686-gentoo-dragonflyX.Y       |BSD-x86-elf" \
 		"hppa64-aldsF-linux-gnu5.3    |linux-generic32 -DB_ENDIAN" \
 		"powerpc-gentOO-linux-uclibc  |linux-ppc" \
 		"powerpc64-unk-linux-gnu      |linux-ppc64" \
@@ -55,6 +57,7 @@ case ${CHOST} in
 	*-aix*)      system="aix";;
 	*-darwin*)   system="darwin";;
 	*-freebsd*)  system="BSD";;
+	*-dragonfly*)  system="BSD";;
 	*-hpux*)     system="hpux";;
 	*-linux*)    system="linux";;
 	*-solaris*)  system="solaris";;
