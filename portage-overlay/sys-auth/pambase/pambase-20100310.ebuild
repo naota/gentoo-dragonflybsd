@@ -20,7 +20,7 @@ RDEPEND="
 	|| (
 		>=sys-libs/pam-0.99.9.0-r1
 		( sys-auth/openpam
-		  || ( sys-freebsd/freebsd-pam-modules sys-netbsd/netbsd-pam-modules )
+		  || ( sys-freebsd/freebsd-pam-modules sys-netbsd/netbsd-pam-modules sys-dfbsd/dfbsd-pam-modules )
 		)
 	)
 	cracklib? ( >=sys-libs/pam-0.99[cracklib] )
