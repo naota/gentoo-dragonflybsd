@@ -28,7 +28,7 @@ src_configure() {
 		--bindir=/bin \
 		$(use_enable nls) \
 		$(use_enable pcre perl-regexp) \
-		$(use elibc_FreeBSD || echo --without-included-regex) \
+		$(use elibc_FreeBSD || use elibc_DragonFlyBSD || echo --without-included-regex) \
 		|| die "econf failed"
 }
 
