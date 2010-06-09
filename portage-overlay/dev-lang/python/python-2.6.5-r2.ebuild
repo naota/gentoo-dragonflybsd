@@ -78,6 +78,7 @@ src_prepare() {
 	fi
 
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}/${PV}"
+	epatch "${FILESDIR}"/${P}-dfbsd-socketmodule.patch
 
 	sed -i -e "s:@@GENTOO_LIBDIR@@:$(get_libdir):g" \
 		Lib/distutils/command/install.py \
