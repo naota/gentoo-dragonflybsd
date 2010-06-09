@@ -74,6 +74,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/openrc-9999-msg-style.patch
 	epatch "${FILESDIR}"/openrc-9999-pause.patch
 	cp "${FILESDIR}"/os-DragonFlyBSD.mk mk
+	cp "${FILESDIR}"/Makefile.DragonFlyBSD conf.d || die "copy Makefile.DragonFlyBSD failed"
 }
 
 src_compile() {
