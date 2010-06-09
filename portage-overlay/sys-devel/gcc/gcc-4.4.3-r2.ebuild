@@ -83,6 +83,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/4.4.3/gcc-4.4.3-dragonfly-config-gcc.patch
 	epatch "${FILESDIR}"/4.4.3/gcc-4.4.3-dragonfly-config-host.patch
 	cp "${FILESDIR}"/dragonfly-spec.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD spec header"
+	cp "${FILESDIR}"/dragonfly.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD header"
 }
 
 pkg_setup() {
