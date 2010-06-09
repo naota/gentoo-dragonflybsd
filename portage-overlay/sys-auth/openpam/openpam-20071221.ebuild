@@ -11,7 +11,7 @@ SRC_URI="mirror://sourceforge/${PN}/${P}.tar.gz"
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 IUSE="debug vim-syntax"
 
 RDEPEND="!virtual/pam"
