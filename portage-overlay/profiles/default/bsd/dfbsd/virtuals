@@ -1,0 +1,12 @@
+# This file defines the virtuals that Gentoo/DragonFly BSD needs to modify respect
+# the base profile
+
+# KEEP THIS FILE SORTED ALPHABETICALLY OR RISK WRATH
+
+virtual/bootloader		sys-dfbsd/boot0
+virtual/inetd			sys-dfbsd/dfbsd-usbin
+virtual/libc			sys-dfbsd/dfbsd-lib
+virtual/logger			sys-dfbsd/dfbsd-usbin
+virtual/opengl			media-libs/mesa
+virtual/os-headers		sys-dfbsd/dfbsd-lib
+virtual/pam			sys-auth/openpam

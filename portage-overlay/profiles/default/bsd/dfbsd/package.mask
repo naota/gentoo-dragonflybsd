@@ -1,0 +1,3 @@
+# Don't use them, use the one in base system
+dev-util/yacc
+dev-util/byacc

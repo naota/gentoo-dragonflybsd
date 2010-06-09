@@ -1,0 +1,2 @@
+# Unmask the flag which corresponds to ARCH.
+-x86-dfbsd

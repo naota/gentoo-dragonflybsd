@@ -1,0 +1,7 @@
+USERLAND="BSD"
+KERNEL="DragonFlyBSD"
+ELIBC="DragonFlyBSD"
+
+MAKE="gmake"
+
+USE="berkdb crypt ipv6 ncurses nls pam perl python readline ssl tcpd zlib"
