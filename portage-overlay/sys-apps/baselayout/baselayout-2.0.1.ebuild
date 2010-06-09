@@ -132,7 +132,7 @@ src_install() {
 	[[ ${SYMLINK_LIB} == "yes" ]] && libdir=$(get_abi_LIBDIR "${DEFAULT_ABI}")
 
 	emake \
-		OS=$(use kernel_FreeBSD && echo BSD || echo Linux) \
+		OS=$(use kernel_FreeBSD && echo BSD || use kernel_DragonFlyBSD && echo BSD || echo Linux) \
 		LIB=${libdir} \
 		DESTDIR="${D}" \
 		install || die
