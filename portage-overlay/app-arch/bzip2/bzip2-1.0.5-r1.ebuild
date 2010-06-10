@@ -10,7 +10,7 @@ SRC_URI="http://www.bzip.org/${PV}/${P}.tar.gz"
 
 LICENSE="BZIP2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd ~x86-dfbsd"
 IUSE="static"
 
 DEPEND=""
