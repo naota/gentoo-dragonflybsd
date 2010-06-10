@@ -1,0 +1,22 @@
+--- src/rc/rc-plugin.c.orig	2010-06-10 15:02:41.000000000 +0900
++++ src/rc/rc-plugin.c	2010-06-10 15:03:11.000000000 +0900
+@@ -61,7 +61,7 @@
+ } PLUGIN;
+ TAILQ_HEAD(, plugin) plugins;
+ 
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__DragonFly__)
+ dlfunc_t
+ dlfunc(void * __restrict handle, const char * __restrict symbol)
+ {
+--- src/rc/rc-plugin.h.orig	2010-06-10 14:53:37.000000000 +0900
++++ src/rc/rc-plugin.h	2010-06-10 15:02:32.000000000 +0900
+@@ -42,7 +42,7 @@
+ void rc_plugin_run(RC_HOOK, const char *value);
+ 
+ /* dlfunc defines needed to avoid ISO errors. FreeBSD has this right :) */
+-#ifndef __FreeBSD__
++#if !defined(__FreeBSD__) && !defined(__DragonFly__)
+ struct __dlfunc_arg {
+ 	int	__dlfunc_dummy;
+ };
