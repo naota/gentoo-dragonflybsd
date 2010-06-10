@@ -10,7 +10,7 @@ SRC_URI="http://rsync.samba.org/ftp/rsync/src/${P/_/}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 IUSE="acl iconv ipv6 static xattr"
 
 DEPEND=">=dev-libs/popt-1.5
