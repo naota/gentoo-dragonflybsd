@@ -85,6 +85,7 @@ src_unpack() {
 	cp "${FILESDIR}"/dragonfly-spec.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD spec header"
 	cp "${FILESDIR}"/dragonfly.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD header"
 	cp "${FILESDIR}"/i386-dragonfly.h "${S}"/gcc/config/i386/dragonfly.h || die "failed to copy DragonFly BSD i386 header"
+	sed -i '/\/ginclude\/stddef\.h/d' gcc/Makefile.in || die
 }
 
 pkg_setup() {
