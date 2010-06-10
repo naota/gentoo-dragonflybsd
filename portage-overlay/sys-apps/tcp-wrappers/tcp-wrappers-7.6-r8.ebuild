@@ -13,7 +13,7 @@ SRC_URI="ftp://ftp.porcupine.org/pub/security/${MY_P}.tar.gz
 
 LICENSE="tcp_wrappers_license"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd ~x86-dfbsd"
 IUSE="ipv6"
 
 DEPEND=""
