@@ -1,0 +1,20 @@
+--- src/librc/librc-daemon.c.orig	2010-06-10 11:58:08.000000000 +0900
++++ src/librc/librc-daemon.c	2010-06-10 12:13:41.000000000 +0900
+@@ -159,6 +159,17 @@
+ #  define _GET_KINFO_PID(kp) (kp.p_pid)
+ #  define _KVM_PATH NULL
+ #  define _KVM_FLAGS KVM_NO_FILES
++# elif defined(__DragonFly__)
++#  ifndef KERN_PROC_PROC
++#    define KERN_PROC_PROC KERN_PROC_ALL
++#  endif
++#  define _KINFO_PROC kinfo_proc
++#  define _KVM_GETARGV kvm_getargv
++#  define _GET_KINFO_UID(kp) (kp.p_ruid)
++#  define _GET_KINFO_COMM(kp) (kp.p_comm)
++#  define _GET_KINFO_PID(kp) (kp.p_pid)
++#  define _KVM_PATH _PATH_DEVNULL
++#  define _KVM_FLAGS O_RDONLY
+ # else
+ #  ifndef KERN_PROC_PROC
+ #    define KERN_PROC_PROC KERN_PROC_ALL
