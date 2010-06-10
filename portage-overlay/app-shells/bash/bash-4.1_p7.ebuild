@@ -71,6 +71,7 @@ src_unpack() {
 	cd ../..
 
 	epatch "${FILESDIR}"/${PN}-4.1-fbsd-eaccess.patch #303411
+	epatch "${FILESDIR}"/${PN}-4.1-dfbsd-fpurge.patch # http://leaf.dragonflybsd.org/mailarchive/users/2010-02/msg00058.html
 
 	if ! use vanilla ; then
 		sed -i '1i#define NEED_FPURGE_DECL' execute_cmd.c # needs fpurge() decl
