@@ -10,7 +10,7 @@ SRC_URI="mirror://sourceforge/expat/${P}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-dfbsd ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-dfbsd ~x86-fbsd ~x86-dfbsd"
 IUSE=""
 
 src_unpack() {
