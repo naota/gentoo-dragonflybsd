@@ -1,0 +1,38 @@
+commit ee0b00baf07f18c23a180da5efd78fe01335364b
+Author: Zac Medico <zmedico@gentoo.org>
+Date:   Tue Apr 6 20:54:11 2010 -0700
+
+    Make ensure_dirs() behave correctly for DragonFly when EPERM is raised for
+    makedir('/'). Thanks to Naohiro Aota <naota@elisp.net> for the initial patch.
+
+diff --git a/pym/portage/util/__init__.py b/pym/portage/util/__init__.py
+index 5412043..ac191fb 100644
+--- a/pym/portage/util/__init__.py
++++ b/pym/portage/util/__init__.py
+@@ -1046,14 +1046,19 @@ def ensure_dirs(dir_path, *args, **kwargs):
+ 		func_call = "makedirs('%s')" % dir_path
+ 		if oe.errno in (errno.EEXIST, errno.EISDIR):
+ 			pass
+-		elif oe.errno == errno.EPERM:
+-			raise OperationNotPermitted(func_call)
+-		elif oe.errno == errno.EACCES:
+-			raise PermissionDenied(func_call)
+-		elif oe.errno == errno.EROFS:
+-			raise ReadOnlyFileSystem(func_call)
+ 		else:
+-			raise
++			if os.path.isdir(dir_path):
++				# NOTE: DragonFly raises EPERM for makedir('/')
++				# and that is supposed to be ignored here.
++				pass
++			elif oe.errno == errno.EPERM:
++				raise OperationNotPermitted(func_call)
++			elif oe.errno == errno.EACCES:
++				raise PermissionDenied(func_call)
++			elif oe.errno == errno.EROFS:
++				raise ReadOnlyFileSystem(func_call)
++			else:
++				raise
+ 	perms_modified = apply_permissions(dir_path, *args, **kwargs)
+ 	return created_dir or perms_modified
+ 
