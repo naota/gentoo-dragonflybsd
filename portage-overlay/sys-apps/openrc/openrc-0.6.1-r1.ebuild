@@ -77,6 +77,10 @@ src_unpack() {
 	cp "${FILESDIR}"/conf.d-Makefile.DragonFlyBSD conf.d/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
 	cp "${FILESDIR}"/etc-Makefile.DragonFlyBSD etc/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
 	cp "${FILESDIR}"/init.d-Makefile.DragonFlyBSD init.d/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
+	cp "${FILESDIR}"/sh-Makefile.DragonFlyBSD sh/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
+	cp "${FILESDIR}"/runlevels-Makefile.DragonFlyBSD runlevels/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
+	cp "${FILESDIR}"/init.d.misc-Makefile.DragonFlyBSD init.d.misc/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
+	cp "${FILESDIR}"/doc-Makefile.DragonFlyBSD doc/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
 }
 
 src_compile() {
