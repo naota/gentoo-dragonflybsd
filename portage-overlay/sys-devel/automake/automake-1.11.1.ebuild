@@ -24,7 +24,7 @@ DESCRIPTION="Used to generate Makefile.in from Makefile.am"
 HOMEPAGE="http://sources.redhat.com/automake/"
 
 LICENSE="GPL-2"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 IUSE=""
 
 RDEPEND="dev-lang/perl
