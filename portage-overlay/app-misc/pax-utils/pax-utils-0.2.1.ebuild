@@ -19,6 +19,12 @@ IUSE="caps"
 
 DEPEND="caps? ( sys-libs/libcap )"
 
+src_unpack() {
+	unpack "${A}"
+	cd "${S}"
+	epatch "${FILESDIR}"/${P}-dragonfly.patch
+}
+
 src_compile() {
 	emake CC="$(tc-getCC)" USE_CAP=$(use caps && echo yes) || die
 }
