@@ -1,0 +1,16 @@
+--- lib/sh/fpurge.c.orig	2010-02-08 17:31:18 +0000
++++ lib/sh/fpurge.c	2010-02-08 17:32:31 +0000
+@@ -61,8 +61,13 @@
+        If this invariant is not fulfilled and the stream is read-write but
+        currently writing, subsequent putc or fputc calls will write directly
+        into the buffer, although they shouldn't be allowed to.  */
++#if defined __DragonFly__
++    if ((((struct __FILE_public *) fp)->_flags & __SRD) != 0)
++      ((struct __FILE_public *) fp)->_w = 0;
++#else
+     if ((fp->_flags & __SRD) != 0)
+       fp->_w = 0;
++#endif
+ # endif
+   return result;
+
