@@ -12,7 +12,7 @@ SRC_URI="http://www.flameeyes.eu/gentoo-distfiles/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ~ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-fbsd ~x86-freebsd ~amd64-linux ~ia64-linux ~x86-linux ~x86-dfbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ~ppc64 s390 sh sparc x86 ~sparc-fbsd ~x86-fbsd ~x86-freebsd ~amd64-linux ~ia64-linux ~x86-linux"
 IUSE="debug cracklib passwdqc consolekit gnome-keyring selinux mktemp ssh +sha512"
 RESTRICT="binchecks"
 
@@ -20,7 +20,7 @@ RDEPEND="
 	|| (
 		>=sys-libs/pam-0.99.9.0-r1
 		( sys-auth/openpam
-		  || ( sys-freebsd/freebsd-pam-modules sys-netbsd/netbsd-pam-modules sys-dfbsd/dfbsd-pam-modules )
+		  || ( sys-freebsd/freebsd-pam-modules sys-netbsd/netbsd-pam-modules )
 		)
 	)
 	cracklib? ( >=sys-libs/pam-0.99[cracklib] )
