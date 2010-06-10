@@ -10,7 +10,7 @@ SRC_URI="mirror://gnu/libiconv/${P}.tar.gz"
 
 LICENSE="GPL-3"
 SLOT="0"
-KEYWORDS="~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 IUSE=""
 
 DEPEND="!sys-libs/glibc
