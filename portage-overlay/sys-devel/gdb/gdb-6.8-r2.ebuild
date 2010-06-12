@@ -37,6 +37,7 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	use vanilla || EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
+	use vanilla || epatch "${FILESDIR}"/${P}-dragonfly.patch
 	strip-linguas -u bfd/po opcodes/po
 }
 
