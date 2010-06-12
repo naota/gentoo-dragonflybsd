@@ -29,3 +29,18 @@
  *-*-linux*)	gdb_osabi=GDB_OSABI_LINUX ;;
  *-*-nto*)	gdb_osabi=GDB_OSABI_QNXNTO ;;
  m68*-*-openbsd* | m88*-*-openbsd* | vax-*-openbsd*) ;;
+--- gdb/configure.ac.orig	2010-06-13 01:26:29.000000000 +0900
++++ gdb/configure.ac	2010-06-13 01:27:57.000000000 +0900
+@@ -937,10 +937,10 @@
+     [Define to 1 if the regex included in libiberty should be used.])
+ fi
+ 
+-# Check if <sys/proc.h> defines `struct thread' with a td_pcb member.
++# Check if <sys/user.h> defines `struct thread' with a td_pcb member.
+ AC_CHECK_MEMBERS([struct thread.td_pcb], [], [],
+ [#include <sys/param.h>
+-#include <sys/proc.h>
++#include <sys/user.h>
+ ])
+ 
+ # See if <sys/lwp.h> defines `struct lwp`.

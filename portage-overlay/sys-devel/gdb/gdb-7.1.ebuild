@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/sys-devel/gdb/gdb-7.1.ebuild,v 1.1 2010/03/19 02:21:14 vapier Exp $
 
-inherit flag-o-matic eutils
+inherit flag-o-matic eutils autotools
 
 export CTARGET=${CTARGET:-${CHOST}}
 if [[ ${CTARGET} == ${CHOST} ]] ; then
@@ -32,16 +32,23 @@ RDEPEND=">=sys-libs/ncurses-5.2-r2
 	python? ( dev-lang/python )"
 DEPEND="${RDEPEND}
 	|| ( app-arch/xz-utils app-arch/lzma-utils )
+	=sys-devel/autoconf-2.64
 	test? ( dev-util/dejagnu )
 	nls? ( sys-devel/gettext )"
 
 src_unpack() {
 	unpack ${A}
 	cd "${S}"
-	use vanilla || [[ -n ${PATCH_VER} ]] && EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
-	use vanilla || epatch "${FILESDIR}"/${P}-dragonfly-gdb-config.patch
-	# http://leaf.dragonflybsd.org/cgi-bin/cgit/dragonfly.git/commit/?id=3749d171a17574885d8edd4e0ef8bc3f7bff45de&h=vendor/GMP
-	use vanilla || epatch "${FILESDIR}"/${P}-dragonfly-gdb-i386fbsd-nat.patch
+	if ! use vanilla ; then
+		[[ -n ${PATCH_VER} ]] && EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
+		use kernel_DragonFlyBSD && epatch "${FILESDIR}"/${P}-dragonfly-gdb-config.patch
+		# http://leaf.dragonflybsd.org/cgi-bin/cgit/dragonfly.git/commit/?id=3749d171a17574885d8edd4e0ef8bc3f7bff45de&h=vendor/GMP
+		epatch "${FILESDIR}"/${P}-dragonfly-gdb-i386fbsd-nat.patch
+		epatch "${FILESDIR}"/${P}-dragonfly-gdb-bsd-kvm.patch
+		cd "${S}"/gdb
+		AT_NO_RECURSIVE=yes eautoreconf
+		cd "${S}"
+	fi
 	strip-linguas -u bfd/po opcodes/po
 }
 
