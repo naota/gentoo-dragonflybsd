@@ -40,6 +40,8 @@ src_unpack() {
 	cd "${S}"
 	use vanilla || [[ -n ${PATCH_VER} ]] && EPATCH_SUFFIX="patch" epatch "${WORKDIR}"/patch
 	use vanilla || epatch "${FILESDIR}"/${P}-dragonfly-gdb-config.patch
+	# http://leaf.dragonflybsd.org/cgi-bin/cgit/dragonfly.git/commit/?id=3749d171a17574885d8edd4e0ef8bc3f7bff45de&h=vendor/GMP
+	use vanilla || epatch "${FILESDIR}"/${P}-dragonfly-gdb-i386fbsd-nat.patch
 	strip-linguas -u bfd/po opcodes/po
 }
 

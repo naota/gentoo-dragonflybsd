@@ -1,0 +1,12 @@
+--- gdb/i386fbsd-nat.c.orig	2010-06-12 23:35:36.000000000 +0900
++++ gdb/i386fbsd-nat.c	2010-06-12 23:38:42.000000000 +0900
+@@ -111,7 +111,9 @@
+   regcache_raw_supply (regcache, I386_ESP_REGNUM, &pcb->pcb_esp);
+   regcache_raw_supply (regcache, I386_EBX_REGNUM, &pcb->pcb_ebx);
+   regcache_raw_supply (regcache, I386_EIP_REGNUM, &pcb->pcb_eip);
++#ifndef __DragonFly__
+   regcache_raw_supply (regcache, I386_GS_REGNUM, &pcb->pcb_gs);
++#endif
+ 
+   return 1;
+ }
