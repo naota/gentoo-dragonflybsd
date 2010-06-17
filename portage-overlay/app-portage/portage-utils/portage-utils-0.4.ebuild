@@ -17,6 +17,8 @@ src_unpack() {
 	unpack ${A}
 	cd "${S}"
 	sed -i -e 's:\[\[:[:' -e 's:\]\]:]:' Makefile
+	epatch "${FILESDIR}"/${P}-improve-test-portability.patch
+	epatch "${FILESDIR}"/${P}-qfile.patch
 }
 
 src_compile() {

@@ -1,0 +1,13 @@
+diff --git a/qfile.c b/qfile.c
+index 666b365..69a2ccc 100644
+--- a/qfile.c
++++ b/qfile.c
+@@ -167,7 +167,7 @@ dont_skip_pkg: /* End of the package exclusion tests. */
+ 
+ 				if (!path_ok) {
+ 					/* check the full filepath ... */
+-					size_t dirname_len = (entry_basename - e->name - 1);
++					size_t dirname_len = strlen(e->name) - strlen(entry_basename) - 1;
+ 					/* basename(/usr)     = usr, dirname(/usr)     = /
+ 					 * basename(/usr/bin) = bin, dirname(/usr/bin) = /usr
+ 					 */
