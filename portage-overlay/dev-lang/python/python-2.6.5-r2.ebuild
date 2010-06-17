@@ -79,6 +79,11 @@ src_prepare() {
 
 	EPATCH_SUFFIX="patch" epatch "${WORKDIR}/${PV}"
 	epatch "${FILESDIR}"/${P}-dfbsd-socketmodule.patch
+	# cause kernel panic. disable for now.
+	use kernel_DragonFlyBSD && epatch "${FILESDIR}"/${P}-dragonfly-disable-posix-test.patch
+	epatch "${FILESDIR}"/${P}-dragonfly-configure.patch
+	epatch "${FILESDIR}"/${P}-dragonfly-setup.py.patch
+	epatch "${FILESDIR}"/${P}-dragonfly-osname.patch
 
 	sed -i -e "s:@@GENTOO_LIBDIR@@:$(get_libdir):g" \
 		Lib/distutils/command/install.py \

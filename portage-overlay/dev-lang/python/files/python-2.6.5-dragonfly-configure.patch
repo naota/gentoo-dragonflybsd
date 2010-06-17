@@ -1,0 +1,13 @@
+--- configure.in.orig	2010-06-15 09:47:10.000000000 +0900
++++ configure.in	2010-06-15 09:48:40.000000000 +0900
+@@ -1876,8 +1876,8 @@
+ 				esac
+ 		fi;;
+ 	NetBSD*|DragonFly*)
+-		LDSHARED="cc -shared ${LDFLAGS}"
+-		LDCXXSHARED="c++ -shared ${LDFLAGS}";;
++		LDSHARED='$(CC) -shared ${LDFLAGS}'
++		LDCXXSHARED='$(CXX) -shared ${LDFLAGS}';;
+ 	OpenUNIX*|UnixWare*)
+ 		if test "$GCC" = "yes" ; then
+ 			LDSHARED='$(CC) -shared'
