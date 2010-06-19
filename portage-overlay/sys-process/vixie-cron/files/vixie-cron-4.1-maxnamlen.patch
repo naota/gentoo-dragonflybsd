@@ -1,0 +1,15 @@
+--- database.c.orig	2010-06-19 02:22:19.000000000 +0900
++++ database.c	2010-06-19 02:24:14.000000000 +0900
+@@ -28,6 +28,12 @@
+ 
+ #include "cron.h"
+ 
++#ifndef MAXNAMLEN
++# ifdef __DragonFly__
++#  define MAXNAMLEN 255
++# endif
++#endif
++
+ #define TMAX(a,b) ((a)>(b)?(a):(b))
+ 
+ static	void		process_crontab(const char *, const char *,
