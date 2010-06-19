@@ -1,0 +1,29 @@
+--- sbin/savecore/savecore.c.orig	2010-06-19 00:55:31.000000000 +0900
++++ sbin/savecore/savecore.c	2010-06-19 00:55:52.000000000 +0900
+@@ -95,7 +95,7 @@
+ static int checkfor, compress, clear, force, keep, verbose;	/* flags */
+ static int nfound, nsaved, nerr;			/* statistics */
+ 
+-extern FILE *zopen(const char *, const char *);
++extern FILE *gzopen(const char *, const char *);
+ 
+ static void
+ printheader(FILE *f, const struct kerneldumpheader *h, const char *device,
+@@ -390,7 +390,7 @@
+ 
+ 	if (compress) {
+ 		sprintf(buf, "kern.%d.gz", bounds);
+-		fpkern = zopen(buf, "w");
++		fpkern = gzopen(buf, "w");
+ 	} else {
+ 		sprintf(buf, "kern.%d", bounds);
+ 		fpkern = fopen(buf, "w");
+@@ -436,7 +436,7 @@
+ 	oumask = umask(S_IRWXG|S_IRWXO); /* Restrict access to the core file.*/
+ 	if (compress) {
+ 		sprintf(buf, "vmcore.%d.gz", bounds);
+-		fp = zopen(buf, "w");
++		fp = gzopen(buf, "w");
+ 	} else {
+ 		sprintf(buf, "vmcore.%d", bounds);
+ 		fp = fopen(buf, "w");
