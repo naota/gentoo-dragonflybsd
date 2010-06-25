@@ -34,6 +34,11 @@ src_unpack() {
 	epatch "${FILESDIR}"/${P}-zlib.patch
 	epatch "${FILESDIR}"/${P}-ldconfig.patch
 	S="${WORKDIR}/${P}/sbin"
+	cd ${S}
+	dummy_mk ${REMOVE_SUBDIRS}
+	freebsd_rename_libraries
+	sed -i.bak -e 's/-lkiconv/-lkiconv -liconv/' \
+		mount_cd9660/Makefile mount_msdos/Makefile mount_ntfs/Makefile
 }
 
 src_install() {
