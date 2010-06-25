@@ -1,0 +1,302 @@
+--- bsd.doc.mk.orig	2010-06-18 15:51:16.000000000 +0900
++++ bsd.doc.mk	2010-06-18 15:52:36.000000000 +0900
+@@ -104,9 +104,11 @@
+ realinstall:
+ .if ${PRINTERDEVICE} == "html"
+ 	cd ${SRCDIR}; \
++		${INSTALL} -d ${DESTDIR}${BINDIR}/${VOLUME}
+ 		${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
+ 		${DOC}*.html ${DESTDIR}${BINDIR}/${VOLUME}
+ .else
++	${INSTALL} -d ${DESTDIR}${BINDIR}/${VOLUME}
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
+ 		${DFILE} ${DESTDIR}${BINDIR}/${VOLUME}
+ .endif
+--- bsd.files.mk.orig	2010-06-18 15:56:36.000000000 +0900
++++ bsd.files.mk	2010-06-18 16:07:02.000000000 +0900
+@@ -40,6 +40,7 @@
+ .endif
+ installfiles: _${group}INS_${file:T}
+ _${group}INS_${file:T}: ${file}
++	${INSTALL} -d ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
+ 	${INSTALL} -o ${${group}OWN_${.ALLSRC:T}} \
+ 	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
+ 	    ${.ALLSRC} \
+@@ -52,10 +53,12 @@
+ installfiles: _${group}INS
+ _${group}INS: ${_${group}FILES}
+ .if defined(${group}NAME)
++	${INSTALL} -d ${DESTDIR}${${group}DIR}/${${group}NAME}
+ 	${INSTALL} -o ${${group}OWN} -g ${${group}GRP} \
+ 	    -m ${${group}MODE} ${.ALLSRC} \
+ 	    ${DESTDIR}${${group}DIR}/${${group}NAME}
+ .else
++	${INSTALL} -d ${DESTDIR}${${group}DIR}
+ 	${INSTALL} -o ${${group}OWN} -g ${${group}GRP} \
+ 	    -m ${${group}MODE} ${.ALLSRC} ${DESTDIR}${${group}DIR}
+ .endif
+--- bsd.incs.mk.orig	2010-06-18 16:00:08.000000000 +0900
++++ bsd.incs.mk	2010-06-18 16:08:19.000000000 +0900
+@@ -40,6 +40,7 @@
+ .endif
+ installincludes: _${group}INS_${header:T}
+ _${group}INS_${header:T}: ${header}
++	${INSTALL} -d ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
+ 	${INSTALL} -C -o ${${group}OWN_${.ALLSRC:T}} \
+ 	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
+ 	    ${.ALLSRC} \
+@@ -52,9 +53,11 @@
+ installincludes: _${group}INS
+ _${group}INS: ${_${group}INCS}
+ .if defined(${group}NAME)
++	${INSTALL} -d ${DESTDIR}${${group}DIR}/${${group}NAME}
+ 	${INSTALL} -C -o ${${group}OWN} -g ${${group}GRP} -m ${${group}MODE} \
+ 	    ${.ALLSRC} ${DESTDIR}${${group}DIR}/${${group}NAME}
+ .else
++	${INSTALL} -d ${DESTDIR}${${group}DIR}
+ 	${INSTALL} -C -o ${${group}OWN} -g ${${group}GRP} -m ${${group}MODE} \
+ 	    ${.ALLSRC} ${DESTDIR}${${group}DIR}
+ .endif
+--- bsd.info.mk.orig	2010-06-18 16:09:56.000000000 +0900
++++ bsd.info.mk	2010-06-18 16:35:07.000000000 +0900
+@@ -86,6 +86,7 @@
+ TEX?=		tex
+ DVIPS?=		dvips
+ DVIPS2ASCII?=	dvips2ascii
++INSTALL?=	install
+ 
+ .SUFFIXES: ${ICOMPRESS_EXT} .info .texi .texinfo .dvi .ps .latin1 .html
+ 
+@@ -152,6 +153,7 @@
+ .for x in ${INFO}
+ INSTALLINFODIRS+= ${x:S/$/-install/}
+ ${x:S/$/-install/}:
++	${INSTALL} -d ${DESTDIR}${INFODIR}/${INFODIRFILE}
+ 	${INSTALLINFO} ${INSTALLINFOFLAGS} \
+ 	    --defsection=${INFOSECTION} \
+ 	    --defentry=${INFOENTRY_${x}} \
+@@ -182,10 +184,12 @@
+ .if !defined(NOINFO) && defined(INFO)
+ install: ${INSTALLINFODIRS}
+ .if !empty(IFILES:N*.html)
++	${INSTALL} -d ${DESTDIR}${INFODIR}
+ 	${INSTALL} -o ${INFOOWN} -g ${INFOGRP} -m ${INFOMODE} \
+ 		${IFILES:N*.html} ${DESTDIR}${INFODIR}
+ .endif
+ .if !empty(FORMATS:Mhtml)
++	${INSTALL} -d ${DESTDIR}${INFODIR}
+ 	${INSTALL} -o ${INFOOWN} -g ${INFOGRP} -m ${INFOMODE} \
+ 		${INFO:S/$/.info.*.html/} ${DESTDIR}${INFODIR}
+ .endif
+-- bsd.libnames.mk.orig	2010-06-18 16:37:08.000000000 +0900
++++ bsd.libnames.mk	2010-06-18 16:38:45.000000000 +0900
+@@ -36,7 +36,7 @@
+ LIBEDIT?=	${DESTDIR}${LIBDIR}/libedit.a
+ LIBF2C?=	${DESTDIR}${LIBDIR}/libf2c.a
+ LIBFETCH?=	${DESTDIR}${LIBDIR}/libfetch.a
+-LIBFL?=		"don't use LIBFL, use LIBL"
++LIBFL?=		${DESTDIR}${LIBDIR}/libfl.a
+ LIBFORM?=	${DESTDIR}${LIBDIR}/libform.a
+ LIBFORMS?=	${DESTDIR}${LIBDIR}/libforms.a
+ LIBFTPIO?=	${DESTDIR}${LIBDIR}/libftpio.a
+@@ -56,7 +56,7 @@
+ LIBKRB5?=	${DESTDIR}${LIBDIR}/libkrb5.a	# XXX in secure dist, not base
+ LIBKINFO?=	${DESTDIR}${LIBDIR}/libkinfo.a
+ LIBKVM?=	${DESTDIR}${LIBDIR}/libkvm.a
+-LIBL?=		${DESTDIR}${LIBDIR}/libl.a
++LIBL?=		${DESTDIR}${LIBDIR}/libfl.a
+ LIBLN?=		"don't use LIBLN, use LIBL"
+ LIBM?=		${DESTDIR}${LIBDIR}/libm.a
+ LIBMAGIC?=	${DESTDIR}${LIBDIR}/libmagic.a
+--- bsd.man.mk.orig	2010-06-18 16:12:43.000000000 +0900
++++ bsd.man.mk	2010-06-18 16:40:03.000000000 +0900
+@@ -166,9 +166,11 @@
+ .if defined(NOMANCOMPRESS)
+ .if defined(MANFILTER)
+ .for page in ${MAN}
++	${INSTALL} -d ${DESTDIR}${MANDIR}${page:E}${MANSUBDIR}/${page}
+ 	${MINSTALL} ${page:T:S/$/${FILTEXTENSION}/g} \
+ 		${DESTDIR}${MANDIR}${page:E}${MANSUBDIR}/${page}
+ .if defined(MANBUILDCAT) && !empty(MANBUILDCAT)
++	${INSTALL} -d ${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page}
+ 	${MINSTALL} ${page:T:S/$/${CATEXT}${FILTEXTENSION}/g} \
+ 		${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page}
+ .endif
+@@ -182,11 +184,14 @@
+ 		esac; \
+ 		page=$$1; shift; sect=$$1; shift; \
+ 		d=${DESTDIR}${MANDIR}$${sect}${MANSUBDIR}; \
++		${ECHO} ${INSTALL} -d $${d}; \
++		${INSTALL} -d $${d}; \
+ 		${ECHO} ${MINSTALL} $${page} $${d}; \
+ 		${MINSTALL} $${page} $${d}; \
+ 	done
+ .if defined(MANBUILDCAT) && !empty(MANBUILDCAT)
+ .for page in ${MAN}
++	${INSTALL} -d ${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page:T}
+ 	${MINSTALL} ${page:T:S/$/${CATEXT}/} \
+ 		${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page:T}
+ .endfor
+@@ -194,9 +199,11 @@
+ .endif
+ .else
+ .for page in ${MAN}
++	${INSTALL} -d ${DESTDIR}${MANDIR}${page:E}${MANSUBDIR}
+ 	${MINSTALL} ${page:T:S/$/${MCOMPRESS_EXT}/g} \
+ 		${DESTDIR}${MANDIR}${page:E}${MANSUBDIR}
+ .if defined(MANBUILDCAT) && !empty(MANBUILDCAT)
++	${INSTALL} -d ${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page:T:S/$/${MCOMPRESS_EXT}/}
+ 	${MINSTALL} ${page:T:S/$/${CATEXT}${MCOMPRESS_EXT}/g} \
+ 		${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page:T:S/$/${MCOMPRESS_EXT}/}
+ .endif
+--- bsd.own.mk.orig	2010-06-18 16:44:49.000000000 +0900
++++ bsd.own.mk	2010-06-18 16:45:19.000000000 +0900
+@@ -190,10 +190,6 @@
+ LOCALEMODE?=	${NOBINMODE}
+ 
+ # Common variables
+-.if !defined(DEBUG_FLAGS)
+-STRIP?=		-s
+-.endif
+-
+ COMPRESS_CMD?=	gzip -cn
+ COMPRESS_EXT?=	.gz
+ 
+--- bsd.prog.mk.orig	2010-06-18 16:24:22.000000000 +0900
++++ bsd.prog.mk	2010-06-18 16:40:23.000000000 +0900
+@@ -8,10 +8,6 @@
+ 
+ CFLAGS+=${COPTS} ${DEBUG_FLAGS}
+ 
+-.if !defined(DEBUG_FLAGS)
+-STRIP?=	-s
+-.endif
+-
+ .if defined(NOSHARED) && ( ${NOSHARED} != "no" && ${NOSHARED} != "NO" )
+ LDFLAGS+= -static
+ .endif
+@@ -103,9 +99,11 @@
+ _proginstall:
+ .if defined(PROG)
+ .if defined(PROGNAME)
++	${INSTALL} -d ${DESTDIR}${BINDIR}
+ 	${INSTALL} ${STRIP} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
+ 	    ${_INSTALLFLAGS} ${PROG} ${DESTDIR}${BINDIR}/${PROGNAME}
+ .else
++	${INSTALL} -d ${DESTDIR}${BINDIR}
+ 	${INSTALL} ${STRIP} -o ${BINOWN} -g ${BINGRP} -m ${BINMODE} \
+ 	    ${_INSTALLFLAGS} ${PROG} ${DESTDIR}${BINDIR}
+ .endif
+@@ -137,6 +135,7 @@
+ SCRIPTSMODE_${script:T}?=	${SCRIPTSMODE}
+ _scriptsinstall: _SCRIPTSINS_${script:T}
+ _SCRIPTSINS_${script:T}: ${script}
++	${INSTALL} -d ${DESTDIR}${SCRIPTSDIR_${.ALLSRC:T}}
+ 	${INSTALL} -o ${SCRIPTSOWN_${.ALLSRC:T}} \
+ 	    -g ${SCRIPTSGRP_${.ALLSRC:T}} -m ${SCRIPTSMODE_${.ALLSRC:T}} \
+ 	    ${.ALLSRC} \
+--- bsd.sys.mk.orig	2010-06-18 16:41:15.000000000 +0900
++++ bsd.sys.mk	2010-06-18 16:41:55.000000000 +0900
+@@ -24,9 +24,6 @@
+ . if defined(WARNS)
+ .  if ${WARNS} >= 1
+ CWARNFLAGS	+=	-Wsystem-headers
+-.   if !defined(NO_WERROR) && ${CCVER} == "gcc41"
+-CWARNFLAGS	+=	-Werror
+-.   endif
+ .  endif
+ .  if ${WARNS} >= 2
+ CWARNFLAGS	+=	-Wall
+@@ -55,9 +52,6 @@
+ . if defined(WFORMAT)
+ .  if ${WFORMAT} > 0
+ CWARNFLAGS	+=	-Wformat=2 -Wno-format-extra-args
+-.   if !defined(NO_WERROR) && ${CCVER} == "gcc41"
+-CWARNFLAGS	+=	-Werror
+-.   endif
+ .  endif
+ . endif
+ .endif
+--- sys.mk.orig	2010-06-18 16:29:13.000000000 +0900
++++ sys.mk	2010-06-18 16:48:29.000000000 +0900
+@@ -39,7 +39,7 @@
+ .if defined(%POSIX)
+ CC		?=	c89
+ .else
+-CC		?=	cc
++CC		?=	gcc
+ .endif
+ CC_LINK		?=	${CC}
+ # The system cc frontend is not subject to the path, e.g. when buildworld
+@@ -48,9 +48,9 @@
+ NXENV		?=	CCVER=${HOST_CCVER} BINUTILSVER=${HOST_BINUTILSVER} OBJFORMAT_PATH=/ PATH=/usr/bin:/bin:/usr/sbin:/sbin
+ NXCC		?=	${NXENV} ${CC}
+ NXCC_LINK	?=	${NXENV} ${CC_LINK}
+-CFLAGS		?=	-O -pipe
++CFLAGS		?=	-pipe
+ 
+-CXX		?=	c++
++CXX		?=	g++
+ CXX_LINK	?=	${CXX}
+ NXCXX		?=	${NXENV} ${CXX}
+ NXCXX_LINK	?=	${NXENV} ${CXX_LINK}
+@@ -299,11 +299,6 @@
+ .include </etc/defaults/make.conf>
+ .endif
+ 
+-__MAKE_CONF?=/etc/make.conf
+-.if exists(${__MAKE_CONF})
+-.include "${__MAKE_CONF}"
+-.endif
+-
+ .include <bsd.cpu.mk>
+ 
+ .if exists(/etc/make.conf.local)
+--- bsd.lib.mk.orig	2010-06-18 16:10:51.000000000 +0900
++++ bsd.lib.mk	2010-06-20 02:58:45.000000000 +0900
+@@ -26,10 +26,6 @@
+ CFLAGS+= ${DEBUG_FLAGS}
+ .endif
+ 
+-.if !defined(DEBUG_FLAGS)
+-STRIP?=	-s
+-.endif
+-
+ .include <bsd.libnames.mk>
+ 
+ TARGET_LIBDIR?=		${LIBDIR}
+@@ -46,7 +42,7 @@
+ PICFLAG=-fpic
+ .endif
+ 
+-PO_FLAG=-pg
++PO_FLAG=
+ 
+ .c.o:
+ 	${CC} ${_${.IMPSRC:T}_FLAGS} ${CFLAGS} -c ${.IMPSRC} -o ${.TARGET}
+@@ -201,14 +197,17 @@
+ .ORDER: beforeinstall _libinstall
+ _libinstall:
+ .if defined(LIB) && !empty(LIB) && !defined(NOINSTALLLIB)
++	${INSTALL} -d ${DESTDIR}${TARGET_LIBDIR}
+ 	${INSTALL} -C -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+ 	    ${_INSTALLFLAGS} lib${LIB}.a ${DESTDIR}${TARGET_LIBDIR}
+ .endif
+ .if !defined(NOPROFILE) && defined(LIB) && !empty(LIB)
++	${INSTALL} -d ${DESTDIR}${TARGET_PROFLIBDIR}
+ 	${INSTALL} -C -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+ 	    ${_INSTALLFLAGS} lib${LIB}_p.a ${DESTDIR}${TARGET_PROFLIBDIR}/lib${LIB}.a
+ .endif
+ .if defined(SHLIB_NAME)
++	${INSTALL} -d ${DESTDIR}${TARGET_SHLIBDIR}
+ 	${INSTALL} ${STRIP} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+ 	    ${_INSTALLFLAGS} ${_SHLINSTALLFLAGS} \
+ 	    ${SHLIB_NAME} ${DESTDIR}${TARGET_SHLIBDIR}
+@@ -217,6 +216,7 @@
+ .endif
+ .endif
+ .if defined(INSTALL_PIC_ARCHIVE) && defined(LIB) && !empty(LIB)
++	${INSTALL} -d ${DESTDIR}${TARGET_LIBDIR}
+ 	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+ 	    ${_INSTALLFLAGS} lib${LIB}_pic.a ${DESTDIR}${TARGET_LIBDIR}
+ .endif

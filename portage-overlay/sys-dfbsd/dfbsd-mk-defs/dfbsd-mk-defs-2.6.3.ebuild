@@ -19,6 +19,11 @@ IUSE=""
 
 RESTRICT="strip"
 
+src_unpack() {
+	git_src_unpack;
+	cd "${WORKDIR}"/${P}/share/mk
+	epatch "${FILESDIR}"/${P}-gentoo.patch
+}
 src_configure() { :; }
 src_compile() { :; }
 
