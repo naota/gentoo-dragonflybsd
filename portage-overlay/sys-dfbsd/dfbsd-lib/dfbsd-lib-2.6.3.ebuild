@@ -3,19 +3,14 @@
 # $Header: $
 
 EAPI=3
-EGIT_REPO_URI="git://git.dragonflybsd.org/dragonfly.git"
-EGIT_COMMIT="v2.6.3"
-EGIT_PROJECT="dragonflybsd"
+EDFLY_DIR="lib"
 
-inherit git bsdmk freebsd
+inherit dragonfly
 
 DESCRIPTION="DragonFly sbin utils"
-HOMEPAGE="http://www.dragonflybsd.org/"
 
-LICENSE=""
 SLOT="0"
 KEYWORDS="~x86-dfbsd"
-IUSE="ipfilter pf"
 
 RDEPEND=""
 DEPEND="=sys-dfbsd/dfbsd-sources-${PV}*
@@ -35,17 +30,13 @@ REMOVE_SUBDIRS="libncurses
 pkg_setup() {
 	[ -c /dev/zero ] || \
 		die "You forgot to mount /dev; the compiled libc would break."
-	mymakeopts="${mymakeopts} WITHOUT_BIND= WITHOUT_BIND_LIBS= WITHOUT_SENDMAIL="
+	mymakeopts="${mymakeopts} NO_BIND= NO_SENDMAIL= "
 }
 
-src_unpack() {
-	git_src_unpack
-	S="${WORKDIR}/${P}/lib"
-	cd ${S}
-	dummy_mk ${REMOVE_SUBDIRS}
-	freebsd_rename_libraries
+PATCHES=( "${FILESDIR}"/${P}-csu.patch )
 
-	epatch "${FILESDIR}"/${P}-csu.patch
+src_unpack() {
+	dragonfly_src_unpack
 
 	sed -i.bak -e 's/iconv.h//' "${WORKDIR}"/${P}/include/Makefile
 	sed -i.bak -e '/^MAN/d;/^MLINK/d' "${S}"/libc/iconv/Makefile.inc
@@ -78,7 +69,7 @@ src_unpack() {
 			die "Problem fixing \"${dir}/Makefile"
 	done
 
-	ln -s "/usr/src/sys-${RV}" "${WORKDIR}/${P}/sys" || die "Couldn't make sys symlink!"
+	ln -s "/usr/src/sys-${PV}" "${WORKDIR}/${P}/sys" || die "Couldn't make sys symlink!"
 
 	if install --version 2> /dev/null | grep -q GNU; then
 		sed -i.bak -e 's:${INSTALL} -C:${INSTALL}:' "${WORKDIR}/${P}/include/Makefile"
@@ -107,13 +98,13 @@ src_unpack() {
 
 src_compile() {
 	cd "${WORKDIR}/${P}/include"
-	$(freebsd_get_bmake) CC="$(tc-getCC)" || die "make include failed"
+	$(dragonfly_get_bmake) CC="$(tc-getCC)" || die "make include failed"
 
 	append-flags "-isystem '${WORKDIR}/${P}/include_proper'"
 
 	einfo "Compiling libc."
 	cd "${S}"
-	NOFLAGSTRIP=yes freebsd_src_compile
+	NOFLAGSTRIP=yes dragonfly_src_compile
 }
 
 src_install() {
@@ -178,7 +169,7 @@ install_includes()
 	fi
 
 	einfo "Installing includes into ${INCLUDEDIR} as ${BINOWN}:${BINGRP}..."
-	$(freebsd_get_bmake) installincludes \
+	$(dragonfly_get_bmake) installincludes \
 		MACHINE=${MACHINE} DESTDIR="${DESTDIR}" \
 		INCLUDEDIR="${INCLUDEDIR}" BINOWN="${BINOWN}" \
 		BINGRP="${BINGRP}" || die "install_includes() failed"
