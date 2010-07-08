@@ -1,0 +1,13 @@
+diff --git a/gnu/lib/libdialog/Makefile b/gnu/lib/libdialog/Makefile
+index 879df15..73b8105 100644
+--- a/gnu/lib/libdialog/Makefile
++++ b/gnu/lib/libdialog/Makefile
+@@ -24,6 +24,8 @@ DPADD+= ${LIBNCURSES}
+ .if !defined(NOHTML)
+ afterinstall:
+ .for file in ${EXAMPLES}
++	${INSTALL} -d -o ${BINOWN} -g ${BINGRP} -m 444 \
++	      ${DESTDIR}/usr/share/examples/libdialog
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 444 \
+ 	      ${.CURDIR}/TESTS/${file} ${DESTDIR}/usr/share/examples/libdialog
+ .endfor
