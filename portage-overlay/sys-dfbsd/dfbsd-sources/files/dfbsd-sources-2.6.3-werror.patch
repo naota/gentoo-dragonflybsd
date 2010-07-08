@@ -1,0 +1,11 @@
+--- conf/kern.pre.mk.orig	2010-06-18 14:00:50.000000000 +0900
++++ conf/kern.pre.mk	2010-06-18 14:01:24.000000000 +0900
+@@ -81,7 +81,7 @@
+ 	${CC} -c ${CFLAGS} ${PROF} ${.PREFIX}.c
+ 
+ .if !defined(NO_WERROR) && ${CCVER} == "gcc41"
+-WERROR=-Werror
++WERROR=-Wno-error
+ .endif
+ 
+ GEN_CFILES= $S/platform/$P/$M/genassym.c

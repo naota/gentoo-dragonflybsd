@@ -1,0 +1,13 @@
+--- config/GENERIC.orig	2010-06-18 14:49:56.000000000 +0900
++++ config/GENERIC	2010-06-18 14:50:22.000000000 +0900
+@@ -34,8 +34,10 @@
+ options 	MSDOSFS			#MSDOS Filesystem
+ options 	CD9660			#ISO 9660 Filesystem
+ options 	PROCFS			#Process filesystem
++options		LINPROCFS
+ options 	COMPAT_43		#Compatible with BSD 4.3 [KEEP THIS!]
+ options		COMPAT_DF12		#Compatible with DragonFly 1.2 and earlier
++options		COMPAT_LINUX
+ options 	SCSI_DELAY=5000		#Delay (in ms) before probing SCSI
+ options		DEVICE_POLLING		# Support mixed interrupt-polling
+ 					# handling of network device drivers
