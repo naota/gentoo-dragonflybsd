@@ -11,6 +11,7 @@ DESCRIPTION="DragonFly sbin utils"
 
 SLOT="0"
 KEYWORDS="~x86-dfbsd"
+IUSE="atm ipv6 ssl"
 
 RDEPEND=""
 DEPEND="=sys-dfbsd/dfbsd-sources-${PV}*
@@ -22,18 +23,20 @@ PROVIDE="virtual/libc
 REMOVE_SUBDIRS="libncurses
 	libz libbz2 libarchive \
 	libsm libsmdb libsmutil \
-	libbegemot libbsnmp \
-	libpam libpcap bind libwrap libmagic \
+	libpam libpcap libbind libbind9 libwrap libmagic \
 	libcom_err libtelnet
-	libedit libelf libisc"
+	libedit libisc pam_module"
 
 pkg_setup() {
 	[ -c /dev/zero ] || \
 		die "You forgot to mount /dev; the compiled libc would break."
-	mymakeopts="${mymakeopts} NO_BIND= NO_SENDMAIL= "
+	use atm || REMOVE_SUBDIRS="${REMOVE_SUBDIRS} libatm"
+	use ipv6 || mymakeopts="${mymakeopts} NOINET6= "
+	use ssl || mymakeopts="${mymakeopts} NO_OPENSSL= "
 }
 
-PATCHES=( "${FILESDIR}"/${P}-csu.patch )
+PATCHES=( "${FILESDIR}"/${P}-csu.patch 
+	"${FILESDIR}"/${P}-libsdp.patch )
 
 src_unpack() {
 	dragonfly_src_unpack
@@ -100,6 +103,10 @@ src_compile() {
 	cd "${WORKDIR}/${P}/include"
 	$(dragonfly_get_bmake) CC="$(tc-getCC)" || die "make include failed"
 
+	append-flags $(test-flags -fno-strict-aliasing)
+
+	strip-flags
+
 	append-flags "-isystem '${WORKDIR}/${P}/include_proper'"
 
 	einfo "Compiling libc."
@@ -126,8 +133,6 @@ src_install() {
 	insinto /etc
 	doins auth.conf nls.alias netconfig
 
-	local MACHINE="$(tc-arch-kernel)"
-
 	gen_usr_ldscript libalias.so libatm.so libbind9.so libbluetooth.so \
 		libbsdxml.so libc.so libcalendar.so libcam.so libcrypt.so \
 		libdevinfo.so libdevstat.so libevent.so libevtr.so libfetch.so libform.so \
@@ -138,6 +143,9 @@ src_install() {
 		libsdp.so libsmb.so libtacplus.so libtermcap.so	libtermlib.so libtinfo.so \
 		libusbhid.so libutil.so libvgl.so libxpg4.so libypclnt.so
 		thread/libthread_xu.so thread/libc_r.so 
+	
+	rm "${D}"/$(get_libdir)/libpthread.so
+	dosym libpthread.so.0 /$(get_libdir)/libpthread.so
 }
 
 install_includes()

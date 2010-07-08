@@ -1,0 +1,31 @@
+--- libsdp/Makefile.orig	2010-06-30 01:13:14.000000000 +0900
++++ libsdp/Makefile	2010-06-30 01:14:21.000000000 +0900
+@@ -13,7 +13,7 @@
+ INCS=		sdp.h
+ INCSDIR=	/usr/include
+ 
+-CFLAGS+=	-I${.CURDIR} -I${SYSDIR}
++CFLAGS+=	-I${.CURDIR} -I${SYSDIR} -I${SYSDIR}/netbt
+ 
+ MLINKS+=	sdp.3 SDP_GET8.3
+ MLINKS+=	sdp.3 SDP_GET16.3
+--- libsdp/session.c.orig	2010-06-30 01:16:31.000000000 +0900
++++ libsdp/session.c	2010-06-30 01:15:36.000000000 +0900
+@@ -65,6 +65,7 @@
+ #include <sys/types.h>
+ #include <sys/un.h>
+ #include <bluetooth.h>
++#include <l2cap.h>
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <string.h>
+--- libsdp/sdp.h
++++ libsdp/sdp.h
+@@ -66,6 +66,7 @@
+ #define _SDP_H_
+ 
+ #include <string.h>
++#include <sys/endian.h>
+ 
+ __BEGIN_DECLS
+ 
