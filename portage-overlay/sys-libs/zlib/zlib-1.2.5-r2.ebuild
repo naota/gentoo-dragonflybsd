@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/sys-libs/zlib/zlib-1.2.4.ebuild,v 1.4 2010/04/14 02:23:25 vapier Exp $
+# $Header: /var/cvsroot/gentoo-x86/sys-libs/zlib/zlib-1.2.5-r2.ebuild,v 1.2 2010/05/01 11:02:10 aballier Exp $
 
 inherit eutils toolchain-funcs
 
@@ -19,23 +19,22 @@ RDEPEND="!<dev-libs/libxml2-2.7.7" #309623
 src_unpack() {
 	unpack ${A}
 	cd "${S}"
-	epatch "${FILESDIR}"/${PN}-1.2.4-build.patch
-	epatch "${FILESDIR}"/${PN}-1.2.4-visibility-support.patch #149929
-	epatch "${FILESDIR}"/${PN}-1.2.4-LDFLAGS.patch #126718
 	epatch "${FILESDIR}"/${PN}-1.2.3-mingw-implib.patch #288212
-	epatch "${FILESDIR}"/${PN}-1.2.4-configure-LANG.patch
 	# trust exit status of the compiler rather than stderr #55434
 	# -if test "`(...) 2>&1`" = ""; then
 	# +if (...) 2>/dev/null; then
 	sed -i 's|\<test "`\([^"]*\) 2>&1`" = ""|\1 2>/dev/null|' configure || die
-	sed -i -e '/ldconfig/d' Makefile* || die
+
+	# bug #316377
+	epatch "${FILESDIR}"/${P}-lfs-decls.patch
+	# bug #316841
+	epatch "${FILESDIR}"/${P}-bsd_chosts.patch
 }
 
 src_compile() {
-	tc-export AR CC RANLIB RC DLLWRAP
 	case ${CHOST} in
 	*-mingw*|mingw*)
-		emake -f win32/Makefile.gcc prefix=/usr || die
+		emake -f win32/Makefile.gcc prefix=/usr STRIP= PREFIX=${CHOST}- || die
 		;;
 	*)	# not an autoconf script, so cant use econf
 		./configure --shared --prefix=/usr --libdir=/usr/$(get_libdir) || die
@@ -45,7 +44,7 @@ src_compile() {
 }
 
 src_install() {
-	emake install DESTDIR="${D}" || die
+	emake install DESTDIR="${D}" LDCONFIG=: || die
 	dodoc FAQ README ChangeLog doc/*.txt
 
 	case ${CHOST} in
