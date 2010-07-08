@@ -1,0 +1,24 @@
+diff --git a/libexec/rtld-elf/Makefile b/libexec/rtld-elf/Makefile
+index 40bbbe5..0145753 100644
+--- a/libexec/rtld-elf/Makefile
++++ b/libexec/rtld-elf/Makefile
+@@ -11,6 +11,8 @@ INSTALLFLAGS=	-C -b
+ .ifndef NOFSCHG
+ INSTALLFLAGS+=	-fschg
+ .endif
++BINDIR=		/libexec
++SYMLINKS=	${BINDIR}/${PROG} /usr/libexec/${PROG}
+ MLINKS=		rtld.1 ld-elf.so.1.1
+ MLINKS+=	rtld.1 ld-elf.so.2.1
+ 
+@@ -24,8 +26,8 @@ LDFLAGS+=	-Wl,-T,${LDSCRIPT} -Wl,-E -Wl,-Bstatic
+ DPADD=		${.OBJDIR}/../../lib/libc_rtld/libc_rtld.a
+ LDADD=		-L${.OBJDIR}/../../lib/libc_rtld -lc_rtld
+ .else
+-CFLAGS+=	-fpic -DPIC
+-LDFLAGS+=	-shared -Wl,-Bsymbolic
++CFLAGS+=	-fPIC -DPIC 
++LDFLAGS+=	-Wl,-b,elf32-i386 -shared -Wl,-Bsymbolic 
+ DPADD=		${.OBJDIR}/../../lib/libc_rtld/libc_rtld_pic.a
+ LDADD=		-L${.OBJDIR}/../../lib/libc_rtld -lc_rtld_pic
+ .endif
