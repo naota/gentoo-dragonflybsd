@@ -27,6 +27,7 @@ src_prepare() {
 	epatch "${FILESDIR}/${PN}-20050201-nbsd.patch"
 	epatch "${FILESDIR}/${PN}-20050616-redef.patch"
 	epatch "${FILESDIR}/${PN}-20050616-optional.patch"
+	epatch "${FILESDIR}/${P}-path.patch"
 
 	sed -i -e 's:-Werror::' "${S}/configure.ac"
 

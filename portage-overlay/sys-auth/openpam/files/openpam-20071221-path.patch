@@ -1,0 +1,11 @@
+--- lib/openpam_dynamic.c.orig	2010-07-05 22:38:19.000000000 +0900
++++ lib/openpam_dynamic.c	2010-07-05 22:38:46.000000000 +0900
+@@ -74,7 +74,7 @@
+ 		prefix = "";
+ 
+ 	/* try versioned module first, then unversioned module */
+-	if (asprintf(&vpath, "%s%s.%d", prefix, path, LIB_MAJ) < 0)
++	if (asprintf(&vpath, "%s/%s.%d", prefix, path, LIB_MAJ) < 0)
+ 		goto buf_err;
+ 	if ((dlh = dlopen(vpath, RTLD_NOW)) == NULL) {
+ 		openpam_log(PAM_LOG_DEBUG, "%s: %s", vpath, dlerror());
