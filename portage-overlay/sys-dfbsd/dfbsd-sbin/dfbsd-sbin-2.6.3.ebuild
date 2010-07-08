@@ -3,19 +3,15 @@
 # $Header: $
 
 EAPI=3
-EGIT_REPO_URI="git://git.dragonflybsd.org/dragonfly.git"
-EGIT_COMMIT="v2.6.3"
-EGIT_PROJECT="dragonflybsd"
+EDFLY_DIR="sbin"
 
-inherit git bsdmk freebsd
+inherit dragonfly flag-o-matic
 
 DESCRIPTION="DragonFly sbin utils"
-HOMEPAGE="http://www.dragonflybsd.org/"
 
-LICENSE=""
 SLOT="0"
 KEYWORDS="~x86-dfbsd"
-IUSE="ipfilter pf"
+IUSE="atm ipfilter ipv6"
 
 RDEPEND="=sys-dfbsd/dfbsd-lib-${PV}*
 	dev-libs/libedit
@@ -27,22 +23,29 @@ PROVIDE="virtual/dev-manager"
 
 
 REMOVE_SUBDIRS="dhclient rcorder newbtconf rcrun"
+PATCHES=( 
+	"${FILESDIR}"/${P}-zlib.patch
+	"${FILESDIR}"/${P}-ldconfig.patch
+	"${FILESDIR}"/${P}-noshare.patch
+	)
+
+pkg_setup() {
+	use atm || REMOVE_SUBDIRS="${REMOVE_SUBDIRS} atm"
+	use ipfilter || mymakeopts="${mymakeopts} NO_IPFILTER= "
+	use ipv6 || mymakeopts="${mymakeopts} NO_INET6= "
+
+	append-flags $(test-flags -static-libgcc)
+}
 
 src_unpack() {
-	git_src_unpack
-	cd "${S}"
-	epatch "${FILESDIR}"/${P}-zlib.patch
-	epatch "${FILESDIR}"/${P}-ldconfig.patch
-	S="${WORKDIR}/${P}/sbin"
-	cd ${S}
-	dummy_mk ${REMOVE_SUBDIRS}
-	freebsd_rename_libraries
+	dragonfly_src_unpack
+
 	sed -i.bak -e 's/-lkiconv/-lkiconv -liconv/' \
 		mount_cd9660/Makefile mount_msdos/Makefile mount_ntfs/Makefile
 }
 
 src_install() {
-	NOFSCHG=yes freebsd_src_install
+	NOFSCHG=yes dragonfly_src_install
 	keepdir /var/log
 	# Needed by ldconfig:
 	keepdir /var/run
@@ -70,7 +73,4 @@ src_install() {
 
 	use ipfilter && { doperiodic security \
 		security/*.ipfdenied || die ; }
-
-	use pf && { doperiodic security \
-		security/*.pfdenied || die ; }
 }
