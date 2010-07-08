@@ -1,0 +1,39 @@
+diff --git a/share/syscons/fonts/Makefile b/share/syscons/fonts/Makefile
+index 8000a02..0112c41 100644
+--- a/share/syscons/fonts/Makefile
++++ b/share/syscons/fonts/Makefile
+@@ -35,6 +35,8 @@ NOMAN = noman
+ NOOBJ = noobj
+ 
+ install:
++	${INSTALL} -d -o ${BINOWN} -g ${BINGRP} \
++		${DESTDIR}${FONTDIR}
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${SHAREMODE} ${FONTS} \
+ 		${DESTDIR}${FONTDIR}
+ 
+diff --git a/share/syscons/keymaps/Makefile b/share/syscons/keymaps/Makefile
+index 6310818..c55f8ae 100644
+--- a/share/syscons/keymaps/Makefile
++++ b/share/syscons/keymaps/Makefile
+@@ -48,6 +48,8 @@ NOMAN = noman
+ NOOBJ = noobj
+ 
+ install:
++	${INSTALL} -d -o ${BINOWN} -g ${BINGRP} \
++	    ${DESTDIR}${MAPSDIR}
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${SHAREMODE} ${KEYMAPS} \
+ 	    ${DESTDIR}${MAPSDIR}
+ 
+diff --git a/share/syscons/scrnmaps/Makefile b/share/syscons/scrnmaps/Makefile
+index 55c3669..2545d49 100644
+--- a/share/syscons/scrnmaps/Makefile
++++ b/share/syscons/scrnmaps/Makefile
+@@ -17,6 +17,8 @@ all: ${SCRMAPS}
+ build-tools: ${SCRMAPS_MK}
+ 
+ install:
++	${INSTALL} -d -o ${BINOWN} -g ${BINGRP} \
++	    ${DESTDIR}${SCRDIR}
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m ${SHAREMODE} \
+ 	    ${SCRMAPS} ${DESTDIR}${SCRDIR}
+ 

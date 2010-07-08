@@ -1,0 +1,14 @@
+diff --git a/share/dict/Makefile b/share/dict/Makefile
+index cfae0ad..9ba3c7b 100644
+--- a/share/dict/Makefile
++++ b/share/dict/Makefile
+@@ -5,8 +5,7 @@
+ NOOBJ=		noobj
+ 
+ # XXX MISSING:	connectives words
+-FILES=		README propernames web2 web2a freebsd
++FILES=		README freebsd
+ FILESDIR=	${BINDIR}/dict
+-SYMLINKS=	web2 ${FILESDIR}/words
+ 
+ .include <bsd.prog.mk>

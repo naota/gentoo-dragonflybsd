@@ -1,0 +1,90 @@
+diff --git a/share/monetdef/Makefile b/share/monetdef/Makefile
+index 37284d0..1a7aed7 100644
+--- a/share/monetdef/Makefile
++++ b/share/monetdef/Makefile
+@@ -97,55 +97,85 @@ all: ${LOCALES:S/$/.out/g}
+ 
+ afterinstall:
+ .for lang in ${LOCALES}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${lang}
+ 	${INSTALL} -m 644 -o ${BINOWN} -g ${BINGRP} ${lang}.out \
+ 		${LOCALEDIR}/${lang}/LC_MONETARY
+ .endfor
+ .for link in ${LATIN15LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-15
+ 	${LN} -sf ../${link}.ISO8859-1/LC_MONETARY \
+ 	       ${LOCALEDIR}/${link}.ISO8859-15/LC_MONETARY
+ .endfor
+ .for link in ${ASCIILINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.US-ASCII
+ 	${LN} -sf ../${link}.ISO8859-1/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.US-ASCII/LC_MONETARY
+ .endfor
+ .for link in ${CH_LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.ISO8859-1
+ 	${LN} -sf ../${CH_SRC}.ISO8859-1/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.ISO8859-1/LC_MONETARY
+ .endfor
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/ja_JP.SJIS
+ 	${LN} -sf ../ja_JP.eucJP/LC_MONETARY \
+ 		${LOCALEDIR}/ja_JP.SJIS/LC_MONETARY
+ .for link in ${UTF8_LATIN1LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++                ${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-1/LC_MONETARY \
+                 ${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${UTF8_LATIN2LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-2/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${UTF8_LATIN7LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-7/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${UTF8_LATIN9LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-9/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${UTF8_LATIN13LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-13/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${UTF8_LATIN15LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${link}.ISO8859-15/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
+ .for link in ${CH_LINKS}
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -sf ../${CH_SRC}.UTF-8/LC_MONETARY \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_MONETARY
+ .endfor
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/ja_JP.UTF-8
+ 	${LN} -sf ../ja_JP.eucJP/LC_MONETARY \
+ 		${LOCALEDIR}/ja_JP.UTF-8/LC_MONETARY
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/ko_KR.UTF-8
+ 	${LN} -sf ../ko_KR.eucKR/LC_MONETARY \
+ 		${LOCALEDIR}/ko_KR.UTF-8/LC_MONETARY
++	${INSTALL} -d -m 755 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/zh_TW.UTF-8
+ 	${LN} -sf ../zh_TW.Big5/LC_MONETARY \
+ 		${LOCALEDIR}/zh_TW.UTF-8/LC_MONETARY
+ 

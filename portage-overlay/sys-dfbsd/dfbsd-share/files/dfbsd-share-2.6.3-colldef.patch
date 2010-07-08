@@ -1,0 +1,65 @@
+diff --git a/share/colldef/Makefile b/share/colldef/Makefile
+index 0c3ed9f..54ec117 100644
+--- a/share/colldef/Makefile
++++ b/share/colldef/Makefile
+@@ -97,38 +97,60 @@ uk_UA.KOI8-U.out:       map.KOI8-U
+ 
+ afterinstall:
+ .for locale in ${LOCALES}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++		${LOCALEDIR}/${locale}
+ 	${INSTALL} -m 644 -o ${BINOWN} -g ${BINGRP} \
+ 		${locale}.out ${LOCALEDIR}/${locale}/LC_COLLATE
+ .endfor
+ .for link in ${ASCIILINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}
+ 	${LN} -fs ../la_LN.US-ASCII/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}/LC_COLLATE
+ .endfor
+ .for link in ${ZHLINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}
+ 	${LN} -fs ../is_IS.ISO8859-1/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}/LC_COLLATE
+ .endfor
+ .for link in ${LATIN1LINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-1
+ 	${LN} -fs ../la_LN.ISO8859-1/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}.ISO8859-1/LC_COLLATE
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-15
+ 	${LN} -fs ../la_LN.ISO8859-15/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}.ISO8859-15/LC_COLLATE
+ .endfor
+ .for link in ${LATIN2LINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-2
+ 	${LN} -fs ../la_LN.ISO8859-2/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}.ISO8859-2/LC_COLLATE
+ .endfor
+ .for link in ${DELINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-1
+ 	${LN} -fs ../de_DE.ISO8859-1/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}.ISO8859-1/LC_COLLATE
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.ISO8859-15
+ 	${LN} -fs ../de_DE.ISO8859-15/LC_COLLATE \
+ 	       ${LOCALEDIR}/${link}.ISO8859-15/LC_COLLATE
+ .endfor
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/sk_SK.ISO8859-2
+ 	${LN} -fs ../cs_CZ.ISO8859-2/LC_COLLATE \
+ 	       ${LOCALEDIR}/sk_SK.ISO8859-2/LC_COLLATE
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/pt_BR.ISO8859-1
+ 	${LN} -fs ../pt_PT.ISO8859-1/LC_COLLATE \
+ 		${LOCALEDIR}/pt_BR.ISO8859-1/LC_COLLATE
+ .for link in ${UTF8LINKS}
++	${INSTALL} -d -m 644 -o ${BINOWN} -g ${BINGRP} \
++	       ${LOCALEDIR}/${link}.UTF-8
+ 	${LN} -fs ../la_LN.UTF-8/LC_COLLATE \
+ 		${LOCALEDIR}/${link}.UTF-8/LC_COLLATE
+ .endfor

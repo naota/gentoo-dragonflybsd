@@ -1,0 +1,33 @@
+diff --git a/share/examples/Makefile b/share/examples/Makefile
+index 73f9b20..93aea16 100644
+--- a/share/examples/Makefile
++++ b/share/examples/Makefile
+@@ -26,6 +26,7 @@ beforeinstall: etc-examples ${SHARED}
+ FILES!=	find -L ${dir} -type f -print
+ .for file in ${FILES}
+ copies::
++	${INSTALL} -d -o ${BINOWN} -g ${BINGRP} -m 755 `dirname ${DDIR}/${file}`
+ 	${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 644 ${file} ${DDIR}/${file}
+ .endfor
+ .endfor
+diff --git a/etc/Makefile b/etc/Makefile
+index 9fb8f33..ec0fc45 100644
+--- a/etc/Makefile
++++ b/etc/Makefile
+@@ -394,10 +394,14 @@ distrib-dirs:
+ 	done
+ 
+ etc-examples:
+-	cd ${.CURDIR}; ${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 444 \
++	cd ${.CURDIR}; ${INSTALL} -d -o ${BINOWN} -g ${BINGRP} -m 555 \
++	    ${DESTDIR}/usr/share/examples/etc; \
++	    ${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 444 \
+ 	    ${BINUPDATE} ${BIN1} ${BIN2} nsmb.conf opieaccess \
+ 	    ${DESTDIR}/usr/share/examples/etc
+-	cd ${.CURDIR}/defaults; ${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 444 \
++	cd ${.CURDIR}/defaults; ${INSTALL} -d -o ${BINOWN} -g ${BINGRP} -m 555 \
++	    ${DESTDIR}/usr/share/examples/etc/defaults; \
++	    ${INSTALL} -o ${BINOWN} -g ${BINGRP} -m 444 \
+ 	    ${DEFAULTS} ${DESTDIR}/usr/share/examples/etc/defaults
+ 
+ .include <bsd.prog.mk>
