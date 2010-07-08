@@ -1,0 +1,13 @@
+diff --git a/usr.bin/make/Makefile b/usr.bin/make/Makefile
+index b3ac092..518255e 100644
+--- a/usr.bin/make/Makefile
++++ b/usr.bin/make/Makefile
+@@ -10,8 +10,6 @@ SRCS=	arch.c buf.c cond.c dir.c for.c hash.c hash_tables.c job.c	\
+ 	lst.c main.c make.c parse.c proc.c shell.c str.c suff.c targ.c	\
+ 	util.c var.c
+ 
+-NOSHARED?=	YES
+-
+ CFLAGS+=-DMAKE_VERSION=\"5200408120\"
+ 
+ # Make object files which depend on preprocessor symbols defined

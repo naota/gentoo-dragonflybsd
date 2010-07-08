@@ -1,0 +1,12 @@
+diff --git a/usr.bin/rfcomm_sppd/rfcomm_sppd.c b/usr.bin/rfcomm_sppd/rfcomm_sppd.c
+index 6bed6ea..621dba9 100644
+--- a/usr.bin/rfcomm_sppd/rfcomm_sppd.c
++++ b/usr.bin/rfcomm_sppd/rfcomm_sppd.c
+@@ -76,6 +76,7 @@
+ #include <termios.h>
+ #include <unistd.h>
+ #include <sys/stat.h>
++#include <netdb.h>
+ 
+ #include <netbt/rfcomm.h>
+ 

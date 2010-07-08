@@ -1,0 +1,14 @@
+diff --git a/usr.bin/Makefile b/usr.bin/Makefile
+index 4db5b9a..62c56bc 100644
+--- a/usr.bin/Makefile
++++ b/usr.bin/Makefile
+@@ -114,7 +114,9 @@ SUBDIR=	alias \
+ 	make \
+ 	mandoc \
+ 	mesg \
++	mkcsmapper \
+ 	mkdep \
++	mkesdb \
+ 	mkfifo \
+ 	mklocale \
+ 	mkstr \

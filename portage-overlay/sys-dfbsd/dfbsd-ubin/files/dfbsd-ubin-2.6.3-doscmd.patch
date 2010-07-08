@@ -1,0 +1,17 @@
+diff --git a/usr.bin/doscmd/Makefile b/usr.bin/doscmd/Makefile
+index 2b5beda..1ea5b46 100644
+--- a/usr.bin/doscmd/Makefile
++++ b/usr.bin/doscmd/Makefile
+@@ -32,8 +32,12 @@ CFLAGS+=	-DNO_X
+ .endif
+ 
+ beforeinstall:
++	${INSTALL} -d -o ${BINOWN} -g ${EXEGRP} -m ${EXEMODE} \
++	    ${DESTDIR}/usr/libdata/doscmd/
+ 	${INSTALL} -o ${BINOWN} -g ${EXEGRP} -m ${EXEMODE} \
+ 	    emsdriv.sys redir.com ${DESTDIR}/usr/libdata/doscmd/
++	${INSTALL} -d -o ${BINOWN} -g ${EXEGRP} -m ${SHAREMODE} \
++	    ${DESTDIR}/usr/libdata/doscmd/fonts
+ 	${INSTALL} -o ${BINOWN} -g ${EXEGRP} -m ${SHAREMODE} \
+ 	    ${FONTFILES} ${DESTDIR}/usr/libdata/doscmd/fonts
+ 	cd ${.CURDIR} && \
