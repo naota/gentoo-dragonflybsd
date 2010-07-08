@@ -3,27 +3,24 @@
 # $Header: $
 
 EAPI=3
-EGIT_REPO_URI="git://git.dragonflybsd.org/dragonfly.git"
-EGIT_COMMIT="v2.6.3"
-EGIT_PROJECT="dragonflybsd"
+EDFLY_DIR="share/mk"
 
-inherit git
+inherit dragonfly
 
 DESCRIPTION="Makefile definitions used for building and installing libraries and system files"
-HOMEPAGE="http://www.dragonflybsd.org/"
 
-LICENSE=""
 SLOT="0"
 KEYWORDS="~x86-dfbsd"
-IUSE=""
 
 RESTRICT="strip"
 
+
 src_unpack() {
-	git_src_unpack;
+	git_src_unpack
 	cd "${WORKDIR}"/${P}/share/mk
 	epatch "${FILESDIR}"/${P}-gentoo.patch
 }
+
 src_configure() { :; }
 src_compile() { :; }
 
@@ -34,5 +31,5 @@ src_install() {
 	else
 		insinto /usr/share/mk
 	fi
-	doins *.mk *.awk
+	doins *.mk
 }

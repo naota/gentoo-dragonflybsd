@@ -18,7 +18,7 @@
  .endif
  installfiles: _${group}INS_${file:T}
  _${group}INS_${file:T}: ${file}
-+	${INSTALL} -d ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
++	${INSTALL} -d ${DESTDIR}${${group}DIR_${.ALLSRC:T}}
  	${INSTALL} -o ${${group}OWN_${.ALLSRC:T}} \
  	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
  	    ${.ALLSRC} \
@@ -37,11 +37,14 @@
  .endif
 --- bsd.incs.mk.orig	2010-06-18 16:00:08.000000000 +0900
 +++ bsd.incs.mk	2010-06-18 16:08:19.000000000 +0900
-@@ -40,6 +40,7 @@
+@@ -40,6 +40,10 @@
  .endif
  installincludes: _${group}INS_${header:T}
  _${group}INS_${header:T}: ${header}
-+	${INSTALL} -d ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}}
++
++ 	${INSTALL} -d -o ${${group}OWN_${.ALLSRC:T}} \
++ 	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
++ 	    ${DESTDIR}${${group}DIR_${.ALLSRC:T}}/${${group}NAME_${.ALLSRC:T}} 
  	${INSTALL} -C -o ${${group}OWN_${.ALLSRC:T}} \
  	    -g ${${group}GRP_${.ALLSRC:T}} -m ${${group}MODE_${.ALLSRC:T}} \
  	    ${.ALLSRC} \
@@ -49,7 +52,7 @@
  installincludes: _${group}INS
  _${group}INS: ${_${group}INCS}
  .if defined(${group}NAME)
-+	${INSTALL} -d ${DESTDIR}${${group}DIR}/${${group}NAME}
++	${INSTALL} -d ${DESTDIR}${${group}DIR}
  	${INSTALL} -C -o ${${group}OWN} -g ${${group}GRP} -m ${${group}MODE} \
  	    ${.ALLSRC} ${DESTDIR}${${group}DIR}/${${group}NAME}
  .else
@@ -149,6 +152,24 @@
  	${MINSTALL} ${page:T:S/$/${CATEXT}${MCOMPRESS_EXT}/g} \
  		${DESTDIR}${CATDIR}${page:E}${MANSUBDIR}/${page:T:S/$/${MCOMPRESS_EXT}/}
  .endif
+@@ -222,6 +222,8 @@
+ 		l=${DESTDIR}${MANDIR}$${sect}${MANSUBDIR}/$$name; \
+ 		name=$$1; shift; sect=$$1; shift; \
+ 		t=${DESTDIR}${MANDIR}$${sect}${MANSUBDIR}/$$name; \
++		d=`dirname $$t`; \
++		test -d $$d || mkdir $$d; \
+ 		${ECHO} $${t}${ZEXT} -\> $${l}${ZEXT}; \
+ 		rm -f $${t} $${t}${MCOMPRESS_EXT}; \
+ 		${LN} $${l}${ZEXT} $${t}${ZEXT}; \
+@@ -237,6 +239,8 @@
+ 		l=${DESTDIR}${CATDIR}$${sect}${MANSUBDIR}/$$name; \
+ 		name=$$1; shift; sect=$$1; shift; \
+ 		t=${DESTDIR}${CATDIR}$${sect}${MANSUBDIR}/$$name; \
++		d=`dirname $$t`; \
++		test -d $$d || mkdir $$d; \
+ 		${ECHO} $${t}${ZEXT} -\> $${l}${ZEXT}; \
+ 		rm -f $${t} $${t}${MCOMPRESS_EXT}; \
+ 		${LN} $${l}${ZEXT} $${t}${ZEXT}; \
 --- bsd.own.mk.orig	2010-06-18 16:44:49.000000000 +0900
 +++ bsd.own.mk	2010-06-18 16:45:19.000000000 +0900
 @@ -190,10 +190,6 @@
@@ -299,4 +320,38 @@
 +	${INSTALL} -d ${DESTDIR}${TARGET_LIBDIR}
  	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
  	    ${_INSTALLFLAGS} lib${LIB}_pic.a ${DESTDIR}${TARGET_LIBDIR}
+ .endif
+--- bsd.links.mk.orig	2010-06-18 16:42:54.000000000 +0900
++++ bsd.links.mk	2010-06-30 02:13:16.000000000 +0900
+@@ -16,6 +16,8 @@
+ 		t=${DESTDIR}$$1; \
+ 		shift; \
+ 		${ECHO} $$t -\> $$l; \
++		d=`dirname $$t`; \
++		test -d $$d || mkdir $$d; \
+ 		${LN} -f $$l $$t; \
+ 	done; true
+ .endif
+@@ -27,6 +29,8 @@
+ 		t=${DESTDIR}$$1; \
+ 		shift; \
+ 		${ECHO} $$t -\> $$l; \
++		d=`dirname $$t`; \
++		test -d $$d || mkdir $$d; \
+ 		${LN} -fs $$l $$t; \
+ 	done; true
+ .endif
+diff --git a/share/mk/bsd.nls.mk b/share/mk/bsd.nls.mk
+index 3f62688..a596ab2 100644
+--- bsd.nls.mk.orig
++++ bsd.nls.mk
+@@ -64,7 +64,8 @@ FILESGROUPS+=	NLS
+ # installation rules
+ #
+ .for file in ${NLS}
+-NLSNAME_${file:T}= ${file:T:R}/${NLSNAME}.cat
++NLSDIR_${file:T}:= ${NLSDIR}/${file:T:R}
++NLSNAME_${file:T}= ${NLSNAME}.cat
+ .if defined(NLSLINKS_${file:R}) && !empty(NLSLINKS_${file:R})
+ NLSLINKS+=	${file:R}
  .endif
