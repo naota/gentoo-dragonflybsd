@@ -75,6 +75,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/openrc-9999-pause.patch
 	epatch "${FILESDIR}"/${P}-dragonfly-librc-daemon.patch
 	epatch "${FILESDIR}"/${P}-dragonfly-rc-plugin.patch
+	use kernel_DragonFlyBSD && epatch "${FILESDIR}"/${P}-librc-daemon.patch
 	cp "${FILESDIR}"/os-DragonFlyBSD.mk mk
 	cp "${FILESDIR}"/conf.d-Makefile.DragonFlyBSD conf.d/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"
 	cp "${FILESDIR}"/etc-Makefile.DragonFlyBSD etc/Makefile.DragonFlyBSD || die "copy Makefile.DragonFlyBSD failed"

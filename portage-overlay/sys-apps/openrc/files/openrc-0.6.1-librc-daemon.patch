@@ -1,0 +1,11 @@
+--- src/librc/librc-daemon.c.orig	2010-07-06 10:04:40.000000000 +0900
++++ src/librc/librc-daemon.c	2010-07-06 10:05:06.000000000 +0900
+@@ -199,6 +199,8 @@
+ 	const char *const *arg;
+ 	int match;
+ 
++	if(pid == -1) return NULL;
++
+ 	if ((kd = kvm_openfiles(_KVM_PATH, _KVM_PATH,
+ 		    NULL, _KVM_FLAGS, errbuf)) == NULL)
+ 	{
