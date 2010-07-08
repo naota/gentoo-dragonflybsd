@@ -1,0 +1,13 @@
+--- binutils-2.20.1/gas/configure.tgt.orig	2010-06-29 19:53:49.000000000 +0900
++++ binutils-2.20.1/gas/configure.tgt	2010-06-29 19:54:37.000000000 +0900
+@@ -208,8 +208,9 @@
+   i386-*-freebsdaout*)			fmt=aout em=386bsd ;;
+   i386-*-freebsd[12].*)			fmt=aout em=386bsd ;;
+   i386-*-freebsd[12])			fmt=aout em=386bsd ;;
+-  i386-*-freebsd* | i386-*-kfreebsd*-gnu | i386-*-dragonfly*)
++  i386-*-freebsd* | i386-*-kfreebsd*-gnu)
+ 				    	fmt=elf em=freebsd ;;
++  i386-*-dragonfly*)			fmt=elf em=386bsd ;;
+   i386-*-sysv*)				fmt=coff ;;
+   i386-*-sco3.2v5*coff)			fmt=coff ;;
+   i386-*-isc*)				fmt=coff ;;
