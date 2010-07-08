@@ -1,0 +1,27 @@
+diff --git a/usr.sbin/rpcbind/Makefile b/usr.sbin/rpcbind/Makefile
+index 618c3ee..881459c 100644
+--- a/usr.sbin/rpcbind/Makefile
++++ b/usr.sbin/rpcbind/Makefile
+@@ -8,13 +8,19 @@ SRCS=	check_bound.c rpcb_stat.c rpcb_svc_4.c rpcbind.c pmap_svc.c \
+ 	rpcb_svc.c rpcb_svc_com.c security.c warmstart.c util.c
+ WARNS?=	1
+ 
+-CFLAGS+= -DPORTMAP -DLIBWRAP
++CFLAGS+= -DPORTMAP
+ 
+ .if !defined(NO_INET6)
+ CFLAGS+= -DINET6
+ .endif
+ 
+-DPADD=	${LIBWRAP} ${LIBUTIL}
+-LDADD=	-lwrap -lutil
++DPADD= ${LIBUTIL}
++LDADD= -lutil
++
++.if !defined(NO_WRAP)
++CFLAGS+= -DLIBWRAP
++DPADD+=         ${LIBWRAP}
++LDADD+=         -lwrap
++.endif
+ 
+ .include <bsd.prog.mk>

@@ -1,0 +1,22 @@
+diff --git a/usr.sbin/adduser/adduser.sh b/usr.sbin/adduser/adduser.sh
+index 3a8a9d3..3bc8637 100644
+--- a/usr.sbin/adduser/adduser.sh
++++ b/usr.sbin/adduser/adduser.sh
+@@ -813,7 +813,7 @@ ETCSHELLS="${ETCSHELLS:-/etc/shells}"
+ NOHOME="/nonexistent"
+ NOLOGIN="nologin"
+ NOLOGIN_PATH="/sbin/nologin"
+-GREPCMD="/usr/bin/grep"
++GREPCMD="/bin/grep"
+ DATECMD="/bin/date"
+ 
+ # Set default values
+@@ -827,7 +827,7 @@ uclass=
+ uhome=
+ upass=
+ ushell=
+-udotdir=/usr/share/skel
++udotdir=/etc/skel
+ ugroups=
+ uexpire=
+ upwexpire=
