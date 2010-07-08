@@ -27,3 +27,6 @@ bsd-post_src_install()
 profile-post_src_install() { bsd-post_src_install ; }
         post_src_install() { bsd-post_src_install ; }
 
+export CFLAGS="${CFLAGS} -static-libgcc"
+export CXXFLAGS="${CSSFLAGS} -static-libgcc"
+
