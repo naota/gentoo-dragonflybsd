@@ -1,0 +1,12 @@
+--- Configure.orig	2010-07-07 07:35:10.000000000 +0900
++++ Configure	2010-07-07 07:35:18.000000000 +0900
+@@ -5147,8 +5147,7 @@
+ 	# as that way the compiler can do the right implementation dependant
+ 	# thing. (NWC)
+ 	case "$gccversion" in
+-	?*)	set stack-protector -fstack-protector
+-		eval $checkccflag
++	?*)	eval $checkccflag
+ 		;;
+ 	esac
+ 	;;

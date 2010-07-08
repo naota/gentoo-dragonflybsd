@@ -1,0 +1,31 @@
+--- hints/dragonfly.sh.orig	2010-07-07 09:48:32.000000000 +0900
++++ hints/dragonfly.sh	2010-07-07 09:49:08.000000000 +0900
+@@ -17,23 +17,11 @@
+ 
+ # Dynamic Loading flags have not changed much, so they are separated
+ # out here to avoid duplicating them everywhere.
+-case "$osvers" in
+-*)  objformat=`/usr/bin/objformat`
+-    if [ x$objformat = xelf ]; then
+-	libpth="/usr/lib /usr/local/lib"
+-	glibpth="/usr/lib /usr/local/lib"
+-	ldflags="-Wl,-E "
+-	lddlflags="-shared "
+-    else
+-	if [ -e /usr/lib/aout ]; then
+-	    libpth="/usr/lib/aout /usr/local/lib /usr/lib"
+-	    glibpth="/usr/lib/aout /usr/local/lib /usr/lib"
+-	fi
+-	lddlflags='-Bshareable'
+-    fi
+-    cccdlflags='-DPIC -fPIC'
+-    ;;
+-esac
++libpth="/usr/lib /usr/local/lib"
++glibpth="/usr/lib /usr/local/lib"
++ldflags="-Wl,-E "
++lddlflags="-shared "
++cccdlflags='-DPIC -fPIC'
+ 
+ case "$osvers" in
+ *)  ccflags="${ccflags} -DHAS_FPSETMASK -DHAS_FLOATINGPOINT_H"

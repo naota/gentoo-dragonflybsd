@@ -26,7 +26,7 @@ LICENSE="|| ( Artistic GPL-1 GPL-2 GPL-3 )"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd ~x86-dfbsd"
 #KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
-IUSE="berkdb build debug doc gdbm ithreads"
+IUSE="berkdb build debug doc gdbm ithreads elibc_DragonFlyBSD"
 
 COMMON_DEPEND="berkdb? ( sys-libs/db )
 	gdbm? ( >=sys-libs/gdbm-1.8.3 )
@@ -96,6 +96,14 @@ src_prepare() {
 	# pod/perltoc.pod fails
 	ln -s ${LIBPERL} libperl$(get_libname ${SHORT_PV})
 	ln -s ${LIBPERL} libperl$(get_libname )
+
+	sed -i 's:/usr/bin/grep:/bin/grep:' hints/dragonfly.sh || die
+
+	if use elibc_DragonFlyBSD; then
+		epatch "${FILESDIR}"/${P}-nostack-protector.patch
+		epatch "${FILESDIR}"/${P}-dragonfly-hints.patch
+		append-flags $(test-flags -fno-stack-protector)
+	fi
 }
 
 myconf() {
@@ -192,6 +200,7 @@ src_configure() {
 	[[ -n "${ABI}" ]] && myconf "-Dusrinc=$(get_ml_incdir)"
 
 	[[ ${ELIBC} == "FreeBSD" ]] && myconf "-Dlibc=/usr/$(get_libdir)/libc.a"
+	[[ ${ELIBC} == "DragonFlyBSD" ]] && myconf "-Dlibc=/usr/$(get_libdir)/libc.a"
 
 	if [[ $(get_libdir) != "lib" ]] ; then
 		# We need to use " and not ', as the written config.sh use ' ...
