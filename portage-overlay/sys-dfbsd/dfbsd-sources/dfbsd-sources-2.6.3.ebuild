@@ -37,7 +37,7 @@ src_install() {
 	else
 		insinto "/usr/src/sys-${PVR}"
 	fi
-	doins -r "${S}/sys/"*
+	doins -r "${S}"/*
 }
 
 pkg_postinst() {
