@@ -25,7 +25,7 @@ REMOVE_SUBDIRS="libncurses
 	libsm libsmdb libsmutil \
 	libpam libpcap libbind libbind9 libwrap libmagic \
 	libcom_err libtelnet
-	libedit libisc pam_module"
+	libedit libisc pam_module libevent"
 
 pkg_setup() {
 	[ -c /dev/zero ] || \
