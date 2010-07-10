@@ -1,0 +1,12 @@
+diff --git a/sys/boot/pc32/kgzldr/Makefile b/sys/boot/pc32/kgzldr/Makefile
+index 5e7dd95..a95a091 100644
+--- a/sys/boot/pc32/kgzldr/Makefile
++++ b/sys/boot/pc32/kgzldr/Makefile
+@@ -20,6 +20,7 @@ kgzldr.o: ${OBJS}
+ 	${CC} ${LDFLAGS} -o ${.TARGET} ${OBJS}
+ 
+ realinstall:
++	${INSTALL} -d -o ${LIBOWN} -g ${LIBGRP} -m 755 ${DESTDIR}${LIBDIR}
+ 	${INSTALL} -o ${LIBOWN} -g ${LIBGRP} -m ${LIBMODE} \
+ 	    kgzldr.o ${DESTDIR}${LIBDIR}
+ 
