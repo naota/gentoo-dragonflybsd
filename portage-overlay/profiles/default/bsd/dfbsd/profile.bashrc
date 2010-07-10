@@ -28,5 +28,14 @@ profile-post_src_install() { bsd-post_src_install ; }
         post_src_install() { bsd-post_src_install ; }
 
 export CFLAGS="${CFLAGS} -static-libgcc"
-export CXXFLAGS="${CSSFLAGS} -static-libgcc"
+export CXXFLAGS="${CXXFLAGS} -static-libgcc"
 
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -pipe"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -O -O0 -O1 -O2 -mcpu -march -mtune"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fstack-protector -fstack-protector-all"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fbounds-checking -fno-strict-overflow"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-PIE -fno-pie -fno-unit-at-a-time"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -g -g[0-9] -ggdb -ggdb[0-9] -gstabs -gstabs+"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -fno-ident"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -W* -w"
+export ALLOWED_FLAGS="${ALLOWED_FLAGS} -static-libgcc"
