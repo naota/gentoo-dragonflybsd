@@ -4,9 +4,13 @@
 
 PATCHVER="1.1"
 ELF2FLT_VER=""
-inherit toolchain-binutils
+inherit toolchain-binutils flag-o-matic
 
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
+
+pkg_setup() {
+	append-flags "-DTE_DragonFly"
+}
 
 src_unpack() {
 	toolchain-binutils_src_unpack
