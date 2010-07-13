@@ -1,2 +1,0 @@
-LESSOPEN="|lesspipe.sh %s"
-LESS="-R -M --shift 5"
