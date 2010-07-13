@@ -24,7 +24,7 @@ DEPEND="sys-apps/portage
 	>=dev-lang/python-2.6[xml]
 	!!>=dev-lang/python-2.6[-xml]"
 RDEPEND="${DEPEND}
-	|| ( app-misc/realpath sys-freebsd/freebsd-bin )
+	|| ( app-misc/realpath sys-freebsd/freebsd-bin sys-dfbsd/dfbsd-bin )
 	sys-apps/gawk
 	sys-apps/grep"
 
