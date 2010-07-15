@@ -28,9 +28,10 @@ sys-devel/patch x86-dfbsd
 dev-libs/libxml2 x86-dfbsd
 dev-libs/expat x86-dfbsd
 dev-libs/gmp x86-dfbsd
-dev-libs/mpfr x86-dfbsd
 dev-libs/libffi x86-dfbsd
 dev-libs/libiconv x86-dfbsd
+dev-libs/mpfr x86-dfbsd
+dev-libs/popt x86-dfbsd
 dev-lang/perl x86-dfbsd
 app-arch/bzip2 x86-dfbsd
 app-arch/gzip x86-dfbsd

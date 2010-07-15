@@ -40,10 +40,10 @@ virtual/editor
 virtual/gzip
 virtual/libc
 virtual/os-headers
-sys-freebsd/freebsd-lib
-sys-freebsd/freebsd-libexec
-sys-freebsd/freebsd-bin
-sys-freebsd/freebsd-sbin
-sys-freebsd/freebsd-ubin
-sys-freebsd/freebsd-usbin
-sys-freebsd/freebsd-contrib
+sys-dfbsd/dfbsd-lib
+sys-dfbsd/dfbsd-libexec
+sys-dfbsd/dfbsd-bin
+sys-dfbsd/dfbsd-sbin
+sys-dfbsd/dfbsd-ubin
+sys-dfbsd/dfbsd-usbin
+sys-dfbsd/dfbsd-contrib
