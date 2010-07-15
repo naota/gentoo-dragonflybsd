@@ -1,6 +1,6 @@
 # Copyright 1999-2010 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /var/cvsroot/gentoo-x86/dev-vcs/git/git-1.7.1-r1.ebuild,v 1.4 2010/06/14 22:21:37 angelos Exp $
+# $Header: /var/cvsroot/gentoo-x86/dev-vcs/git/git-1.7.1.1.ebuild,v 1.1 2010/06/30 00:15:58 robbat2 Exp $
 
 EAPI=2
 
@@ -18,7 +18,7 @@ if [ "$PV" != "9999" ]; then
 	SRC_URI="mirror://kernel/software/scm/git/${MY_P}.tar.bz2
 			mirror://kernel/software/scm/git/${PN}-manpages-${DOC_VER}.tar.bz2
 			doc? ( mirror://kernel/software/scm/git/${PN}-htmldocs-${DOC_VER}.tar.bz2 )"
-	KEYWORDS="~alpha amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
+	KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 else
 	SRC_URI=""
 	EGIT_BRANCH="master"
@@ -48,8 +48,8 @@ RDEPEND="${CDEPEND}
 			dev-perl/Net-SMTP-SSL
 			dev-perl/Authen-SASL
 			cgi? ( virtual/perl-CGI )
-			cvs? ( >=dev-util/cvsps-2.1 dev-perl/DBI dev-perl/DBD-SQLite )
-			subversion? ( dev-util/subversion[-dso,perl] dev-perl/libwww-perl dev-perl/TermReadKey )
+			cvs? ( >=dev-vcs/cvsps-2.1 dev-perl/DBI dev-perl/DBD-SQLite )
+			subversion? ( dev-vcs/subversion[-dso,perl] dev-perl/libwww-perl dev-perl/TermReadKey )
 			)
 	gtk?
 	(
@@ -89,7 +89,7 @@ pkg_setup() {
 	if use webdav && ! use curl ; then
 		ewarn "USE=webdav needs USE=curl. Ignoring"
 	fi
-	if use subversion && has_version dev-util/subversion && built_with_use --missing false dev-util/subversion dso ; then
+	if use subversion && has_version dev-vcs/subversion && built_with_use --missing false dev-vcs/subversion dso ; then
 		ewarn "Per Gentoo bugs #223747, #238586, when subversion is built"
 		ewarn "with USE=dso, there may be weird crashes in git-svn. You"
 		ewarn "have been warned."
@@ -168,9 +168,9 @@ src_prepare() {
 
 	# USE=-iconv causes segfaults, fixed post 1.7.1
 	# Gentoo bug #321895
-	epatch "${FILESDIR}"/git-1.7.1-noiconv-segfault-fix.patch
+	#epatch "${FILESDIR}"/git-1.7.1-noiconv-segfault-fix.patch
 
-	epatch "${FILESDIR}"/${P}-Makefile.patch
+	epatch "${FILESDIR}"/${PN}-1.7.1-Makefile.patch
 
 	sed -i \
 		-e 's:^\(CFLAGS =\).*$:\1 $(OPTCFLAGS) -Wall:' \
@@ -367,13 +367,13 @@ src_test() {
 		disabled="${disabled} ${tests_nonroot}"
 	else
 		[[ $cvs -gt 0 ]] && \
-			has_version dev-util/cvs && \
+			has_version dev-vcs/cvs && \
 			let cvs=$cvs+1
 		[[ $cvs -gt 1 ]] && \
-			built_with_use dev-util/cvs server && \
+			built_with_use dev-vcs/cvs server && \
 			let cvs=$cvs+1
 		if [[ $cvs -lt 3 ]]; then
-			einfo "Disabling CVS tests (needs dev-util/cvs[USE=server])"
+			einfo "Disabling CVS tests (needs dev-vcs/cvs[USE=server])"
 			disabled="${disabled} ${tests_cvs}"
 		fi
 	fi
@@ -407,8 +407,8 @@ showpkgdeps() {
 
 pkg_postinst() {
 	use emacs && elisp-site-regen
-	if use subversion && has_version dev-util/subversion && ! built_with_use --missing false dev-util/subversion perl ; then
-		ewarn "You must build dev-util/subversion with USE=perl"
+	if use subversion && has_version dev-vcs/subversion && ! built_with_use --missing false dev-vcs/subversion perl ; then
+		ewarn "You must build dev-vcs/subversion with USE=perl"
 		ewarn "to get the full functionality of git-svn!"
 	fi
 	elog "These additional scripts need some dependencies:"
