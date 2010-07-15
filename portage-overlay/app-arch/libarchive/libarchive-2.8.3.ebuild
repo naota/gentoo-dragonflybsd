@@ -13,7 +13,7 @@ SRC_URI="http://${PN}.googlecode.com/files/${P}.tar.gz
 
 LICENSE="BSD"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc ~ppc64 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
 IUSE="static static-libs acl xattr kernel_linux +bzip2 +lzma +zlib"
 
 COMPRESS_LIBS_DEPEND="lzma? ( app-arch/xz-utils )
