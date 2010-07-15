@@ -85,7 +85,11 @@ src_unpack() {
 	cp "${FILESDIR}"/dragonfly-spec.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD spec header"
 	cp "${FILESDIR}"/dragonfly.h "${S}"/gcc/config/ || die "failed to copy DragonFly BSD header"
 	cp "${FILESDIR}"/i386-dragonfly.h "${S}"/gcc/config/i386/dragonfly.h || die "failed to copy DragonFly BSD i386 header"
-	sed -i '/\/ginclude\/stddef\.h/d' gcc/Makefile.in || die
+
+	if use elibc_DragonFlyBSD; then
+		sed -i '/\/ginclude\/stddef\.h/d' gcc/Makefile.in || die
+		#sed -i 's/^enable_shared = .*$/enable_shared = no/' libgcc/Makefile.in || die
+	fi
 }
 
 pkg_setup() {
@@ -95,4 +99,6 @@ pkg_setup() {
 		ewarn "Graphite support is still experimental and unstable."
 		ewarn "Any bugs resulting from the use of Graphite will not be fixed."
 	fi
+
+	use elibc_DragonFlyBSD && export EXTRA_ECONF="${EXTRA_ECONF} --disable-shared"
 }

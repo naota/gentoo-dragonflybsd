@@ -141,7 +141,9 @@ is built with the --enable-threads configure-time option.}		\
 #define USE_LD_AS_NEEDED 1
 #endif
 
+
 #if 0
+#define REAL_LIBGCC_SPEC "%{shared-libgcc: -lgcc_s %{!shared: -lgcc}} %{!shared-libgcc: -lgcc -lgcc_eh}"
 #define LINK_LIBGCC_SPEC ""
 #define LIBGCC_SPEC "%{shared: -lgcc_pic} %{!shared: -lgcc}"
 
