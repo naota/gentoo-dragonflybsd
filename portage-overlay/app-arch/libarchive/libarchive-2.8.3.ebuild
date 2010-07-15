@@ -76,8 +76,8 @@ src_install() {
 	# remove useless .a and .la files (only for non static compilation)
 	use static-libs || find "${D}" \( -name '*.a' -or -name '*.la' \) -delete
 
-	# Create tar symlink for FreeBSD
-	if [[ ${CHOST} == *-freebsd* ]]; then
+	# Create tar symlink for FreeBSD or DragonFly
+	if [[ ${CHOST} == *-freebsd* || ${CHOST} == *-dragonfly* ]]; then
 		dosym bsdtar /bin/tar
 		dosym bsdtar.1 /usr/share/man/man1/tar.1
 		# We may wish to switch to symlink bsdcpio to cpio too one day
