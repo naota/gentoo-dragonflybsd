@@ -40,13 +40,8 @@
 #define LOG_FMT_CMDLINE			"FORMAT: C - Command Line\n"
 
 #define PROC_DIR			"/proc"
-#ifdef __DragonFly__
-#define PROC_SELF_FD                   PROC_DIR "/curproc/fd"
-#define PROC_SELF_CMDLINE              PROC_DIR "/curproc/cmdline"
-#else
 #define PROC_SELF_FD			PROC_DIR "/self/fd"
 #define PROC_SELF_CMDLINE		PROC_DIR "/self/cmdline"
-#endif
 
 char sandbox_lib[SB_PATH_MAX];
 
