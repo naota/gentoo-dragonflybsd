@@ -16,7 +16,7 @@ SRC_URI="mirror://gentoo/${P}.tar.lzma
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 m68k ~mips ppc ppc64 s390 sh sparc ~sparc-fbsd x86 ~x86-fbsd ~x86-dfbsd"
 IUSE=""
 
 DEPEND="|| ( app-arch/xz-utils app-arch/lzma-utils )
