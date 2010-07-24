@@ -10,3 +10,5 @@
 *sys-dfbsd/dfbsd-share
 *sys-dfbsd/dfbsd-contrib
 *sys-dfbsd/boot0
+
+*app-arch/libarchive
