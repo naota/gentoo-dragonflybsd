@@ -4,6 +4,8 @@
 
 EAPI=2
 
+use build && export GENTOO_DEPEND_ON_PERL=no
+
 inherit toolchain-funcs eutils elisp-common perl-module bash-completion
 [ "$PV" == "9999" ] && inherit git
 
@@ -29,13 +31,13 @@ fi
 
 LICENSE="GPL-2"
 SLOT="0"
-IUSE="+blksha1 +curl cgi doc emacs gtk iconv +perl ppcsha1 tk +threads +webdav xinetd cvs subversion"
+IUSE="+blksha1 build +curl cgi doc emacs gtk iconv +perl ppcsha1 tk +threads +webdav xinetd cvs subversion"
 
 # Common to both DEPEND and RDEPEND
 CDEPEND="
 	!blksha1? ( dev-libs/openssl )
 	sys-libs/zlib
-	perl?   ( dev-lang/perl )
+	!build? ( perl?   ( dev-lang/perl ) )
 	tk?     ( dev-lang/tk )
 	curl?   (
 		net-misc/curl
@@ -44,13 +46,15 @@ CDEPEND="
 	emacs?  ( virtual/emacs )"
 
 RDEPEND="${CDEPEND}
-	perl? ( dev-perl/Error
-			dev-perl/Net-SMTP-SSL
-			dev-perl/Authen-SASL
-			cgi? ( virtual/perl-CGI )
-			cvs? ( >=dev-vcs/cvsps-2.1 dev-perl/DBI dev-perl/DBD-SQLite )
-			subversion? ( dev-vcs/subversion[-dso,perl] dev-perl/libwww-perl dev-perl/TermReadKey )
-			)
+	!build? (
+		perl? ( dev-perl/Error
+				dev-perl/Net-SMTP-SSL
+				dev-perl/Authen-SASL
+				cgi? ( virtual/perl-CGI )
+				cvs? ( >=dev-vcs/cvsps-2.1 dev-perl/DBI dev-perl/DBD-SQLite )
+				subversion? ( dev-vcs/subversion[-dso,perl] dev-perl/libwww-perl dev-perl/TermReadKey )
+				)
+		)
 	gtk?
 	(
 		>=dev-python/pygtk-2.8
