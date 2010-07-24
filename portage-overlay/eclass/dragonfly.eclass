@@ -49,6 +49,9 @@ dragonfly_src_unpack() {
 	dummy_mk ${REMOVE_SUBDIRS}
 	freebsd_do_patches
 	freebsd_rename_libraries
+	# We don't use libtermcap, we use libncurses
+	find "${S}" -name Makefile -print0 | xargs -0 \
+		sed -i -e 's:-lmytinfo:-lncurses:g;'
 }
 
 dragonfly_src_compile() {
