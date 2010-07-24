@@ -146,6 +146,8 @@ src_install() {
 	
 	rm "${D}"/$(get_libdir)/libpthread.so
 	dosym libpthread.so.0 /$(get_libdir)/libpthread.so
+	dosym libpthread.so /$(get_libdir)/libthread_xu.so
+	dosym libpthread.so /$(get_libdir)/libthread_xu.so.2
 }
 
 install_includes()
