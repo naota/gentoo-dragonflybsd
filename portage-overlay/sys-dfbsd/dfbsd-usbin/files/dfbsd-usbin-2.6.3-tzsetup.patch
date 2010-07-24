@@ -1,0 +1,13 @@
+diff --git a/usr.sbin/tzsetup/Makefile b/usr.sbin/tzsetup/Makefile
+index 8edde07..4cb06b9 100644
+--- a/usr.sbin/tzsetup/Makefile
++++ b/usr.sbin/tzsetup/Makefile
+@@ -4,7 +4,7 @@
+ PROG=	tzsetup
+ MAN=	tzsetup.8
+ CFLAGS+=	-I${.CURDIR}
+-LDADD+=	-ldialog -lncurses -lmytinfo
++LDADD+=	-ldialog -lncurses
+ DPADD+=	${LIBDIALOG} ${LIBNCURSES} ${LIBMYTINFO}
+ WARNS?=	2
+ 

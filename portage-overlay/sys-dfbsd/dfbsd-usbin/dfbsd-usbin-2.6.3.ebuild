@@ -16,8 +16,8 @@ RDEPEND="=sys-dfbsd/dfbsd-lib-${PV}*[usb?,bluetooth?,netware?]
 	dev-libs/libedit
 	net-libs/libpcap"
 DEPEND="${RDEPEND}
+	dev-libs/libevent
 	=sys-dfbsd/dfbsd-mk-defs-${PV}*
-	=sys-dfbsd/dfbsd-usbin-${PV}*
 	sys-apps/texinfo
 	sys-devel/flex"
 
@@ -26,7 +26,8 @@ PROVIDE="virtual/logger"
 IUSE="acpi atm ipv6 isdn nis ssl tcpd"
 
 PATCHES=( "${FILESDIR}"/${P}-nowrap.patch 
-	"${FILESDIR}"/${P}-adduser.patch )
+	"${FILESDIR}"/${P}-adduser.patch 
+	"${FILESDIR}"/${P}-tzsetup.patch )
 REMOVE_SUBDIRS="
 	named named-checkzone named-checkconf rndc rndc-confgen
 	dnssec-keygen dnssec-signzone
@@ -37,7 +38,7 @@ REMOVE_SUBDIRS="
 	wpa/wpa_supplicant wpa/hostapd wpa/hostapd_cli
 	wpa/wpa_cli wpa/wpa_passphrase
 	zic amd
-	pkg_install authpf mailwrapper makewhatis"
+	pkg_install authpf mailwrapper makewhatis 802_11"
 
 
 pkg_setup() {
