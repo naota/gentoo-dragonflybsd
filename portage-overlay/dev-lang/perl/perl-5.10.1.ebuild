@@ -604,7 +604,8 @@ src_remove_extra_files() {
 	${prV}/vmsish.pm
 	${prV}/warnings
 	${prV}/warnings.pm
-	${prV}/warnings/register.pm"
+	${prV}/warnings/register.pm
+	${prV}/Tie/Hash.pm"
 
 	pushd "${D}" > /dev/null
 	# Remove cruft
