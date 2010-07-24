@@ -16,6 +16,7 @@ IUSE="atm ipfilter ipv6"
 RDEPEND="=sys-dfbsd/dfbsd-lib-${PV}*
 	dev-libs/libedit
 	sys-libs/readline
+	sys-devel/flex
 	sys-process/vixie-cron"
 DEPEND="=sys-dfbsd/dfbsd-mk-defs-${PV}*"
 
