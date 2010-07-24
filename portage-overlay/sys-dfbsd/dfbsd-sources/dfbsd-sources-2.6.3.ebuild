@@ -13,6 +13,9 @@ SLOT="${PVR}"
 KEYWORDS="~x86-dfbsd"
 IUSE="symlink"
 
+RDEPEND="=sys-dfbsd/dfbsd-mk-defs-${PV}*"
+DEPEND=""
+
 RESTRICT="strip binchecks"
 
 PATCHES=(
