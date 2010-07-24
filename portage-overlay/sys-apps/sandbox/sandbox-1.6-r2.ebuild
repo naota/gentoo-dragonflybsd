@@ -37,6 +37,7 @@ src_unpack() {
 	epatch "${FILESDIR}"/${P}-disable-qa-static.patch
 	epatch "${FILESDIR}"/${P}-disable-pthread.patch
 	epatch "${FILESDIR}"/${P}-check-additional-errno.patch
+	epatch "${FILESDIR}"/${P}-dragonfly-proc.patch
 	epatch "${FILESDIR}"/0001-libsandbox-handle-more-at-functions.patch
 }
 
