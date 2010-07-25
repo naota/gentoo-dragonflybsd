@@ -12,3 +12,6 @@
 *sys-dfbsd/boot0
 
 *app-arch/libarchive
+
+*sys-libs/timezone-data
+
