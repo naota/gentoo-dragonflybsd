@@ -133,6 +133,8 @@ src_install() {
 	insinto /etc
 	doins auth.conf nls.alias netconfig
 
+	doins "etc.i386"/*
+
 	gen_usr_ldscript libalias.so libatm.so libbind9.so libbluetooth.so \
 		libbsdxml.so libc.so libcalendar.so libcam.so libcrypt.so \
 		libdevinfo.so libdevstat.so libevent.so libevtr.so libfetch.so libform.so \
