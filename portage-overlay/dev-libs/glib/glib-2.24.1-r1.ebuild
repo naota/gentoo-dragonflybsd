@@ -12,7 +12,7 @@ HOMEPAGE="http://www.gtk.org/"
 LICENSE="LGPL-2"
 SLOT="2"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd"
-IUSE="debug doc fam hardened selinux xattr"
+IUSE="debug doc elibc_DragonFlyBSD fam hardened selinux xattr"
 
 RDEPEND="virtual/libiconv
 	xattr? ( sys-apps/attr )
@@ -78,6 +78,8 @@ src_configure() {
 	# convert this to the use_enable form, as it results in a broken build.
 	# -- compnerd (3/27/06)
 	use debug && myconf="--enable-debug"
+
+	use elibc_DragonFlyBSD && myconf="${myconf} --with-libiconv=gnu"
 
 	# Always build static libs, see #153807
 	# Always use internal libpcre, bug #254659
