@@ -12,14 +12,16 @@ inherit x-modular
 DESCRIPTION="X.Org SM library"
 
 KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd"
-IUSE="ipv6 +uuid elibc_FreeBSD"
+IUSE="ipv6 +uuid elibc_FreeBSD elibc_DragonFlyBSD"
 
 RDEPEND=">=x11-libs/libICE-1.0.5
 	x11-libs/xtrans
 	x11-proto/xproto
 	uuid? (
 	  !elibc_FreeBSD? (
-		|| ( >=sys-apps/util-linux-2.16 <sys-libs/e2fsprogs-libs-1.41.8 )
+	    !elibc_DragonFlyBSD? (
+			|| ( >=sys-apps/util-linux-2.16 <sys-libs/e2fsprogs-libs-1.41.8 )
+		)
 	  )
 	)"
 DEPEND="${RDEPEND}"
