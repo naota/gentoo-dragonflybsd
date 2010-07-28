@@ -4,6 +4,7 @@ app-arch/gzip x86-dfbsd
 <app-admin/python-updater-9999 x86-dfbsd
 app-editors/nano x86-dfbsd
 app-misc/mime-types x86-dfbsd
+app-portage/autounmask x86-dfbsd
 dev-libs/expat x86-dfbsd
 dev-libs/gmp x86-dfbsd
 dev-libs/libxml2 x86-dfbsd
@@ -12,11 +13,14 @@ dev-libs/libiconv x86-dfbsd
 dev-libs/mpfr x86-dfbsd
 dev-libs/popt x86-dfbsd
 dev-perl/Authen-SASL x86-dfbsd
+dev-perl/Class-MethodMaker x86-dfbsd
 dev-perl/Digest-HMAC x86-dfbsd
 dev-perl/Digest-SHA1 x86-dfbsd
 dev-perl/Error x86-dfbsd
 dev-perl/IO-Socket-SSL x86-dfbsd
 dev-perl/Net-SMTP-SSL x86-dfbsd
+dev-perl/PortageXS x86-dfbsd
+dev-perl/Shell-EnvImporter x86-dfbsd
 dev-perl/YAML-Tiny x86-dfbsd
 dev-scheme/guile x86-dfbsd
 dev-util/dejagnu x86-dfbsd
@@ -81,5 +85,7 @@ virtual/perl-libnet x86-dfbsd
 virtual/perl-Module-Build x86-dfbsd
 virtual/perl-Package-Constants x86-dfbsd
 virtual/perl-Scalar-List-Utils x86-dfbsd
+virtual/perl-Sys-Syslog x86-dfbsd
+virtual/perl-Term-ANSIColor x86-dfbsd
 virtual/perl-Test-Harness x86-dfbsd
 virtual/pmake x86-dfbsd
