@@ -12,16 +12,16 @@ SRC_URI="https://fedorahosted.org/releases/x/m/xmlto/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~amd64-linux ~x86-linux ~ppc-macos ~x64-macos ~x86-macos ~x86-solaris ~x86-dfbsd"
 IUSE="latex"
 
 RDEPEND="app-shells/bash
-	|| ( sys-apps/which sys-freebsd/freebsd-ubin )
+	|| ( sys-apps/which sys-freebsd/freebsd-ubin sys-dfbsd/dfbsd-ubin )
 	dev-libs/libxslt
 	>=app-text/docbook-xsl-stylesheets-1.62.0-r1
 	~app-text/docbook-xml-dtd-4.2
 	|| ( sys-apps/util-linux app-misc/getopt )
-	|| ( >=sys-apps/coreutils-6.10-r1 sys-freebsd/freebsd-ubin )
+	|| ( >=sys-apps/coreutils-6.10-r1 sys-freebsd/freebsd-ubin sys-dfbsd/dfbsd-ubin )
 	latex? ( >=app-text/passivetex-1.25
 		>=dev-tex/xmltex-1.9-r2 )"
 DEPEND="${RDEPEND}
