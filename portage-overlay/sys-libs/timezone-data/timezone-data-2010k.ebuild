@@ -16,7 +16,7 @@ SRC_URI="ftp://elsie.nci.nih.gov/pub/tzdata${data_ver}.tar.gz
 LICENSE="BSD public-domain"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
-IUSE="nls elibc_FreeBSD elibc_glibc"
+IUSE="nls elibc_DragonFlyBSD elibc_FreeBSD elibc_glibc"
 
 RDEPEND="!<sys-libs/glibc-2.3.5"
 
@@ -32,6 +32,7 @@ src_compile() {
 	local LDLIBS
 	tc-export CC
 	use elibc_FreeBSD && append-flags -DSTD_INSPIRED #138251
+	use elibc_DragonFlyBSD && append-flags -DSTD_INSPIRED #138251
 	if use nls ; then
 		use elibc_glibc || LDLIBS="${LDLIBS} -lintl" #154181
 		export NLS=1
