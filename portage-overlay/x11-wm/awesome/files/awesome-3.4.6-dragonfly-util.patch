@@ -1,0 +1,13 @@
+diff --git a/awesome-3.4.6/common/util.h b/awesome-3.4.6/common/util.h
+index 4631826..e693a2d 100644
+--- a/awesome-3.4.6/common/util.h
++++ b/awesome-3.4.6/common/util.h
+@@ -32,7 +32,7 @@
+ #include <assert.h>
+ #include <stdio.h>
+ 
+-#if !(defined (__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__))
++#if !(defined (__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__) || defined(__DragonFly__))
+ #include <alloca.h>
+ #endif
+ 

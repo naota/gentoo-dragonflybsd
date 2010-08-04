@@ -12,7 +12,7 @@ SRC_URI="http://awesome.naquadah.org/download/${P}.tar.bz2"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~amd64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
-IUSE="dbus doc elibc_FreeBSD bash-completion"
+IUSE="dbus doc elibc_DragonFlyBSD elibc_FreeBSD bash-completion"
 
 RDEPEND=">=dev-lang/lua-5.1[deprecated]
 	dev-libs/libev
@@ -25,7 +25,8 @@ RDEPEND=">=dev-lang/lua-5.1[deprecated]
 	>=x11-libs/startup-notification-0.10
 	>=x11-libs/xcb-util-0.3.6
 	dbus? ( >=sys-apps/dbus-1 )
-	elibc_FreeBSD? ( dev-libs/libexecinfo )"
+	elibc_FreeBSD? ( dev-libs/libexecinfo )
+	elibc_DragonFlyBSD? ( dev-libs/libexecinfo )"
 
 DEPEND="${RDEPEND}
 	>=app-text/asciidoc-8.4.5
@@ -59,6 +60,7 @@ mycmakeargs="-DPREFIX=${EPREFIX}/usr
 
 src_prepare() {
 	epatch "${FILESDIR}/${PN}-3.4.2-backtrace.patch"
+	epatch "${FILESDIR}/${P}-dragonfly-util.patch"
 }
 
 src_compile() {
