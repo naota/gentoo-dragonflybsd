@@ -1,0 +1,86 @@
+--- configure.in.orig	2010-08-04 14:46:30.789782000 +0000
++++ configure.in	2010-08-04 15:41:52.049884000 +0000
+@@ -427,6 +427,15 @@
+     esac
+   ;;
+ 
++  ## DragonFly ports
++  *-*-dragonfly* )
++    opsys=dragonfly
++    case "${canonical}" in
++      amd64-*|x86_64-*) machine=amdx86-64 ;;
++      i[3456]86-*)      machine=intel386 ;;
++    esac
++  ;;
++
+   ## FreeBSD kernel + glibc based userland
+   *-*-kfreebsd*gnu* )
+     opsys=gnu-kfreebsd
+@@ -992,6 +1001,8 @@
+ 
+   freebsd) LIBS_SYSTEM="-lutil" ;;
+ 
++  dragonfly) LIBS_SYSTEM="-lutil" ;;
++
+   hpux*) LIBS_SYSTEM="-l:libdld.sl" ;;
+ 
+   sol2*) LIBS_SYSTEM="-lsocket -lnsl -lkstat" ;;
+@@ -1071,6 +1082,10 @@
+     LIB_STANDARD='-lgcc -lc -lgcc $(CRT_DIR)/crtend.o $(CRT_DIR)/crtn.o'
+     START_FILES='pre-crt0.o $(CRT_DIR)/crt1.o $(CRT_DIR)/crti.o $(CRT_DIR)/crtbegin.o'
+     ;;
++  dragonfly )
++    LIB_STANDARD='-lgcc -lc -lgcc $(CRT_DIR)/crtend.o $(CRT_DIR)/crtn.o'
++    START_FILES='pre-crt0.o $(CRT_DIR)/crt1.o $(CRT_DIR)/crti.o $(CRT_DIR)/crtbegin.o'
++    ;;
+   gnu-linux | gnu-kfreebsd )
+     LIB_STANDARD='-lgcc -lc -lgcc $(CRT_DIR)/crtn.o'
+     START_FILES='pre-crt0.o $(CRT_DIR)/crt1.o $(CRT_DIR)/crti.o'
+@@ -1190,7 +1205,7 @@
+   if test x$have_sound_header = xyes || test $HAVE_ALSA = yes; then
+      case "$opsys" in
+        dnl defined __FreeBSD__ || defined __NetBSD__ || defined __linux__
+-       gnu-linux|freebsd|netbsd)
++       gnu-linux|freebsd|netbsd|dragonfly)
+          AC_DEFINE(HAVE_SOUND, 1, [Define to 1 if you have sound support.])
+          ;;
+      esac
+@@ -1648,7 +1663,7 @@
+ 
+ use_mmap_for_buffers=no
+ case "$opsys" in
+-  freebsd|irix6-5) use_mmap_for_buffers=yes ;;
++  freebsd|irix6-5|dragonfly) use_mmap_for_buffers=yes ;;
+ esac
+ 
+ AC_FUNC_MMAP
+@@ -2567,7 +2582,7 @@
+ case "$opsys" in
+   aix4-2) mail_lock="lockf" ;;
+ 
+-  gnu|freebsd|netbsd|openbsd|darwin|irix6-5) mail_lock="flock" ;;
++  gnu|freebsd|dragonfly|netbsd|openbsd|darwin|irix6-5) mail_lock="flock" ;;
+ 
+   ## On GNU/Linux systems, both methods are used by various mail programs.
+   ## I assume most people are using newer mailers that have heard of flock.
+@@ -2706,6 +2721,11 @@
+     fi
+     ;;
+ 
++  dragonfly)
++    TERMINFO=yes
++    LIBS_TERMCAP="-lncurses"
++    ;;
++
+   netbsd)
+     if test $ac_cv_search_tputs = -lterminfo; then
+       TERMINFO=yes
+@@ -3379,7 +3399,7 @@
+ if test "x$GCC" = "xyes" && test "x$ORDINARY_LINK" != "xyes"; then
+ 
+   case "$opsys" in
+-    freebsd|netbsd|openbsd) LIB_GCC= ;;
++    freebsd|dragonfly|netbsd|openbsd) LIB_GCC= ;;
+ 
+     gnu-*)
+       ## armin76@gentoo.org reported that the lgcc_s flag is necessary to
