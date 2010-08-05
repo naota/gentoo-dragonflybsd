@@ -2,7 +2,7 @@
 # Distributed under the terms of the GNU General Public License v2
 # $Header: /var/cvsroot/gentoo-x86/app-misc/tmux/tmux-1.3.ebuild,v 1.1 2010/07/24 16:54:56 jlec Exp $
 
-inherit toolchain-funcs
+inherit eutils toolchain-funcs
 
 DESCRIPTION="Terminal multiplexer"
 HOMEPAGE="http://tmux.sourceforge.net"
@@ -19,6 +19,12 @@ RDEPEND="${DEPEND}
 	vim-syntax? ( || (
 			app-editors/vim
 			app-editors/gvim ) )"
+
+src_unpack() {
+	unpack "${A}"
+	cd "${S}"
+	epatch "${FILESDIR}"/${P}-dragonfly.patch
+}
 
 src_compile() {
 	# The configure script isn't created by GNU autotools.
