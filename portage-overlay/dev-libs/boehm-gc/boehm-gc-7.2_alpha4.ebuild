@@ -35,6 +35,8 @@ src_compile() {
 }
 
 src_install() {
+	chmod u+x "${S}"/install-sh
+
 	emake DESTDIR="${D}" install || die
 
 	rm -rf "${D}"/usr/share/gc || die
