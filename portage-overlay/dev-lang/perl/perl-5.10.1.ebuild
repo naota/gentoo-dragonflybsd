@@ -35,7 +35,8 @@ COMMON_DEPEND="berkdb? ( sys-libs/db )
 	app-arch/bzip2
 	sys-libs/zlib"
 DEPEND="${COMMON_DEPEND}
-	elibc_FreeBSD? ( sys-freebsd/freebsd-mk-defs )"
+	elibc_FreeBSD? ( sys-freebsd/freebsd-mk-defs )
+	elibc_DragonFlyBSD? ( sys-dfbsd/dfbsd-mk-defs )"
 RDEPEND="${COMMON_DEPEND}"
 PDEPEND=">=app-admin/perl-cleaner-2_pre090920"
 
