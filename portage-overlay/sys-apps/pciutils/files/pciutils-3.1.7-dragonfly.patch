@@ -1,0 +1,13 @@
+diff --git a/lib/configure b/lib/configure
+index 7cae9de..54cbecc 100755
+--- a/lib/configure
++++ b/lib/configure
+@@ -86,7 +86,7 @@ case $sys in
+ 		esac
+ 		echo >>$c '#define PCI_HAVE_STDINT_H'
+ 		;;
+-	freebsd*)
++	freebsd*|dragonfly*)
+ 		echo_n " fbsd-device"
+ 		echo >>$c '#define PCI_HAVE_PM_FBSD_DEVICE'
+ 		echo >>$c '#define PCI_PATH_FBSD_DEVICE "/dev/pci"'

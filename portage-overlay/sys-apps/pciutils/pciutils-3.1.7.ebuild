@@ -21,6 +21,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/${P}-install-lib.patch #273489
 	epatch "${FILESDIR}"/${P}-fbsd.patch #262321
 	epatch "${FILESDIR}"/${PN}-2.2.7-update-pciids-both-forms.patch
+	epatch "${FILESDIR}"/${P}-dragonfly.patch
 }
 
 uyesno() { use $1 && echo yes || echo no ; }
