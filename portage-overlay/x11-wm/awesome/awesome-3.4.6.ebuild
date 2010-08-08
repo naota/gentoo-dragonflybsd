@@ -11,7 +11,7 @@ SRC_URI="http://awesome.naquadah.org/download/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~amd64 ~ppc ~ppc64 ~x86 ~x86-fbsd"
+KEYWORDS="~amd64 ~ppc ~ppc64 ~x86 ~x86-fbsd ~x86-dfbsd"
 IUSE="dbus doc elibc_DragonFlyBSD elibc_FreeBSD bash-completion"
 
 RDEPEND=">=dev-lang/lua-5.1[deprecated]

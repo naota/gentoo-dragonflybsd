@@ -7,9 +7,11 @@ app-misc/mime-types x86-dfbsd
 app-portage/autounmask x86-dfbsd
 dev-libs/expat x86-dfbsd
 dev-libs/gmp x86-dfbsd
-dev-libs/libxml2 x86-dfbsd
+dev-libs/libedit x86-dfbsd
 dev-libs/libffi x86-dfbsd
 dev-libs/libiconv x86-dfbsd
+dev-libs/libxml2 x86-dfbsd
+dev-libs/libevent x86-dfbsd
 dev-libs/mpfr x86-dfbsd
 dev-libs/popt x86-dfbsd
 dev-perl/Authen-SASL x86-dfbsd
@@ -23,8 +25,11 @@ dev-perl/PortageXS x86-dfbsd
 dev-perl/Shell-EnvImporter x86-dfbsd
 dev-perl/YAML-Tiny x86-dfbsd
 dev-scheme/guile x86-dfbsd
+dev-util/ccache x86-dfbsd
 dev-util/dejagnu x86-dfbsd
 dev-util/pkgconfig x86-dfbsd
+mail-mta/ssmtp x86-dfbsd
+net-libs/libpcap x86-dfbsd
 net-misc/curl x86-dfbsd
 net-misc/dhcpcd x86-dfbsd
 net-misc/openssh x86-dfbsd
@@ -67,10 +72,12 @@ sys-devel/patch x86-dfbsd
 sys-libs/db x86-dfbsd
 sys-libs/ncurses x86-dfbsd
 sys-libs/readline x86-dfbsd
+sys-process/cronbase x86-dfbsd
 virtual/editor x86-dfbsd
 virtual/libintl x86-dfbsd
 virtual/libffi x86-dfbsd
 virtual/libiconv x86-dfbsd
+virtual/mta x86-dfbsd
 virtual/pager x86-dfbsd
 virtual/perl-Archive-Tar x86-dfbsd
 virtual/perl-Compress-Raw-Bzip2 x86-dfbsd

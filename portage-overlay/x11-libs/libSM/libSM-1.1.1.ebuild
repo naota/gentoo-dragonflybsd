@@ -11,7 +11,7 @@ inherit x-modular
 
 DESCRIPTION="X.Org SM library"
 
-KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd"
+KEYWORDS="alpha amd64 arm hppa ia64 ~mips ppc ppc64 s390 sh sparc x86 ~x86-fbsd ~x86-dfbsd"
 IUSE="ipv6 +uuid elibc_FreeBSD elibc_DragonFlyBSD"
 
 RDEPEND=">=x11-libs/libICE-1.0.5
