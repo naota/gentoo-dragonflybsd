@@ -30,6 +30,7 @@ dev-util/dejagnu x86-dfbsd
 dev-util/pkgconfig x86-dfbsd
 mail-mta/ssmtp x86-dfbsd
 net-libs/libpcap x86-dfbsd
+net-mail/mailbase x86-dfbsd
 net-misc/curl x86-dfbsd
 net-misc/dhcpcd x86-dfbsd
 net-misc/openssh x86-dfbsd
