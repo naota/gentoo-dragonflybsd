@@ -20,7 +20,8 @@ PATCHES=( "${FILESDIR}"/${P}-doc-locations.patch
 	"${FILESDIR}"/${P}-monetdef.patch 
 	"${FILESDIR}"/${P}-syscons.patch 
 	"${FILESDIR}"/${P}-timedef.patch 
-	"${FILESDIR}"/${P}-misc.patch )
+	"${FILESDIR}"/${P}-misc.patch 
+	"${FILESDIR}"/${P}-csmapper.patch )
 REMOVE_SUBDIRS="mk termcap zoneinfo tabset"
 
 pkg_setup() {

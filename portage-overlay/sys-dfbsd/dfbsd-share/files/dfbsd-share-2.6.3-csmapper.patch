@@ -1,0 +1,12 @@
+diff --git a/share/i18n/csmapper/Makefile b/share/i18n/csmapper/Makefile
+index ccb9744..ab5c9bc 100644
+--- a/share/i18n/csmapper/Makefile
++++ b/share/i18n/csmapper/Makefile
+@@ -8,6 +8,7 @@ NOMAN=
+ .SUFFIXES: .src .646 .mps
+ 
+ BINDIR?= /usr/share/i18n/csmapper
++FILESDIR= /usr/share/i18n/csmapper
+ SRCS_mapper.dir+= mapper.dir.src
+ SRCS_charset.pivot+= charset.pivot.src
+ 
