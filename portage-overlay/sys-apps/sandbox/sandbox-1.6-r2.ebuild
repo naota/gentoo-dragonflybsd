@@ -7,7 +7,7 @@
 # period.
 #
 
-inherit eutils flag-o-matic toolchain-funcs multilib
+inherit eutils flag-o-matic toolchain-funcs multilib autotools
 
 DESCRIPTION="sandbox'd LD_PRELOAD hack"
 HOMEPAGE="http://www.gentoo.org/"
@@ -54,6 +54,7 @@ src_compile() {
 		einfo "Configuring sandbox for ABI=${ABI}..."
 		ECONF_SOURCE="../${P}/" \
 		econf ${myconf} || die
+		use elibc_DragonFlyBSD && sed -i -e 's/-Wl,--gc-sections//' src/Makefile
 		einfo "Building sandbox for ABI=${ABI}..."
 		emake || die
 	done
