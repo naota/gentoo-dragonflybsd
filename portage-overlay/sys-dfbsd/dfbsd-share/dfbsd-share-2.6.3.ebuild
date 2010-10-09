@@ -38,10 +38,11 @@ src_unpack() {
 	epatch "${FILESDIR}"/${P}-examples.patch 
 
 	cd "${S}"
+	sed -i -e '/builtins\.1/d' "${S}/man/man1/Makefile" || die
+	sed -i -e '/vesa.4/d' "${S}/man/man4/Makefile" || die
 	sed -i -e 's:make.conf.5::' "${S}/man/man5/Makefile" || die
 	sed -i -e 's:mailer.conf.5::' "${S}/man/man5/Makefile" || die
 	sed -i -e 's:pbm.5::' -e 's:moduli.5::' "${S}/man/man5/Makefile" || die
-	sed -i -e '/builtins\.1/d' "${S}/man/man1/Makefile" || die
 	sed -i -e '/rc.8/d' "${S}/man/man8/Makefile" || die
 
 	sed -i -e '/MANSUBDIR/d' "${S}"/man/man4/man4.i386/Makefile || die
