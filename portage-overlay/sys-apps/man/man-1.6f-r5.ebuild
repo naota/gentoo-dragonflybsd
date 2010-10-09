@@ -12,7 +12,7 @@ SRC_URI="http://primates.ximian.com/~flucifredi/man/${P}.tar.gz"
 LICENSE="GPL-2"
 SLOT="0"
 KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~sparc-fbsd ~x86-fbsd ~x86-dfbsd"
-IUSE="lzma nls"
+IUSE="+lzma nls"
 
 DEPEND="nls? ( sys-devel/gettext )"
 RDEPEND="|| ( >=sys-apps/groff-1.19.2-r1 app-doc/heirloom-doctools )
@@ -41,6 +41,7 @@ src_prepare() {
 	epatch "${FILESDIR}"/man-1.6f-compress.patch
 	epatch "${FILESDIR}"/man-1.6f-parallel-build.patch #207148 #258916
 	epatch "${FILESDIR}"/man-1.6f-xz.patch #302380
+	epatch "${FILESDIR}"/man-1.6f-makewhatis-compression-cleanup.patch #331979
 	# make sure `less` handles escape sequences #287183
 	sed -i -e '/^DEFAULTLESSOPT=/s:"$:R":' configure
 }
