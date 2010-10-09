@@ -5,6 +5,7 @@
 EAPI=2
 
 use build && export GENTOO_DEPEND_ON_PERL=no
+use perl || export GENTOO_DEPEND_ON_PERL=no
 
 inherit toolchain-funcs eutils elisp-common perl-module bash-completion
 [ "$PV" == "9999" ] && inherit git
