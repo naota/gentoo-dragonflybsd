@@ -33,6 +33,11 @@ src_configure() {
 		--enable-fast-install
 }
 
+src_prepare() {
+	epatch "${FILESDIR}"/${P}-dragonfly.patch
+	epatch "${FILESDIR}"/${P}-weak-reference.patch
+}
+
 # No tests are shipped
 src_test() { :; }
 
