@@ -35,7 +35,7 @@ src_compile() {
 	strip-flags
 	append-flags "-I/usr/include/libstand/"
 	append-flags "-fno-strict-aliasing"
-	NOFLAGSTRIP="yes" dragonfly_src_compile
+	NOFLAGSTRIP="yes" LDFLAGS="" dragonfly_src_compile
 }
 
 src_install() {
