@@ -1,0 +1,16 @@
+diff --git a/libmodman/CMakeLists.txt b/libmodman/CMakeLists.txt
+index 0e07348..11f7dd4 100644
+--- a/libmodman/CMakeLists.txt
++++ b/libmodman/CMakeLists.txt
+@@ -11,8 +11,10 @@ add_library(modman SHARED
+             module.hpp
+             module_manager.hpp
+             module_manager.cpp)
+-if(NOT WIN32)
++if(CMAKE_SYSTEM_NAME matches Linux)
+   target_link_libraries(modman dl)
++else(NOT WIN32)
++  target_link_libraries(modman)
+ endif()
+ set_target_properties(modman PROPERTIES PREFIX "lib" VERSION 1.0.0 SOVERSION 1)
+ install(TARGETS modman DESTINATION ${LIB_INSTALL_DIR})

@@ -13,7 +13,7 @@ SRC_URI="http://${PN}.googlecode.com/files/${P}.tar.gz"
 
 LICENSE="LGPL-2.1"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~ppc64 ~sh ~sparc ~x86 ~x86-fbsd ~x86-dfbsd"
 IUSE="gnome kde mono networkmanager perl python test vala webkit xulrunner"
 
 RDEPEND="
@@ -31,7 +31,8 @@ DEPEND="${RDEPEND}
 
 DOCS="AUTHORS NEWS README ChangeLog"
 
-PATCHES=( "${FILESDIR}"/${P}-mozjs-link_directory.patch )
+PATCHES=( "${FILESDIR}"/${P}-mozjs-link_directory.patch 
+	"${FILESDIR}"/${P}-libdl.patch )
 
 pkg_setup() {
 	if use python; then
