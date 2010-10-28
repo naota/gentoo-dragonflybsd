@@ -7,10 +7,26 @@ index 0e07348..11f7dd4 100644
              module_manager.hpp
              module_manager.cpp)
 -if(NOT WIN32)
-+if(CMAKE_SYSTEM_NAME matches Linux)
++if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    target_link_libraries(modman dl)
-+else(NOT WIN32)
++elseif(NOT WIN32)
 +  target_link_libraries(modman)
  endif()
  set_target_properties(modman PROPERTIES PREFIX "lib" VERSION 1.0.0 SOVERSION 1)
  install(TARGETS modman DESTINATION ${LIB_INSTALL_DIR})
+diff --git a/libproxy/cmake/libproxy.cmk b/libproxy/cmake/libproxy.cmk
+index 5625d4e..df5ee42 100644
+--- a/libproxy/cmake/libproxy.cmk
++++ b/libproxy/cmake/libproxy.cmk
+@@ -1,8 +1,10 @@
+ add_library(libproxy SHARED extension_config.cpp extension_pacrunner.cpp extension_wpad.cpp proxy.cpp url.cpp ${LIBPROXY_SOURCES})
+ if(WIN32)
+   target_link_libraries(libproxy modman;ws2_32;${LIBPROXY_LIBRARIES})
+-else()
++elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+   target_link_libraries(libproxy modman;m;pthread;dl;${LIBPROXY_LIBRARIES})
++else()
++  target_link_libraries(libproxy modman;m;pthread;${LIBPROXY_LIBRARIES})
+ endif()
+ file(TO_NATIVE_PATH ${MODULE_INSTALL_DIR} MODULE_INSTALL_DIR)
+ if(WIN32)
