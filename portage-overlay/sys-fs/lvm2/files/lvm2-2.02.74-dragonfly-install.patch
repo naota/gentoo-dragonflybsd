@@ -1,0 +1,167 @@
+diff --git a/doc/Makefile.in b/doc/Makefile.in
+index c63e3ce..7fb2d99 100644
+--- a/doc/Makefile.in
++++ b/doc/Makefile.in
+@@ -22,8 +22,10 @@ include $(top_builddir)/make.tmpl
+ 
+ install_lvm2: $(CONFSRC)
+ 	@if [ ! -e $(confdir)/$(CONFDEST) ]; then \
+-		echo "$(INSTALL_WDATA) -D $< $(confdir)/$(CONFDEST)"; \
+-		$(INSTALL_WDATA) -D $< $(confdir)/$(CONFDEST); \
++		echo "$(INSTALL_WDATA) -d $(confdir)/"; \
++		$(INSTALL_WDATA) -d $(confdir)/; \
++		echo "$(INSTALL_WDATA) $< $(confdir)/$(CONFDEST)"; \
++		$(INSTALL_WDATA) $< $(confdir)/$(CONFDEST); \
+ 	fi
+ 
+ install: install_lvm2
+diff --git a/scripts/Makefile.in b/scripts/Makefile.in
+index 2220b9c..cbece94 100644
+--- a/scripts/Makefile.in
++++ b/scripts/Makefile.in
+@@ -25,7 +25,8 @@ endif
+ vpath %.sh $(srcdir)
+ 
+ %_install: %.sh
+-	$(INSTALL_PROGRAM) -D $< $(sbindir)/$(basename $(<F))
++	$(INSTALL_PROGRAM) -d $(sbindir)/
++	$(INSTALL_PROGRAM) $< $(sbindir)/$(basename $(<F))
+ 
+ install_lvm2: $(SCRIPTS:.sh=_install)
+ 
+diff --git a/tools/Makefile.in b/tools/Makefile.in
+index 0acc4b3..e467172 100644
+--- a/tools/Makefile.in
++++ b/tools/Makefile.in
+@@ -170,18 +170,22 @@ endif
+ 	install_dmsetup_dynamic install_dmsetup_static
+ 
+ install_cmdlib_include: $(srcdir)/lvm2cmd.h
+-	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
++	$(INSTALL_DATA) -d $(includedir)/
++	$(INSTALL_DATA) $< $(includedir)/$(<F)
+ 
+ install_cmdlib_dynamic: liblvm2cmd.$(LIB_SUFFIX)
+-	$(INSTALL_PROGRAM) -D $< $(libdir)/$(<F).$(LIB_VERSION)
++	$(INSTALL_PROGRAM) -d $(libdir)/
++	$(INSTALL_PROGRAM) $< $(libdir)/$(<F).$(LIB_VERSION)
+ 	$(INSTALL_DIR) $(usrlibdir)
+ 	$(LN_S) -f $(USRLIB_RELPATH)$(<F).$(LIB_VERSION) $(usrlibdir)/$(<F)
+ 
+ install_cmdlib_static: liblvm2cmd-static.a
+-	$(INSTALL_DATA) -D $< $(usrlibdir)/liblvm2cmd.a
++	$(INSTALL_DATA) -d $(usrlibdir)/
++	$(INSTALL_DATA) $< $(usrlibdir)/liblvm2cmd.a
+ 
+ install_tools_dynamic: lvm .commands
+-	$(INSTALL_PROGRAM) -D lvm $(sbindir)/lvm
++	$(INSTALL_PROGRAM) -d $(sbindir)/
++	$(INSTALL_PROGRAM) lvm $(sbindir)/lvm
+ 	@echo Creating symbolic links for individual commands in $(sbindir)
+ 	@for v in `cat .commands`; do \
+ 		echo "$(LN_S) -f lvm $(sbindir)/$$v"; \
+@@ -189,13 +193,16 @@ install_tools_dynamic: lvm .commands
+ 	done;
+ 
+ install_tools_static: lvm.static
+-	$(INSTALL_PROGRAM) -D $< $(staticdir)/$(<F)
++	$(INSTALL_PROGRAM) -d $(staticdir)/
++	$(INSTALL_PROGRAM) $< $(staticdir)/$(<F)
+ 
+ install_dmsetup_dynamic: dmsetup
+-	$(INSTALL_PROGRAM) -D $< $(sbindir)/$(<F)
++	$(INSTALL_PROGRAM) -d $(sbindir)/
++	$(INSTALL_PROGRAM) $< $(sbindir)/$(<F)
+ 
+ install_dmsetup_static: dmsetup.static
+-	$(INSTALL_PROGRAM) -D $< $(staticdir)/$(<F)
++	$(INSTALL_PROGRAM) -d $(staticdir)/
++	$(INSTALL_PROGRAM) $< $(staticdir)/$(<F)
+ 
+ install_device-mapper: $(INSTALL_DMSETUP_TARGETS)
+ 
+diff --git a/libdm/Makefile.in b/libdm/Makefile.in
+index 59b99c6..93248ff 100644
+--- a/libdm/Makefile.in
++++ b/libdm/Makefile.in
+@@ -79,7 +79,8 @@ install: $(INSTALL_TYPE) install_include
+ install_device-mapper: install
+ 
+ install_include: $(srcdir)/libdevmapper.h
+-	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
++	$(INSTALL_DATA) -d $(includedir)/
++	$(INSTALL_DATA) $< $(includedir)/$(<F)
+ 
+ install_dynamic: install_@interface@
+ 
+@@ -88,10 +89,12 @@ install_static: install_@interface@_static
+ install_ioctl: install_lib_shared
+ 
+ install_pkgconfig: libdevmapper.pc
+-	$(INSTALL_DATA) -D $< $(pkgconfigdir)/devmapper.pc
++	$(INSTALL_DATA) -d $(pkgconfigdir)/
++	$(INSTALL_DATA) $< $(pkgconfigdir)/devmapper.pc
+ 
+ install_ioctl_static: $(LIB_STATIC)
+-	$(INSTALL_DATA) -D $< $(usrlibdir)/$(<F)
++	$(INSTALL_DATA) -d $(usrlibdir)/
++	$(INSTALL_DATA) $< $(usrlibdir)/$(<F)
+ 
+ CLEAN_TARGETS += ioctl/libdevmapper.a
+ DISTCLEAN_TARGETS += libdevmapper.pc .exported_symbols_generated
+diff --git a/make.tmpl.in b/make.tmpl.in
+index 1175e24..5d01cfc 100644
+--- a/make.tmpl.in
++++ b/make.tmpl.in
+@@ -314,7 +314,8 @@ $(LIB_SHARED): $(LIB_SHARED).$(LIB_VERSION)
+ 	$(LN_S) -f $(<F) $@
+ 
+ install_lib_shared: $(LIB_SHARED)
+-	$(INSTALL_PROGRAM) -D $< $(libdir)/$(<F).$(LIB_VERSION)
++	$(INSTALL_PROGRAM) -d $(libdir)/
++	$(INSTALL_PROGRAM) $< $(libdir)/$(<F).$(LIB_VERSION)
+ 	$(INSTALL_DIR) $(usrlibdir)
+ 	$(LN_S) -f $(USRLIB_RELPATH)$(<F).$(LIB_VERSION) $(usrlibdir)/$(<F)
+ 
+@@ -322,11 +323,13 @@ install_lib_shared: $(LIB_SHARED)
+ #        and for compatibility links in libdir are created
+ #        when the code is fixed links could be removed.
+ install_dm_plugin: $(LIB_SHARED)
+-	$(INSTALL_PROGRAM) -D $< $(libdir)/device-mapper/$(<F)
++	$(INSTALL_PROGRAM) -d $(libdir)/device-mapper/
++	$(INSTALL_PROGRAM) $< $(libdir)/device-mapper/$(<F)
+ 	$(LN_S) -f device-mapper/$(<F) $(libdir)/$(<F)
+ 
+ install_lvm2_plugin: $(LIB_SHARED)
+-	$(INSTALL_PROGRAM) -D $< $(libdir)/lvm2/$(<F)
++	$(INSTALL_PROGRAM) -d $(libdir)/lvm2/
++	$(INSTALL_PROGRAM) $< $(libdir)/lvm2/$(<F)
+ 	$(LN_S) -f lvm2/$(<F) $(libdir)/$(<F)
+ 	$(LN_S) -f $(<F) $(libdir)/$(<F).$(LIB_VERSION)
+ endif
+diff --git a/liblvm/Makefile.in b/liblvm/Makefile.in
+index 11c6cc1..b95550d 100644
+--- a/liblvm/Makefile.in
++++ b/liblvm/Makefile.in
+@@ -60,15 +60,18 @@ endif
+ install: $(INSTALL_TYPE) install_include
+ 
+ install_include: $(srcdir)/lvm2app.h
+-	$(INSTALL_DATA) -D $< $(includedir)/$(<F)
++	$(INSTALL_DATA) -d $(includedir)/
++	$(INSTALL_DATA) $< $(includedir)/$(<F)
+ 
+ install_dynamic: install_lib_shared
+ 
+ install_static: $(LIB_STATIC)
+-	$(INSTALL_DATA) -D $< $(usrlibdir)/$(<F)
++	$(INSTALL_DATA) -d $(usrlibdir)/
++	$(INSTALL_DATA) $< $(usrlibdir)/$(<F)
+ 
+ install_pkgconfig: $(LIB_NAME).pc
+-	$(INSTALL_DATA) -D $< $(pkgconfigdir)/lvm2app.pc
++	$(INSTALL_DATA) -d $(pkgconfigdir)/
++	$(INSTALL_DATA) $< $(pkgconfigdir)/lvm2app.pc
+ 
+ liblvm.cflow: $(SOURCES)
+ 	set -e; (echo -n "SOURCES += "; \

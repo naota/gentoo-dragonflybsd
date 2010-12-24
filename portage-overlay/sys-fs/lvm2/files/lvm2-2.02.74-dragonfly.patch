@@ -1,0 +1,905 @@
+diff --git a/configure.in b/configure.in
+index d718ab0..b10e3a5 100644
+--- a/configure.in
++++ b/configure.in
+@@ -941,12 +941,13 @@ fi;
+ 
+ ################################################################################
+ dnl -- Check for dlopen
+-AC_CHECK_LIB(dl, dlopen, [
+-	AC_DEFINE([HAVE_LIBDL], 1, [Define to 1 if dynamic libraries are available.])
+-	DL_LIBS="-ldl"
++AC_SEARCH_LIBS(dlopen, [dl c], [
++	AC_DEFINE([HAVE_LIBDL], 1, [Define to 1 if dynamic libraries are available.]) 
+ 	HAVE_LIBDL=yes ], [
+-	DL_LIBS=
+ 	HAVE_LIBDL=no ])
++if [[ "x$HAVE_LIBDL" = xyes ]]; then
++	DL_LIBS="$ac_cv_search_function"
++fi
+ 
+ ################################################################################
+ dnl -- Check for shared/static conflicts
+diff --git a/daemons/dmeventd/dmeventd.c b/daemons/dmeventd/dmeventd.c
+index cc1e4a7..9950254 100644
+--- a/daemons/dmeventd/dmeventd.c
++++ b/daemons/dmeventd/dmeventd.c
+@@ -24,7 +24,6 @@
+ #include "libdevmapper-event.h"
+ #include "dmeventd.h"
+ //#include "libmultilog.h"
+-#include "dm-logging.h"
+ 
+ #include <dlfcn.h>
+ #include <errno.h>
+@@ -38,6 +37,8 @@
+ #include <signal.h>
+ #include <arpa/inet.h>		/* for htonl, ntohl */
+ 
++#include "dm-logging.h"
++
+ #ifdef linux
+ #  include <malloc.h>
+ 
+diff --git a/daemons/dmeventd/libdevmapper-event.c b/daemons/dmeventd/libdevmapper-event.c
+index 61ca340..82e3d0f 100644
+--- a/daemons/dmeventd/libdevmapper-event.c
++++ b/daemons/dmeventd/libdevmapper-event.c
+@@ -12,7 +12,6 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "dmlib.h"
+ #include "libdevmapper-event.h"
+ //#include "libmultilog.h"
+ #include "dmeventd.h"
+@@ -30,6 +29,8 @@
+ #include <sys/wait.h>
+ #include <arpa/inet.h>		/* for htonl, ntohl */
+ 
++#include "dmlib.h"
++
+ static int _sequence_nr = 0;
+ 
+ struct dm_event_handler {
+diff --git a/lib/activate/activate.c b/lib/activate/activate.c
+index 40c0fde..e32271c 100644
+--- a/lib/activate/activate.c
++++ b/lib/activate/activate.c
+@@ -13,6 +13,10 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <limits.h>
++#include <fcntl.h>
++#include <unistd.h>
++
+ #include "lib.h"
+ #include "metadata.h"
+ #include "activate.h"
+@@ -30,10 +34,6 @@
+ #include "segtype.h"
+ #include "sharedlib.h"
+ 
+-#include <limits.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-
+ #define _skip(fmt, args...) log_very_verbose("Skipping: " fmt , ## args)
+ 
+ int lvm1_present(struct cmd_context *cmd)
+diff --git a/lib/activate/fs.c b/lib/activate/fs.c
+index 1f75c40..259c384 100644
+--- a/lib/activate/fs.c
++++ b/lib/activate/fs.c
+@@ -13,6 +13,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
++#include <limits.h>
++#include <dirent.h>
++
+ #include "lib.h"
+ #include "fs.h"
+ #include "toolcontext.h"
+@@ -20,12 +26,6 @@
+ #include "lvm-file.h"
+ #include "memlock.h"
+ 
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-#include <limits.h>
+-#include <dirent.h>
+-
+ static int _mk_dir(const char *dev_dir, const char *vg_name)
+ {
+ 	char vg_path[PATH_MAX];
+diff --git a/lib/config/config.c b/lib/config/config.c
+index 333ff78..53f20c6 100644
+--- a/lib/config/config.c
++++ b/lib/config/config.c
+@@ -13,6 +13,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <sys/stat.h>
++#include <sys/mman.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <ctype.h>
++
+ #include "lib.h"
+ #include "config.h"
+ #include "crc.h"
+@@ -22,12 +28,6 @@
+ #include "lvm-string.h"
+ #include "lvm-file.h"
+ 
+-#include <sys/stat.h>
+-#include <sys/mman.h>
+-#include <unistd.h>
+-#include <fcntl.h>
+-#include <ctype.h>
+-
+ #define SECTION_B_CHAR '{'
+ #define SECTION_E_CHAR '}'
+ 
+diff --git a/lib/device/dev-cache.c b/lib/device/dev-cache.c
+index d43fcc0..84e70ba 100644
+--- a/lib/device/dev-cache.c
++++ b/lib/device/dev-cache.c
+@@ -13,6 +13,10 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <unistd.h>
++#include <sys/param.h>
++#include <dirent.h>
++
+ #include "lib.h"
+ #include "dev-cache.h"
+ #include "lvm-types.h"
+@@ -21,10 +25,6 @@
+ #include "filter-persistent.h"
+ #include "toolcontext.h"
+ 
+-#include <unistd.h>
+-#include <sys/param.h>
+-#include <dirent.h>
+-
+ struct dev_iter {
+ 	struct btree_iter *current;
+ 	struct dev_filter *filter;
+diff --git a/lib/device/dev-io.c b/lib/device/dev-io.c
+index f4d6648..dae417f 100644
+--- a/lib/device/dev-io.c
++++ b/lib/device/dev-io.c
+@@ -13,13 +13,7 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "lib.h"
+-#include "lvm-types.h"
+-#include "device.h"
+-#include "metadata.h"
+-#include "lvmcache.h"
+ #include "memlock.h"
+-#include "locking.h"
+ 
+ #include <limits.h>
+ #include <sys/stat.h>
+@@ -27,6 +21,13 @@
+ #include <unistd.h>
+ #include <sys/ioctl.h>
+ 
++#include "lib.h"
++#include "lvm-types.h"
++#include "device.h"
++#include "metadata.h"
++#include "lvmcache.h"
++#include "locking.h"
++
+ #ifdef linux
+ #  define u64 uint64_t		/* Missing without __KERNEL__ */
+ #  undef WNOHANG		/* Avoid redefinition */
+@@ -36,6 +37,13 @@
+ #  ifndef BLKGETSIZE64		/* fs.h out-of-date */
+ #    define BLKGETSIZE64 _IOR(0x12, 114, size_t)
+ #  endif /* BLKGETSIZE64 */
++#elif __NetBSD__
++#  include <sys/disk.h>
++#  include <sys/disklabel.h>
++#  include <sys/param.h>
++#elif __DragonFly__
++#  include <sys/diskslice.h>
++#  include <sys/param.h>
+ #else
+ #  include <sys/disk.h>
+ #  define BLKBSZGET DKIOCGETBLOCKSIZE
+@@ -125,12 +133,29 @@ static int _io(struct device_area *where, void *buffer, int should_write)
+ static int _get_block_size(struct device *dev, unsigned int *size)
+ {
+ 	const char *name = dev_name(dev);
++#ifdef __NetBSD__
++	struct disklabel	lab;
++#elif __DragonFly__
++	struct partinfo		pinfo;
++#endif
+ 
+ 	if ((dev->block_size == -1)) {
++#ifdef __NetBSD__
++		if (ioctl(dev_fd(dev), DIOCGDINFO, &lab) < 0) {
++			dev->block_size = DEV_BSIZE;
++		} else
++			dev->block_size = lab.d_secsize;
++#elif __DragonFly__
++		if (ioctl(dev_fd(dev), DIOCGPART, &pinfo) < 0) {
++			dev->block_size = DEV_BSIZE;
++		} else
++			dev->block_size = pinfo.media_blksize;
++#else
+ 		if (ioctl(dev_fd(dev), BLKBSZGET, &dev->block_size) < 0) {
+ 			log_sys_error("ioctl BLKBSZGET", name);
+ 			return 0;
+ 		}
++#endif
+ 		log_debug("%s: block size is %u bytes", name, dev->block_size);
+ 	}
+ 
+@@ -246,12 +271,59 @@ static int _dev_get_size_dev(const struct device *dev, uint64_t *size)
+ {
+ 	int fd;
+ 	const char *name = dev_name(dev);
++#ifdef __NetBSD__
++	struct disklabel	lab;
++	struct dkwedge_info     dkw;
++#elif __DragonFly__
++	struct partinfo		pinfo;
++#endif
+ 
+ 	if ((fd = open(name, O_RDONLY)) < 0) {
++#ifndef __NetBSD__
+ 		log_sys_error("open", name);
++#endif
++		return 0;
++		}
++
++#ifdef __NetBSD__
++	if ((*size = lseek (fd, 0, SEEK_END)) < 0) {
++		log_sys_error("lseek SEEK_END", name);
++		close(fd);
+ 		return 0;
+ 	}
+ 
++	if (ioctl(fd, DIOCGDINFO, &lab) < 0) {
++		if (ioctl(fd, DIOCGWEDGEINFO, &dkw) < 0) {
++			log_debug("ioctl DIOCGWEDGEINFO", name);
++			close(fd);
++			return 0;
++		} else
++			if (dkw.dkw_size)
++				*size = dkw.dkw_size;
++	} else
++		if (lab.d_secsize)
++			*size /= lab.d_secsize;
++#elif __DragonFly__
++	if ((*size = lseek (fd, 0, SEEK_END)) < 0) {
++		log_sys_error("lseek SEEK_END", name);
++		close(fd);
++		return 0;
++	}
++
++	if (ioctl(fd, DIOCGPART, &pinfo) < 0) {
++		log_debug("ioctl DIOCGPART", name);
++		close(fd);
++		return 0;
++	} else {
++#if 0
++		/* XXX: we could also get the size this way, instead of lseek */
++		if (pinfo.media_blocks)
++			*size = pinfo.media_blocks;
++#endif
++		if (pinfo.media_blksize)
++			*size /= pinfo.media_blksize;
++	}
++#else
+ 	if (ioctl(fd, BLKGETSIZE64, size) < 0) {
+ 		log_sys_error("ioctl BLKGETSIZE64", name);
+ 		if (close(fd))
+@@ -260,6 +332,7 @@ static int _dev_get_size_dev(const struct device *dev, uint64_t *size)
+ 	}
+ 
+ 	*size >>= BLKSIZE_SHIFT;	/* Convert to sectors */
++#endif
+ 	if (close(fd))
+ 		log_sys_error("close", name);
+ 
+@@ -270,6 +343,7 @@ static int _dev_get_size_dev(const struct device *dev, uint64_t *size)
+ 
+ static int _dev_read_ahead_dev(struct device *dev, uint32_t *read_ahead)
+ {
++#ifdef linux
+ 	long read_ahead_long;
+ 
+ 	if (dev->read_ahead != -1) {
+@@ -295,7 +369,7 @@ static int _dev_read_ahead_dev(struct device *dev, uint32_t *read_ahead)
+ 
+ 	log_very_verbose("%s: read_ahead is %u sectors",
+ 			 dev_name(dev), *read_ahead);
+-
++#endif
+ 	return 1;
+ }
+ 
+@@ -359,8 +433,10 @@ int dev_get_sectsize(struct device *dev, uint32_t *size)
+ 
+ void dev_flush(struct device *dev)
+ {
++#ifdef __linux__
+ 	if (!(dev->flags & DEV_REGULAR) && ioctl(dev->fd, BLKFLSBUF, 0) >= 0)
+ 		return;
++#endif
+ 
+ 	if (fsync(dev->fd) >= 0)
+ 		return;
+diff --git a/lib/device/dev-swap.c b/lib/device/dev-swap.c
+index b8ebcca..397c6ec 100644
+--- a/lib/device/dev-swap.c
++++ b/lib/device/dev-swap.c
+@@ -82,4 +82,10 @@ int dev_is_swap(struct device *dev, uint64_t *signature)
+ 	return ret;
+ }
+ 
++#elif defined(__NetBSD__) || defined(__DragonFly__)
++int dev_is_swap(struct device *dev, uint64_t *signature)
++{
++	return 0;
++}
++
+ #endif
+diff --git a/lib/device/device.c b/lib/device/device.c
+index 593e642..ad5da73 100644
+--- a/lib/device/device.c
++++ b/lib/device/device.c
+@@ -455,7 +455,7 @@ unsigned long dev_optimal_io_size(const char *sysfs_dir,
+ #else
+ 
+ int get_primary_dev(const char *sysfs_dir,
+-		    struct device *dev, dev_t *result)
++		    const struct device *dev, dev_t *result)
+ {
+ 	return 0;
+ }
+diff --git a/lib/filters/filter-persistent.c b/lib/filters/filter-persistent.c
+index 7f48a47..debc422 100644
+--- a/lib/filters/filter-persistent.c
++++ b/lib/filters/filter-persistent.c
+@@ -13,6 +13,10 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
++
+ #include "lib.h"
+ #include "config.h"
+ #include "dev-cache.h"
+@@ -22,10 +26,6 @@
+ #include "lvm-string.h"
+ #include "activate.h"
+ 
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-
+ struct pfilter {
+ 	char *file;
+ 	struct dm_hash_table *devices;
+diff --git a/lib/filters/filter.c b/lib/filters/filter.c
+index d570f79..1fc5149 100644
+--- a/lib/filters/filter.c
++++ b/lib/filters/filter.c
+@@ -13,6 +13,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <dirent.h>
++#include <unistd.h>
++#include <ctype.h>
++#include <fcntl.h>
++#include <limits.h>
++
+ #include "lib.h"
+ #include "dev-cache.h"
+ #include "filter.h"
+@@ -21,12 +27,6 @@
+ #include "metadata.h"
+ #include "activate.h"
+ 
+-#include <dirent.h>
+-#include <unistd.h>
+-#include <ctype.h>
+-#include <fcntl.h>
+-#include <limits.h>
+-
+ #define NUMBER_OF_MAJORS 4096
+ 
+ /* 0 means LVM won't use this major number. */
+diff --git a/lib/format_text/archive.c b/lib/format_text/archive.c
+index bf16da5..a492b48 100644
+--- a/lib/format_text/archive.c
++++ b/lib/format_text/archive.c
+@@ -13,6 +13,13 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <dirent.h>
++#include <unistd.h>
++#include <sys/stat.h>
++#include <sys/file.h>
++#include <fcntl.h>
++#include <time.h>
++
+ #include "lib.h"
+ #include "format-text.h"
+ 
+@@ -22,13 +29,6 @@
+ #include "lvm-file.h"
+ #include "toolcontext.h"
+ 
+-#include <dirent.h>
+-#include <unistd.h>
+-#include <sys/stat.h>
+-#include <sys/file.h>
+-#include <fcntl.h>
+-#include <time.h>
+-
+ #define SECS_PER_DAY 86400	/* 24*60*60 */
+ 
+ /*
+diff --git a/lib/format_text/archiver.c b/lib/format_text/archiver.c
+index 3ace628..060ad6a 100644
+--- a/lib/format_text/archiver.c
++++ b/lib/format_text/archiver.c
+@@ -13,6 +13,8 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <unistd.h>
++
+ #include "lib.h"
+ #include "archiver.h"
+ #include "format-text.h"
+@@ -22,8 +24,6 @@
+ #include "toolcontext.h"
+ #include "locking.h"
+ 
+-#include <unistd.h>
+-
+ struct archive_params {
+ 	int enabled;
+ 	char *dir;
+diff --git a/lib/format_text/format-text.c b/lib/format_text/format-text.c
+index 6923360..aa5e46c 100644
+--- a/lib/format_text/format-text.c
++++ b/lib/format_text/format-text.c
+@@ -13,6 +13,13 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <unistd.h>
++#include <sys/file.h>
++#include <sys/param.h>
++#include <limits.h>
++#include <dirent.h>
++#include <ctype.h>
++
+ #include "lib.h"
+ #include "format-text.h"
+ #include "import-export.h"
+@@ -30,13 +37,6 @@
+ #include "memlock.h"
+ #include "lvmcache.h"
+ 
+-#include <unistd.h>
+-#include <sys/file.h>
+-#include <sys/param.h>
+-#include <limits.h>
+-#include <dirent.h>
+-#include <ctype.h>
+-
+ static struct format_instance *_text_create_text_instance(const struct format_type
+ 						     *fmt, const char *vgname,
+ 						     const char *vgid,
+diff --git a/lib/label/label.c b/lib/label/label.c
+index 9fa5054..4405bea 100644
+--- a/lib/label/label.c
++++ b/lib/label/label.c
+@@ -13,6 +13,10 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <unistd.h>
++
+ #include "lib.h"
+ #include "label.h"
+ #include "crc.h"
+@@ -20,10 +24,6 @@
+ #include "lvmcache.h"
+ #include "metadata.h"
+ 
+-#include <sys/stat.h>
+-#include <fcntl.h>
+-#include <unistd.h>
+-
+ /* FIXME Allow for larger labels?  Restricted to single sector currently */
+ 
+ /*
+diff --git a/lib/locking/file_locking.c b/lib/locking/file_locking.c
+index ed1ccd5..dd8a29c 100644
+--- a/lib/locking/file_locking.c
++++ b/lib/locking/file_locking.c
+@@ -13,6 +13,13 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <limits.h>
++#include <unistd.h>
++#include <sys/file.h>
++#include <sys/stat.h>
++#include <fcntl.h>
++#include <signal.h>
++
+ #include "lib.h"
+ #include "locking.h"
+ #include "locking_types.h"
+@@ -23,13 +30,6 @@
+ #include "lvm-string.h"
+ #include "lvmcache.h"
+ 
+-#include <limits.h>
+-#include <unistd.h>
+-#include <sys/stat.h>
+-#include <sys/file.h>
+-#include <fcntl.h>
+-#include <signal.h>
+-
+ struct lock_list {
+ 	struct dm_list list;
+ 	int lf;
+diff --git a/lib/locking/locking.c b/lib/locking/locking.c
+index e64d227..4e087a3 100644
+--- a/lib/locking/locking.c
++++ b/lib/locking/locking.c
+@@ -13,6 +13,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <assert.h>
++#include <signal.h>
++#include <sys/stat.h>
++#include <limits.h>
++#include <unistd.h>
++
+ #include "lib.h"
+ #include "locking.h"
+ #include "locking_types.h"
+@@ -23,12 +29,6 @@
+ #include "defaults.h"
+ #include "lvmcache.h"
+ 
+-#include <assert.h>
+-#include <signal.h>
+-#include <sys/stat.h>
+-#include <limits.h>
+-#include <unistd.h>
+-
+ static struct locking_type _locking;
+ static sigset_t _oldset;
+ 
+diff --git a/lib/misc/lib.h b/lib/misc/lib.h
+index 100827d..cfc7bc4 100644
+--- a/lib/misc/lib.h
++++ b/lib/misc/lib.h
+@@ -19,6 +19,13 @@
+ #ifndef _LVM_LIB_H
+ #define _LVM_LIB_H
+ 
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++#include <sys/stat.h>
++
+ #include "configure.h"
+ 
+ #define _REENTRANT
+@@ -38,11 +45,4 @@
+ #  include "lvm-logging.h"
+ #endif
+ 
+-#include <errno.h>
+-#include <stdio.h>
+-#include <stdlib.h>
+-#include <string.h>
+-#include <unistd.h>
+-#include <sys/stat.h>
+-
+ #endif
+diff --git a/lib/misc/lvm-exec.c b/lib/misc/lvm-exec.c
+index d332aaa..b272104 100644
+--- a/lib/misc/lvm-exec.c
++++ b/lib/misc/lvm-exec.c
+@@ -13,15 +13,15 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include <unistd.h>
++#include <sys/wait.h>
++
+ #include "lib.h"
+ #include "device.h"
+ #include "locking.h"
+ #include "lvm-exec.h"
+ #include "toolcontext.h"
+ 
+-#include <unistd.h>
+-#include <sys/wait.h>
+-
+ /*
+  * Create verbose string with list of parameters
+  */
+diff --git a/lib/misc/lvm-file.c b/lib/misc/lvm-file.c
+index f577840..4c02ef3 100644
+--- a/lib/misc/lvm-file.c
++++ b/lib/misc/lvm-file.c
+@@ -13,16 +13,16 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "lib.h"
+-#include "lvm-file.h"
+-#include "lvm-string.h"
+-
+ #include <unistd.h>
+ #include <sys/stat.h>
+ #include <sys/file.h>
+ #include <fcntl.h>
+ #include <dirent.h>
+ 
++#include "lib.h"
++#include "lvm-file.h"
++#include "lvm-string.h"
++
+ /*
+  * Creates a temporary filename, and opens a descriptor to the
+  * file.  Both the filename and descriptor are needed so we can
+diff --git a/lib/misc/lvm-wrappers.c b/lib/misc/lvm-wrappers.c
+index 3ab8a71..d326108 100644
+--- a/lib/misc/lvm-wrappers.c
++++ b/lib/misc/lvm-wrappers.c
+@@ -12,11 +12,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "lib.h"
+ 
+ #include <unistd.h>
+ #include <fcntl.h>
+ 
++#include "lib.h"
++
+ int lvm_getpagesize(void)
+ {
+ 	return getpagesize();
+diff --git a/lib/mm/memlock.c b/lib/mm/memlock.c
+index 73d2407..929c674 100644
+--- a/lib/mm/memlock.c
++++ b/lib/mm/memlock.c
+@@ -13,12 +13,10 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "lib.h"
+-#include "memlock.h"
+-#include "defaults.h"
+-#include "config.h"
+-#include "toolcontext.h"
+-
++#ifdef __DragonFly__
++#  define _WITH_GETLINE
++#  include <stdio.h>
++#endif
+ #include <limits.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+@@ -26,6 +24,12 @@
+ #include <sys/time.h>
+ #include <sys/resource.h>
+ 
++#include "lib.h"
++#include "memlock.h"
++#include "defaults.h"
++#include "config.h"
++#include "toolcontext.h"
++
+ #ifndef DEVMAPPER_SUPPORT
+ 
+ void memlock_inc(struct cmd_context *cmd)
+diff --git a/lib/uuid/uuid.c b/lib/uuid/uuid.c
+index de3f0cd..2c9fb4e 100644
+--- a/lib/uuid/uuid.c
++++ b/lib/uuid/uuid.c
+@@ -13,16 +13,16 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "lib.h"
+-#include "uuid.h"
+-#include "lvm-wrappers.h"
+-
+ #include <assert.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+ #include <unistd.h>
+ #include <ctype.h>
+ 
++#include "lib.h"
++#include "uuid.h"
++#include "lvm-wrappers.h"
++
+ static const char _c[] =
+     "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!#";
+ 
+diff --git a/libdm/libdm-file.c b/libdm/libdm-file.c
+index b72b2ab..7d5fc17 100644
+--- a/libdm/libdm-file.c
++++ b/libdm/libdm-file.c
+@@ -13,12 +13,12 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "dmlib.h"
+-
+ #include <sys/file.h>
+ #include <fcntl.h>
+ #include <dirent.h>
+ 
++#include "dmlib.h"
++
+ static int _create_dir_recursive(const char *dir)
+ {
+ 	char *orig, *s;
+diff --git a/make.tmpl.in b/make.tmpl.in
+index fdd625c..5d01cfc 100644
+--- a/make.tmpl.in
++++ b/make.tmpl.in
+@@ -341,10 +341,10 @@ $(LIB_STATIC): $(OBJECTS)
+ %.d: %.c
+ 	$(MKDIR_P) $(dir $@); \
+ 	set -e; \
+-	FILE=`echo $@ | sed 's/\\//\\\\\\//g;s/\\.d//g'`; \
+-	DEPS=`echo $(DEPS) | sed -e 's/\\//\\\\\\//g'`; \
++	FILE=`echo $@ | $(SED) 's/\\//\\\\\\//g;s/\\.d//g'`; \
++	DEPS=`echo $(DEPS) | $(SED) -e 's/\\//\\\\\\//g'`; \
+ 	$(CC) -MM $(INCLUDES) $(DEFS) $(CFLAGS) -o $@ $<; \
+-	sed -i "s/\(.*\)\.o[ :]*/$$FILE.o $$FILE.d $$FILE.pot: $$DEPS /g" $@; \
++	$(SED) -i "s/\(.*\)\.o[ :]*/$$FILE.o $$FILE.d $$FILE.pot: $$DEPS /g" $@; \
+ 	[ -s $@ ] || $(RM) $@
+ 
+ %.mo: %.po
+@@ -372,7 +372,7 @@ distclean: cleandir $(SUBDIRS.distclean)
+ 
+ .export.sym: .exported_symbols_generated
+ 	set -e; (echo "Base {"; echo "	global:"; \
+-		 sed "s/^/		/;s/$$/;/" < $<; \
++		 $(SED) "s/^/		/;s/$$/;/" < $<; \
+ 		 echo "	local:"; echo "		*;"; echo "};") > $@
+ 
+ ifeq (,$(findstring $(MAKECMDGOALS),cscope.out cflow clean distclean lcov))
+diff --git a/tools/dmsetup.c b/tools/dmsetup.c
+index 8855667..7acb197 100644
+--- a/tools/dmsetup.c
++++ b/tools/dmsetup.c
+@@ -21,8 +21,6 @@
+ 
+ #include "configure.h"
+ 
+-#include "dm-logging.h"
+-
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -77,6 +75,8 @@ extern char *optarg;
+ #  define OPTIND_INIT 1
+ #endif
+ 
++#include "dm-logging.h"
++
+ #ifndef TEMP_FAILURE_RETRY
+ # define TEMP_FAILURE_RETRY(expression) \
+   (__extension__                                                              \
+diff --git a/tools/lvmcmdline.c b/tools/lvmcmdline.c
+index 6c66fab..de0df3f 100644
+--- a/tools/lvmcmdline.c
++++ b/tools/lvmcmdline.c
+@@ -13,15 +13,6 @@
+  * Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
+-#include "tools.h"
+-#include "lvm2cmdline.h"
+-#include "label.h"
+-#include "lvm-version.h"
+-
+-#include "stub.h"
+-#include "lvm2cmd.h"
+-#include "last-path-component.h"
+-
+ #include <signal.h>
+ #include <syslog.h>
+ #include <libgen.h>
+@@ -29,6 +20,7 @@
+ #include <time.h>
+ #include <sys/resource.h>
+ 
++#include "configure.h"
+ #ifdef HAVE_GETOPTLONG
+ #  include <getopt.h>
+ #  define GETOPTLONG_FN(a, b, c, d, e) getopt_long((a), (b), (c), (d), (e))
+@@ -47,6 +39,15 @@ extern char *optarg;
+ #  include <libudev.h>
+ #endif
+ 
++#include "tools.h"
++#include "lvm2cmdline.h"
++#include "label.h"
++#include "lvm-version.h"
++
++#include "stub.h"
++#include "lvm2cmd.h"
++#include "last-path-component.h"
++
+ /*
+  * Table of valid switches
+  */
+diff --git a/tools/tools.h b/tools/tools.h
+index e9bc850..c0868dc 100644
+--- a/tools/tools.h
++++ b/tools/tools.h
+@@ -23,6 +23,13 @@
+ #include <assert.h>
+ #include "libdevmapper.h"
+ 
++#include <stdlib.h>
++#include <unistd.h>
++#include <ctype.h>
++#include <limits.h>
++#include <stdarg.h>
++#include <sys/types.h>
++
+ #include "lvm-types.h"
+ #include "lvm-logging.h"
+ #include "activate.h"
+@@ -48,13 +55,6 @@
+ #include "toolcontext.h"
+ #include "toollib.h"
+ 
+-#include <stdlib.h>
+-#include <unistd.h>
+-#include <ctype.h>
+-#include <limits.h>
+-#include <stdarg.h>
+-#include <sys/types.h>
+-
+ #define CMD_LEN 256
+ #define MAX_ARGS 64
+ 

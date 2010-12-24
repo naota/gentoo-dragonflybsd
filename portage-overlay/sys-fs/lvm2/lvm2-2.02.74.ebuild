@@ -19,13 +19,13 @@ IUSE="readline +static clvm cman +lvm1 selinux"
 DEPEND_COMMON="!!sys-fs/device-mapper
 	clvm? ( =sys-cluster/dlm-2*
 			cman? ( =sys-cluster/cman-2* ) )
-	>=sys-fs/udev-151-r4"
+	kernel_linux? ( >=sys-fs/udev-151-r4 )"
 
 RDEPEND="${DEPEND_COMMON}
 	!<sys-apps/openrc-0.4
 	!!sys-fs/lvm-user
 	!!sys-fs/clvm
-	>=sys-apps/util-linux-2.16"
+	kernel_linux? ( >=sys-apps/util-linux-2.16 )"
 
 # Upgrading to this LVM will break older cryptsetup
 RDEPEND="${RDEPEND}
@@ -86,6 +86,12 @@ src_prepare() {
 
 	epatch "${FILESDIR}"/${PN}-2.02.73-asneeded.patch
 
+	epatch "${FILESDIR}"/${PN}-2.02.74-dragonfly-configure.patch
+
+	 epatch "${FILESDIR}"/${PN}-2.02.74-dragonfly.patch
+
+	epatch "${FILESDIR}"/${PN}-2.02.74-dragonfly-install.patch
+
 	eautoreconf
 }
 
@@ -93,7 +99,6 @@ src_configure() {
 	local myconf
 	local buildmode
 
-	myconf="${myconf} --enable-dmeventd"
 	myconf="${myconf} --enable-cmdlib"
 	myconf="${myconf} --enable-applib"
 	myconf="${myconf} --enable-fsadm"
@@ -150,6 +155,15 @@ src_configure() {
 		myconf="${myconf} --with-clvmd=none --with-cluster=none"
 	fi
 
+	if use kernel_linux; then
+		myconf="${myconf} --enable-dmeventd"
+		myconf="${myconf} --enable-udev_rules --enable-udev_sync"
+		myconf="${myconf} --with-udevdir=/$(get_libdir)/udev/rules.d/"
+	else
+		myconf="${myconf} --disable-dmeventd"
+		myconf="${myconf} --disable-udev_rules --disable-udev_sync"
+	fi
+
 	myconf="${myconf}
 			--sbindir=/sbin
 			--with-staticdir=/sbin
@@ -159,9 +173,6 @@ src_configure() {
 		--enable-pkgconfig \
 		--libdir=/$(get_libdir) \
 		--with-usrlibdir=/usr/$(get_libdir) \
-		--enable-udev_rules \
-		--enable-udev_sync \
-		--with-udevdir=/$(get_libdir)/udev/rules.d/ \
 		${myconf} \
 		CLDFLAGS="${LDFLAGS}" || die
 }
@@ -237,9 +248,11 @@ src_install() {
 	newinitd "${FILESDIR}"/device-mapper.rc-2.02.67-r1 device-mapper || die
 	newconfd "${FILESDIR}"/device-mapper.conf-1.02.22-r3 device-mapper || die
 
-	newinitd "${FILESDIR}"/dmeventd.initd-2.02.67-r1 dmeventd || die
-	dolib.a daemons/dmeventd/libdevmapper-event.a \
-	|| die "dolib.a libdevmapper-event.a"
+	if use kernel_linux; then
+		newinitd "${FILESDIR}"/dmeventd.initd-2.02.67-r1 dmeventd || die
+		dolib.a daemons/dmeventd/libdevmapper-event.a \
+		|| die "dolib.a libdevmapper-event.a"
+	fi
 	#gen_usr_ldscript libdevmapper-event.so
 
 	#insinto /etc/udev/rules.d/
