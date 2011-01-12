@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit linux-info eutils multilib libtool
+inherit linux-info eutils multilib libtool autotools
 
 MY_P=${P/_rc/-rc}
 DESCRIPTION="Tool to setup encrypted devices with dm-crypt"
@@ -13,7 +13,7 @@ SRC_URI="http://cryptsetup.googlecode.com/files/${MY_P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-dfbsd"
 IUSE="dynamic nls selinux"
 
 S=${WORKDIR}/${MY_P}
@@ -42,7 +42,8 @@ pkg_setup() {
 }
 
 src_prepare() {
-	elibtoolize
+	epatch "${FILESDIR}"/1.1.3-dragonfly.patch
+	eautoreconf
 }
 
 src_configure() {
