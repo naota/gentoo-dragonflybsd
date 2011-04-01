@@ -12,14 +12,14 @@ SRC_URI="mirror://gentoo/${P}.tar.bz2
 SLOT="0"
 LICENSE="GPL-2"
 #KEYWORDS="~alpha ~amd64 ~hppa ~ia64 ~mips ~ppc ~ppc64 ~sparc ~x86"
-KEYWORDS="alpha amd64 hppa ia64 ~mips ppc ppc64 sparc x86"
+KEYWORDS="alpha amd64 hppa ia64 ~mips ppc ppc64 sparc x86 ~x86-dfbsd"
 IUSE="opengl X"
 
 OPENGL_DEPEND="virtual/opengl
 	x11-misc/mkxf86config
 	app-admin/eselect-opengl"
 
-RDEPEND="dev-util/dialog
+RDEPEND="|| ( dev-util/dialog sys-dfbsd/dfbsd-contrib )
 	sys-apps/pciutils
 	sys-apps/gawk
 	sys-apps/sed
