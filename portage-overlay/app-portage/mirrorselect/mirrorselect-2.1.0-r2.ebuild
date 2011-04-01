@@ -13,11 +13,11 @@ SRC_URI="mirror://gentoo/${P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~m68k ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-fbsd ~x86-dfbsd"
 IUSE=""
 
 RDEPEND="dev-lang/python[xml]
-	dev-util/dialog
+	|| ( dev-util/dialog sys-freebsd/freebsd-contrib sys-dfbsd/dfbsd-contrib )
 	net-analyzer/netselect"
 
 RESTRICT_PYTHON_ABIS="3*"
