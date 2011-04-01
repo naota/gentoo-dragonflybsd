@@ -1,0 +1,343 @@
+diff --git a/configure.in b/configure.in
+index 936d165..f7b7cc9 100644
+--- a/configure.in
++++ b/configure.in
+@@ -29,13 +29,18 @@ AM_PROG_LIBTOOL
+ AC_HEADER_DIRENT
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS(fcntl.h malloc.h inttypes.h sys/ioctl.h sys/mman.h \
+-	ctype.h unistd.h locale.h)
++	ctype.h unistd.h locale.h alloca.h linux/fs.h cpu/param.h \
++	sys/diskslice.h)
+ 
+-AC_CHECK_HEADERS(uuid/uuid.h,,[AC_MSG_ERROR('You need the uuid library')])
++AC_CHECK_HEADERS(uuid/uuid.h,,
++	AC_CHECK_HEADERS(uuid.h,,
++		[AC_MSG_ERROR('You need the uuid library')]))
+ AC_CHECK_HEADER(libdevmapper.h,,[AC_MSG_ERROR('You need the device-mapper library')])
+ 
+ saved_LIBS=$LIBS
+-AC_CHECK_LIB(uuid, uuid_clear, ,[AC_MSG_ERROR('You need the uuid library')])
++AC_CHECK_LIB(uuid, uuid_clear, ,
++	AC_CHECK_LIB(c, uuid_from_string, ,
++		[AC_MSG_ERROR('You need the uuid library')]))
+ AC_SUBST(UUID_LIBS, $LIBS)
+ LIBS=$saved_LIBS
+ 
+@@ -114,12 +114,13 @@ if test x$enable_static_cryptsetup = xyes; then
+ 	LIBS="$saved_LIBS $LIBGCRYPT_LIBS -static"
+ 	AC_CHECK_LIB(gcrypt, gcry_check_version,,
+ 		AC_MSG_ERROR([Cannot find static gcrypt library.]),
+-		[-lgpg-error])
+-	LIBGCRYPT_STATIC_LIBS="$LIBGCRYPT_LIBS -lgpg-error"
++		[-lgpg-error $LTLIBINTL])
++	LIBGCRYPT_STATIC_LIBS="$LIBGCRYPT_LIBS -lgpg-error $LTLIBINTL"
+ 
+ 	LIBS="$saved_LIBS -static"
+ 	AC_CHECK_LIB(popt, poptGetContext,,
+-		AC_MSG_ERROR([Cannot find static popt library.]))
++		AC_MSG_ERROR([Cannot find static popt library.]),
++		[$LTLIBINTL])
+ 
+ 	dnl Try to detect needed device-mapper static libraries, try pkg-config first.
+ 	LIBS="$saved_LIBS -static"
+diff --git a/lib/libdevmapper.c b/lib/libdevmapper.c
+index 3d3c1a4..c687601 100644
+--- a/lib/libdevmapper.c
++++ b/lib/libdevmapper.c
+@@ -1,3 +1,5 @@
++#include "config.h"
++
+ #include <sys/ioctl.h>
+ #include <sys/stat.h>
+ #include <stdio.h>
+@@ -5,8 +7,14 @@
+ #include <errno.h>
+ #include <libdevmapper.h>
+ #include <fcntl.h>
+-#include <linux/fs.h>
+-#include <uuid/uuid.h>
++#ifdef HAVE_LINUX_FS_H
++#  include <linux/fs.h>
++#endif
++#ifdef HAVE_UUID_UUID_H
++#  include <uuid/uuid.h>
++#elif defined(HAVE_UUID_H)
++#  include <uuid.h>
++#endif
+ 
+ #include "internal.h"
+ #include "luks.h"
+@@ -234,7 +242,11 @@ static int _dev_read_ahead(const char *dev, uint32_t *read_ahead)
+ 	if ((fd = open(dev, O_RDONLY)) < 0)
+ 		return 0;
+ 
++#ifdef linux
+ 	r = ioctl(fd, BLKRAGET, &read_ahead_long) ? 0 : 1;
++#else
++	r = 0;
++#endif
+ 	close(fd);
+ 
+ 	if (r)
+@@ -388,14 +400,25 @@ static void dm_prepare_uuid(const char *name, const char *type, const char *uuid
+ 	char *ptr, uuid2[UUID_LEN] = {0};
+ 	uuid_t uu;
+ 	int i = 0;
++#ifndef linux
++	uint32_t ret;
++#endif
+ 
+ 	/* Remove '-' chars */
+-	if (uuid && !uuid_parse(uuid, uu)) {
+-		for (ptr = uuid2, i = 0; i < UUID_LEN; i++)
+-			if (uuid[i] != '-') {
+-				*ptr = uuid[i];
+-				ptr++;
+-			}
++	if (uuid) {
++#ifdef linux
++		if (!uuid_parse(uuid, uu)) {
++#else
++		uuid_from_string(uuid, &uu, &ret);
++		if (ret != uuid_s_ok) {
++			printf("error in uuid_from_string(%s), err = %d\n", uuid, ret);
++#endif
++			for (ptr = uuid2, i = 0; i < UUID_LEN; i++)
++				if (uuid[i] != '-') {
++					*ptr = uuid[i];
++					ptr++;
++				}
++		}
+ 	}
+ 
+ 	i = snprintf(buf, buflen, DM_UUID_PREFIX "%s%s%s%s%s",
+diff --git a/lib/utils.c b/lib/utils.c
+index 1d1faa9..9748077 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -1,10 +1,14 @@
++#include "config.h"
++
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdlib.h>
+ #include <stddef.h>
+ #include <stdarg.h>
+ #include <errno.h>
+-#include <linux/fs.h>
++#ifdef HAVE_LINUX_FS_H
++#  include <linux/fs.h>
++#endif
+ #include <sys/types.h>
+ #include <unistd.h>
+ #include <sys/types.h>
+@@ -14,6 +18,12 @@
+ #include <termios.h>
+ #include <sys/mman.h>
+ #include <sys/resource.h>
++#ifdef HAVE_CPU_PARAM_H
++#  include <cpu/param.h>
++#endif
++#ifdef HAVE_SYS_DISKSLICE_H
++#  include <sys/diskslice.h>
++#endif
+ 
+ #include "libcryptsetup.h"
+ #include "internal.h"
+@@ -155,11 +165,15 @@ static void *aligned_malloc(void **base, int size, int alignment)
+ }
+ static int sector_size(int fd) 
+ {
++#ifdef linux
+ 	int bsize;
+ 	if (ioctl(fd,BLKSSZGET, &bsize) < 0)
+ 		return -EINVAL;
+ 	else
+ 		return bsize;
++#else
++	return DEV_BSIZE;
++#endif
+ }
+ 
+ int sector_size_for_device(const char *device)
+@@ -289,6 +289,9 @@ int get_device_infos(const char *device,
+ 		     int *readonly,
+ 		     uint64_t *size)
+ {
++#ifdef HAVE_SYS_DISKSLICE_H
++	struct partinfo pinfo;
++#endif
+ 	struct stat st;
+ 	unsigned long size_small;
+ 	int fd, r = -1;
+@@ -579,7 +596,7 @@ int get_device_infos(const char *device, struct device_infos *infos, struct cryp
+ 	 */
+ 	if (*readonly == 0 && (r = ioctl(fd, BLKROGET, readonly)) < 0)
+ 		goto out;
+-#else
++#elif defined(linux)
+ #error BLKROGET not available
+ #endif
+ 
+@@ -597,6 +614,12 @@ int get_device_infos(const char *device, struct device_infos *infos, struct cryp
+ 		goto out;
+ 	}
+ 
++#elif defined(DIOCGPART)
++	if (ioctl(fd, DIOCGPART, &pinfo) >= 0) {
++		size = pinfo.media_blocks;
++		r = 0;
++		goto out;	
++	}
+ #else
+ #	error Need at least the BLKGETSIZE ioctl!
+ #endif
+diff --git a/lib/luks1/pbkdf.c b/lib/luks1/pbkdf.c
+index fa1f720..8eae462 100644
+--- a/lib/luks1/pbkdf.c
++++ b/lib/luks1/pbkdf.c
+@@ -25,7 +25,9 @@
+ #include <netinet/in.h>
+ #include <errno.h>
+ #include <signal.h>
+-#include <alloca.h>
++#ifdef HAVE_ALLOCA_H
++#  include <alloca.h>
++#endif
+ #include <sys/time.h>
+ #include <gcrypt.h>
+ 
+diff --git a/lib/luks1/keymanage.c b/lib/luks1/keymanage.c
+index 9b8ba0c..709dfc8 100644
+--- a/lib/luks1/keymanage.c
++++ b/lib/luks1/keymanage.c
+@@ -17,10 +17,14 @@
+  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+  */
+ 
++#include "config.h"
++
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <sys/ioctl.h>
+-#include <linux/fs.h>
++#ifdef HAVE_LINUX_FS_H
++#  include <linux/fs.h>
++#endif
+ #include <netinet/in.h>
+ #include <fcntl.h>
+ #include <errno.h>
+@@ -34,7 +38,11 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <ctype.h>
+-#include <uuid/uuid.h>
++#ifdef HAVE_UUID_UUID_H
++#  include <uuid/uuid.h>
++#elif defined(HAVE_UUID_H)
++#  include <uuid.h>
++#endif
+ 
+ #include "luks.h"
+ #include "af.h"
+@@ -433,6 +441,10 @@ int LUKS_generate_phdr(struct luks_phdr *header,
+ 	unsigned int blocksPerStripeSet = div_round_up(mk->keyLength*stripes,SECTOR_SIZE);
+ 	int r;
+ 	char luksMagic[] = LUKS_MAGIC;
++#ifndef linux
++	uint32_t ret;
++	char *uu;
++#endif
+ 	uuid_t partitionUuid;
+ 	int currentSector;
+ 
+@@ -411,12 +411,25 @@ int LUKS_generate_phdr(struct luks_phdr *header,
+ 		return -EINVAL;
+ 	}
+ 
++#ifdef linux
+ 	if (uuid && uuid_parse(uuid, partitionUuid) == -1) {
+ 		log_err(ctx, _("Wrong LUKS UUID format provided.\n"));
+ 		return -EINVAL;
+ 	}
+-	if (!uuid)
++#else
++	uuid_from_string(uuid, &partitionUuid, &ret);
++	if (uuid && ret != uuid_s_ok) {
++		log_err(ctx, _("Wrong LUKS UUID format provided.\n"));
++		return -EINVAL;
++	}
++#endif
++	if (!uuid) {
++#ifdef linux
+ 		uuid_generate(partitionUuid);
++#else
++		uuid_create(&partitionUuid, &ret);
++#endif
++	}
+ 
+ 	memset(header,0,sizeof(struct luks_phdr));
+ 
+@@ -472,7 +485,17 @@ int LUKS_generate_phdr(struct luks_phdr *header,
+ 	/* alignOffset - offset from natural device alignment provided by topology info */
+ 	header->payloadOffset = currentSector + alignOffset;
+ 
++#ifdef linux
+         uuid_unparse(partitionUuid, header->uuid);
++#else
++	uuid_to_string(&partitionUuid, &uu, &ret);
++	if (uu == NULL) {
++		log_err(ctx, _("Cannot allocate memory in uuid_to_string()\n"));
++		return -1;
++	}
++	memcpy(header->uuid, uu, UUID_STRING_L);
++	free(uu);
++#endif
+ 
+ 	log_dbg("Data offset %d, UUID %s, digest iterations %" PRIu32,
+ 		header->payloadOffset, header->uuid, header->mkDigestIterations);
+@@ -522,15 +522,40 @@ int LUKS_hdr_uuid_set(
+ 	struct crypt_device *ctx)
+ {
+ 	uuid_t partitionUuid;
++#ifndef linux
++	uint32_t ret;
++	char* uu;
++#endif
+ 
+-	if (uuid && uuid_parse(uuid, partitionUuid) == -1) {
+-		log_err(ctx, _("Wrong LUKS UUID format provided.\n"));
+-		return -EINVAL;
++	if (uuid) {
++#ifdef linux
++		if (uuid_parse(uuid, partitionUuid) == -1) {
++#else
++		uuid_from_string(uuid, &partitionUuid, &ret);
++		if (ret != uuid_s_ok) {
++#endif
++			log_err(ctx, _("Wrong LUKS UUID format provided.\n"));
++			return -EINVAL;
++		}
+ 	}
+ 	if (!uuid)
++#ifdef linux
+ 		uuid_generate(partitionUuid);
++#else
++		uuid_create(&partitionUuid, &ret);
++#endif
+ 
++#ifdef linux
+ 	uuid_unparse(partitionUuid, hdr->uuid);
++#else
++	uuid_to_string(&partitionUuid, &uu, &ret);
++	if (uu == NULL) {
++		log_err(ctx, _("Cannot allocate memory in uuid_to_string()\n"));
++		return -1;
++	}
++	memcpy(hdr->uuid, uu, UUID_STRING_L);
++	free(uu);
++#endif
+ 
+ 	return LUKS_write_phdr(device, hdr, ctx);
+ }

@@ -1,0 +1,23 @@
+diff --git a/sbin/cryptdisks/Makefile b/sbin/cryptdisks/Makefile
+index 4b1679e..a3008bf 100644
+--- a/sbin/cryptdisks/Makefile
++++ b/sbin/cryptdisks/Makefile
+@@ -1,14 +1,11 @@
+ PROG=		cryptdisks
+ MAN=		cryptdisks.8
+ 
+-LDADD+=		-L${.CURDIR}/../../gnu/lib/libcryptsetup -lcryptsetup
+-DPADD+=		${.CURDIR}/../../gnu/lib/libcryptsetup/libcryptsetup.a
++LDADD+=		-lcryptsetup
++DPADD+=		-lcryptsetup
+ 
+-LDADD+=		-L${.CURDIR}/../../gnu/lib/libluks -lluks
+-DPADD+=		${.CURDIR}/../../gnu/lib/libluks/libluks.a
+-
+-LDADD+=		-L${.CURDIR}/../../gnu/lib/libdevmapper -ldevmapper
+-DPADD+=		${.CURDIR}/../../gnu/lib/libdevmapper/libdevmapper.a
++LDADD+=		-ldevmapper
++DPADD+=		-ldevmapper
+ 
+ LDADD+=		-lprop -lcrypto
+ 

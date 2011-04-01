@@ -4,7 +4,7 @@
 
 EAPI="2"
 
-inherit linux-info eutils multilib libtool
+inherit linux-info eutils multilib libtool autotools
 
 MY_P=${P/_rc/-rc}
 DESCRIPTION="Tool to setup encrypted devices with dm-crypt"
@@ -13,7 +13,7 @@ SRC_URI="http://cryptsetup.googlecode.com/files/${MY_P}.tar.bz2"
 
 LICENSE="GPL-2"
 SLOT="0"
-KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86"
+KEYWORDS="~alpha ~amd64 ~arm ~hppa ~ia64 ~mips ~ppc ~ppc64 ~s390 ~sh ~sparc ~x86 ~x86-dfbsd"
 IUSE="+static nls selinux"
 
 S=${WORKDIR}/${MY_P}
@@ -22,14 +22,16 @@ RDEPEND=">=sys-fs/lvm2-2.02.64
 	>=dev-libs/libgcrypt-1.1.42
 	!static? ( dev-libs/libgpg-error )
 	>=dev-libs/popt-1.7
-	>=sys-fs/udev-124
+	kernel_linux? ( >=sys-fs/udev-124 )
 	|| ( >=sys-libs/e2fsprogs-libs-1.41 <sys-fs/e2fsprogs-1.41 )
 	selinux? ( sys-libs/libselinux )
 	!sys-fs/cryptsetup-luks"
 DEPEND="${RDEPEND}
+	>=sys-devel/autoconf-2.67
 	static? (
 		|| ( >=dev-libs/libgpg-error-1.10[static-libs] <dev-libs/libgpg-error-1.10 )
 		dev-libs/libgcrypt[static-libs]
+		dev-libs/popt[static-libs]
 	)"
 
 pkg_setup() {
@@ -43,7 +45,8 @@ pkg_setup() {
 src_prepare() {
 	sed -i '/enable_static_cryptsetup=yes/d' configure #350463
 	sed -i '/^LOOPDEV=/s:=.*:=`losetup -f` || exit 0:' tests/{compat,mode}-test
-	elibtoolize
+	epatch "${FILESDIR}"/1.2.0-dragonfly.patch
+	eautoreconf
 }
 
 src_configure() {
